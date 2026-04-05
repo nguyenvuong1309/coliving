@@ -1,0 +1,63 @@
+import {MMKV} from 'react-native-mmkv';
+
+export const storage = new MMKV({
+  id: 'coliving-storage',
+});
+
+// ── Generic helpers ──────────────────────────────────────────────────
+
+export function setItem(key: string, value: string | number | boolean): void {
+  storage.set(key, value);
+}
+
+export function getItem(key: string): string | undefined {
+  return storage.getString(key);
+}
+
+export function removeItem(key: string): void {
+  storage.delete(key);
+}
+
+export function clearAll(): void {
+  storage.clearAll();
+}
+
+// ── Auth-specific helpers ────────────────────────────────────────────
+
+const AUTH_TOKEN_KEY = 'auth_token';
+const USER_ROLE_KEY = 'user_role';
+const APARTMENT_ID_KEY = 'apartment_id';
+
+export function setAuthToken(token: string): void {
+  storage.set(AUTH_TOKEN_KEY, token);
+}
+
+export function getAuthToken(): string | undefined {
+  return storage.getString(AUTH_TOKEN_KEY);
+}
+
+export function setUserRole(role: 'tenant' | 'landlord'): void {
+  storage.set(USER_ROLE_KEY, role);
+}
+
+export function getUserRole(): 'tenant' | 'landlord' | undefined {
+  const role = storage.getString(USER_ROLE_KEY);
+  if (role === 'tenant' || role === 'landlord') {
+    return role;
+  }
+  return undefined;
+}
+
+export function setApartmentId(id: string): void {
+  storage.set(APARTMENT_ID_KEY, id);
+}
+
+export function getApartmentId(): string | undefined {
+  return storage.getString(APARTMENT_ID_KEY);
+}
+
+export function clearAuth(): void {
+  storage.delete(AUTH_TOKEN_KEY);
+  storage.delete(USER_ROLE_KEY);
+  storage.delete(APARTMENT_ID_KEY);
+}

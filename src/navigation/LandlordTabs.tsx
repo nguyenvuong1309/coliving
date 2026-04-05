@@ -1,0 +1,125 @@
+import React from 'react';
+import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
+import {createNativeStackNavigator} from '@react-navigation/native-stack';
+import type {
+  LandlordTabParamList,
+  LandlordStackParamList,
+} from '../types/navigation';
+
+import DashboardScreen from '../screens/landlord/DashboardScreen';
+import TenantListScreen from '../screens/landlord/tenants/TenantListScreen';
+import TenantDetailScreen from '../screens/landlord/tenants/TenantDetailScreen';
+import AssetListScreen from '../screens/landlord/assets/AssetListScreen';
+import AssetEditScreen from '../screens/landlord/assets/AssetEditScreen';
+import LandlordIssueListScreen from '../screens/landlord/issues/IssueListScreen';
+import LandlordIssueDetailScreen from '../screens/landlord/issues/IssueDetailScreen';
+import LandlordPaymentsScreen from '../screens/landlord/payments/PaymentsScreen';
+import CreateBillingScreen from '../screens/landlord/payments/CreateBillingScreen';
+import PaymentOverviewScreen from '../screens/landlord/payments/PaymentOverviewScreen';
+import PaymentConfirmScreen from '../screens/landlord/payments/PaymentConfirmScreen';
+import ApartmentSetupScreen from '../screens/landlord/apartment/ApartmentSetupScreen';
+import InviteCodeScreen from '../screens/landlord/apartment/InviteCodeScreen';
+import RevenueHistoryScreen from '../screens/landlord/RevenueHistoryScreen';
+import LandlordProfileScreen from '../screens/landlord/ProfileScreen';
+
+const Tab = createBottomTabNavigator<LandlordTabParamList>();
+const Stack = createNativeStackNavigator<LandlordStackParamList>();
+
+function LandlordTabNavigator() {
+  return (
+    <Tab.Navigator
+      screenOptions={{
+        tabBarActiveTintColor: '#2563EB',
+        tabBarInactiveTintColor: '#64748B',
+        headerShown: false,
+      }}>
+      <Tab.Screen
+        name="LandlordDashboard"
+        component={DashboardScreen}
+        options={{tabBarLabel: 'Tổng quan'}}
+      />
+      <Tab.Screen
+        name="TenantManagement"
+        component={TenantListScreen}
+        options={{tabBarLabel: 'Người thuê'}}
+      />
+      <Tab.Screen
+        name="AssetList"
+        component={AssetListScreen}
+        options={{tabBarLabel: 'Tài sản'}}
+      />
+      <Tab.Screen
+        name="LandlordIssueList"
+        component={LandlordIssueListScreen}
+        options={{tabBarLabel: 'Sự cố'}}
+      />
+      <Tab.Screen
+        name="LandlordPayments"
+        component={LandlordPaymentsScreen}
+        options={{tabBarLabel: 'Thu tiền'}}
+      />
+    </Tab.Navigator>
+  );
+}
+
+export default function LandlordStack() {
+  return (
+    <Stack.Navigator>
+      <Stack.Screen
+        name="LandlordDashboard"
+        component={LandlordTabNavigator}
+        options={{headerShown: false}}
+      />
+      <Stack.Screen
+        name="ApartmentSetup"
+        component={ApartmentSetupScreen}
+        options={{title: 'Thiết lập căn hộ'}}
+      />
+      <Stack.Screen
+        name="InviteCode"
+        component={InviteCodeScreen}
+        options={{title: 'Mã mời'}}
+      />
+      <Stack.Screen
+        name="TenantDetail"
+        component={TenantDetailScreen}
+        options={{title: 'Chi tiết người thuê'}}
+      />
+      <Stack.Screen
+        name="AssetEdit"
+        component={AssetEditScreen}
+        options={{title: 'Chỉnh sửa tài sản'}}
+      />
+      <Stack.Screen
+        name="LandlordIssueDetail"
+        component={LandlordIssueDetailScreen}
+        options={{title: 'Xử lý sự cố'}}
+      />
+      <Stack.Screen
+        name="CreateBilling"
+        component={CreateBillingScreen}
+        options={{title: 'Tạo kỳ thu tiền'}}
+      />
+      <Stack.Screen
+        name="PaymentOverview"
+        component={PaymentOverviewScreen}
+        options={{title: 'Tổng quan thanh toán'}}
+      />
+      <Stack.Screen
+        name="PaymentConfirm"
+        component={PaymentConfirmScreen}
+        options={{title: 'Xác nhận thanh toán'}}
+      />
+      <Stack.Screen
+        name="RevenueHistory"
+        component={RevenueHistoryScreen}
+        options={{title: 'Lịch sử doanh thu'}}
+      />
+      <Stack.Screen
+        name="LandlordProfile"
+        component={LandlordProfileScreen}
+        options={{title: 'Cá nhân'}}
+      />
+    </Stack.Navigator>
+  );
+}
