@@ -101,3 +101,52 @@ export async function updateProfile(userId: string, updates: ProfileUpdate) {
 
   return data;
 }
+
+// ── OAuth Functions ──────────────────────────────────────────────
+
+export async function signInWithGoogle(idToken: string, accessToken: string) {
+  const {data, error} = await supabase.auth.signInWithIdToken({
+    provider: 'google',
+    token: idToken,
+    access_token: accessToken,
+  });
+
+  if (error) {
+    throw error;
+  }
+
+  return data;
+}
+
+export async function signInWithApple(
+  idToken: string,
+  fullName?: {givenName?: string; familyName?: string},
+) {
+  const {data, error} = await supabase.auth.signInWithIdToken({
+    provider: 'apple',
+    token: idToken,
+  });
+
+  if (error) {
+    throw error;
+  }
+
+  // Save full name to user metadata if available
+  if (fullName && (fullName.givenName || fullName.familyName)) {
+    const nameParts = [];
+    if (fullName.givenName) nameParts.push(fullName.givenName);
+    if (fullName.familyName) nameParts.push(fullName.familyName);
+
+    const fullNameStr = nameParts.join(' ');
+
+    await supabase.auth.updateUser({
+      data: {
+        full_name: fullNameStr,
+        given_name: fullName.givenName,
+        family_name: fullName.familyName,
+      },
+    });
+  }
+
+  return data;
+}

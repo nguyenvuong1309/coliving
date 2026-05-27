@@ -15,15 +15,14 @@ import {useNavigation} from '@react-navigation/native';
 import type {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import {useAuth} from '../../hooks/useAuth';
 import {signUpSchema, type SignUpData} from '../../schemas/auth';
-import {Input} from '../../components';
-import {Button} from '../../components';
+import {Input, Button, GoogleSignInButton, AppleSignInButton} from '../../components';
 import type {AuthStackParamList} from '../../types/navigation';
 
 type Nav = NativeStackNavigationProp<AuthStackParamList, 'SignUp'>;
 
 export default function SignUpScreen() {
   const navigation = useNavigation<Nav>();
-  const {signUp, loading, error} = useAuth();
+  const {signUp, signInWithGoogle, signInWithApple, loading, error} = useAuth();
   const [selectedRole, setSelectedRole] = useState<'tenant' | 'landlord'>(
     'tenant',
   );
@@ -47,8 +46,19 @@ export default function SignUpScreen() {
     signUp(data.email, data.password, data.full_name, selectedRole);
   };
 
+  const handleGoogleSuccess = (idToken: string, accessToken: string) => {
+    signInWithGoogle(idToken, accessToken);
+    navigation.navigate('RoleSelection');
+  };
+
+  const handleAppleSuccess = (idToken: string, fullName?: any) => {
+    signInWithApple(idToken, fullName);
+    navigation.navigate('RoleSelection');
+  };
+
   return (
     <KeyboardAvoidingView
+      testID="signup-screen"
       style={styles.container}
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
       <ScrollView
@@ -56,8 +66,28 @@ export default function SignUpScreen() {
         keyboardShouldPersistTaps="handled">
         <Text style={styles.title}>Tạo tài khoản</Text>
 
+        <View style={styles.oauthSection}>
+          <GoogleSignInButton
+            onSuccess={handleGoogleSuccess}
+            onError={(error) => console.error('Google sign in error:', error)}
+            loading={loading}
+          />
+          <AppleSignInButton
+            onSuccess={handleAppleSuccess}
+            onError={(error) => console.error('Apple sign in error:', error)}
+            loading={loading}
+          />
+        </View>
+
+        <View style={styles.dividerSection}>
+          <View style={styles.divider} />
+          <Text style={styles.dividerText}>hoặc</Text>
+          <View style={styles.divider} />
+        </View>
+
         <View style={styles.roleSelector}>
           <TouchableOpacity
+            testID="signup-role-tenant-btn"
             style={[
               styles.roleBtn,
               selectedRole === 'tenant' && styles.roleBtnActive,
@@ -72,6 +102,7 @@ export default function SignUpScreen() {
             </Text>
           </TouchableOpacity>
           <TouchableOpacity
+            testID="signup-role-landlord-btn"
             style={[
               styles.roleBtn,
               selectedRole === 'landlord' && styles.roleBtnActive,
@@ -92,6 +123,7 @@ export default function SignUpScreen() {
           name="full_name"
           render={({field: {onChange, onBlur, value}}) => (
             <Input
+              testID="signup-fullname-input"
               label="Họ và tên"
               placeholder="Nguyễn Văn A"
               value={value}
@@ -107,6 +139,7 @@ export default function SignUpScreen() {
           name="email"
           render={({field: {onChange, onBlur, value}}) => (
             <Input
+              testID="signup-email-input"
               label="Email"
               placeholder="email@example.com"
               value={value}
@@ -124,6 +157,7 @@ export default function SignUpScreen() {
           name="password"
           render={({field: {onChange, onBlur, value}}) => (
             <Input
+              testID="signup-password-input"
               label="Mật khẩu"
               placeholder="Tối thiểu 6 ký tự"
               value={value}
@@ -140,6 +174,7 @@ export default function SignUpScreen() {
           name="confirmPassword"
           render={({field: {onChange, onBlur, value}}) => (
             <Input
+              testID="signup-confirm-password-input"
               label="Xác nhận mật khẩu"
               placeholder="Nhập lại mật khẩu"
               value={value}
@@ -151,9 +186,14 @@ export default function SignUpScreen() {
           )}
         />
 
-        {error && <Text style={styles.error}>{error}</Text>}
+        {error && (
+          <Text testID="signup-error-message" style={styles.error}>
+            {error}
+          </Text>
+        )}
 
         <Button
+          testID="signup-submit-btn"
           title="Đăng ký"
           onPress={handleSubmit(onSubmit)}
           loading={loading}
@@ -161,6 +201,7 @@ export default function SignUpScreen() {
         />
 
         <TouchableOpacity
+          testID="signup-goto-signin-btn"
           onPress={() => navigation.navigate('SignIn')}
           style={styles.linkBtn}>
           <Text style={styles.linkText}>Đã có tài khoản? Đăng nhập</Text>
@@ -184,6 +225,24 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: '#1E293B',
     marginBottom: 24,
+  },
+  oauthSection: {
+    marginBottom: 24,
+  },
+  dividerSection: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 24,
+  },
+  divider: {
+    flex: 1,
+    height: 1,
+    backgroundColor: '#E2E8F0',
+  },
+  dividerText: {
+    marginHorizontal: 12,
+    color: '#94A3B8',
+    fontSize: 13,
   },
   roleSelector: {
     flexDirection: 'row',

@@ -5,6 +5,8 @@ import {
   signUpRequest,
   signOutRequest,
   resetPasswordRequest,
+  signInWithGoogleRequest,
+  signInWithAppleRequest,
   setUser,
   setSession,
 } from '../store/slices/authSlice';
@@ -46,6 +48,20 @@ export function useAuth() {
     [dispatch],
   );
 
+  const signInWithGoogle = useCallback(
+    (idToken: string, accessToken: string) => {
+      dispatch(signInWithGoogleRequest({idToken, accessToken}));
+    },
+    [dispatch],
+  );
+
+  const signInWithApple = useCallback(
+    (idToken: string, fullName?: any) => {
+      dispatch(signInWithAppleRequest({idToken, fullName}));
+    },
+    [dispatch],
+  );
+
   const checkSession = useCallback(async () => {
     const token = getAuthToken();
     if (!token) {
@@ -80,6 +96,8 @@ export function useAuth() {
     signUp,
     signOut,
     resetPassword,
+    signInWithGoogle,
+    signInWithApple,
     checkSession,
     isAuthenticated: !!session,
     isLandlord: user?.role === 'landlord',

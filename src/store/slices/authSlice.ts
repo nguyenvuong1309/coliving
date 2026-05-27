@@ -1,15 +1,17 @@
 import {createSlice, PayloadAction} from '@reduxjs/toolkit';
 import {all, call, fork, put, takeLatest} from 'redux-saga/effects';
-import {MMKV} from 'react-native-mmkv';
+import {createMMKV} from 'react-native-mmkv';
 import {
   signUp,
   signIn,
   signOut,
   resetPassword,
+  signInWithGoogle,
+  signInWithApple,
 } from '../../services/auth';
 import type {Profile} from '../../types/database';
 
-const storage = new MMKV();
+const storage = createMMKV();
 
 interface AuthState {
   user: Profile | null;
@@ -51,6 +53,20 @@ const authSlice = createSlice({
       state.loading = true;
       state.error = null;
     },
+    signInWithGoogleRequest(
+      state,
+      _action: PayloadAction<{idToken: string; accessToken: string}>,
+    ) {
+      state.loading = true;
+      state.error = null;
+    },
+    signInWithAppleRequest(
+      state,
+      _action: PayloadAction<{idToken: string; fullName?: any}>,
+    ) {
+      state.loading = true;
+      state.error = null;
+    },
     setUser(state, action: PayloadAction<Profile | null>) {
       state.user = action.payload;
     },
@@ -75,6 +91,8 @@ export const {
   signInRequest,
   signOutRequest,
   resetPasswordRequest,
+  signInWithGoogleRequest,
+  signInWithAppleRequest,
   setUser,
   setSession,
   setLoading,
@@ -140,6 +158,46 @@ function* handleResetPassword(
   }
 }
 
+function* handleSignInWithGoogle(
+  action: ReturnType<typeof signInWithGoogleRequest>,
+): Generator<any, void, any> {
+  try {
+    const {session, user} = yield call(
+      signInWithGoogle,
+      action.payload.idToken,
+      action.payload.accessToken,
+    );
+    if (session?.access_token) {
+      storage.set('token', session.access_token);
+    }
+    yield put(setSession(session));
+    yield put(setUser(user));
+    yield put(setLoading(false));
+  } catch (error: any) {
+    yield put(setError(error.message ?? 'Google sign in failed'));
+  }
+}
+
+function* handleSignInWithApple(
+  action: ReturnType<typeof signInWithAppleRequest>,
+): Generator<any, void, any> {
+  try {
+    const {session, user} = yield call(
+      signInWithApple,
+      action.payload.idToken,
+      action.payload.fullName,
+    );
+    if (session?.access_token) {
+      storage.set('token', session.access_token);
+    }
+    yield put(setSession(session));
+    yield put(setUser(user));
+    yield put(setLoading(false));
+  } catch (error: any) {
+    yield put(setError(error.message ?? 'Apple sign in failed'));
+  }
+}
+
 export function* watchSignUp() {
   yield takeLatest(signUpRequest.type, handleSignUp);
 }
@@ -156,12 +214,22 @@ export function* watchResetPassword() {
   yield takeLatest(resetPasswordRequest.type, handleResetPassword);
 }
 
+export function* watchSignInWithGoogle() {
+  yield takeLatest(signInWithGoogleRequest.type, handleSignInWithGoogle);
+}
+
+export function* watchSignInWithApple() {
+  yield takeLatest(signInWithAppleRequest.type, handleSignInWithApple);
+}
+
 export function* authSaga() {
   yield all([
     fork(watchSignUp),
     fork(watchSignIn),
     fork(watchSignOut),
     fork(watchResetPassword),
+    fork(watchSignInWithGoogle),
+    fork(watchSignInWithApple),
   ]);
 }
 

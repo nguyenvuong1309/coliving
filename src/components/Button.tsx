@@ -18,6 +18,7 @@ interface ButtonProps {
   disabled?: boolean;
   style?: ViewStyle;
   textStyle?: TextStyle;
+  testID?: string;
 }
 
 const Button: React.FC<ButtonProps> = ({
@@ -28,11 +29,13 @@ const Button: React.FC<ButtonProps> = ({
   disabled = false,
   style,
   textStyle,
+  testID,
 }) => {
   const isDisabled = disabled || loading;
 
   return (
     <TouchableOpacity
+      testID={testID}
       style={[
         styles.base,
         styles[variant],

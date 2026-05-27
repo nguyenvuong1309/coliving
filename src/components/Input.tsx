@@ -75,7 +75,13 @@ const Input = forwardRef<TextInput, InputProps>(
             {...rest}
           />
         </View>
-        {error && <Text style={styles.error}>{error}</Text>}
+        {error && (
+        <Text
+          testID={rest.testID ? `${rest.testID}-error` : undefined}
+          style={styles.error}>
+          {error}
+        </Text>
+      )}
       </View>
     );
   },

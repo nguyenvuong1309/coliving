@@ -14,14 +14,14 @@ import {useNavigation} from '@react-navigation/native';
 import type {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import {useAuth} from '../../hooks/useAuth';
 import {signInSchema, type SignInData} from '../../schemas/auth';
-import {Input, Button} from '../../components';
+import {Input, Button, GoogleSignInButton, AppleSignInButton} from '../../components';
 import type {AuthStackParamList} from '../../types/navigation';
 
 type Nav = NativeStackNavigationProp<AuthStackParamList, 'SignIn'>;
 
 export default function SignInScreen() {
   const navigation = useNavigation<Nav>();
-  const {signIn, loading, error} = useAuth();
+  const {signIn, signInWithGoogle, signInWithApple, loading, error} = useAuth();
 
   const {
     control,
@@ -36,8 +36,19 @@ export default function SignInScreen() {
     signIn(data.email, data.password);
   };
 
+  const handleGoogleSuccess = (idToken: string, accessToken: string) => {
+    signInWithGoogle(idToken, accessToken);
+    navigation.navigate('RoleSelection');
+  };
+
+  const handleAppleSuccess = (idToken: string, fullName?: any) => {
+    signInWithApple(idToken, fullName);
+    navigation.navigate('RoleSelection');
+  };
+
   return (
     <KeyboardAvoidingView
+      testID="signin-screen"
       style={styles.container}
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
       <ScrollView
@@ -46,11 +57,31 @@ export default function SignInScreen() {
         <Text style={styles.title}>Chào mừng trở lại</Text>
         <Text style={styles.subtitle}>Đăng nhập để tiếp tục</Text>
 
+        <View style={styles.oauthSection}>
+          <GoogleSignInButton
+            onSuccess={handleGoogleSuccess}
+            onError={(error) => console.error('Google sign in error:', error)}
+            loading={loading}
+          />
+          <AppleSignInButton
+            onSuccess={handleAppleSuccess}
+            onError={(error) => console.error('Apple sign in error:', error)}
+            loading={loading}
+          />
+        </View>
+
+        <View style={styles.dividerSection}>
+          <View style={styles.divider} />
+          <Text style={styles.dividerText}>hoặc</Text>
+          <View style={styles.divider} />
+        </View>
+
         <Controller
           control={control}
           name="email"
           render={({field: {onChange, onBlur, value}}) => (
             <Input
+              testID="signin-email-input"
               label="Email"
               placeholder="email@example.com"
               value={value}
@@ -68,6 +99,7 @@ export default function SignInScreen() {
           name="password"
           render={({field: {onChange, onBlur, value}}) => (
             <Input
+              testID="signin-password-input"
               label="Mật khẩu"
               placeholder="Nhập mật khẩu"
               value={value}
@@ -80,14 +112,20 @@ export default function SignInScreen() {
         />
 
         <TouchableOpacity
+          testID="signin-forgot-password-btn"
           onPress={() => navigation.navigate('ForgotPassword')}
           style={styles.forgotBtn}>
           <Text style={styles.forgotText}>Quên mật khẩu?</Text>
         </TouchableOpacity>
 
-        {error && <Text style={styles.error}>{error}</Text>}
+        {error && (
+          <Text testID="signin-error-message" style={styles.error}>
+            {error}
+          </Text>
+        )}
 
         <Button
+          testID="signin-submit-btn"
           title="Đăng nhập"
           onPress={handleSubmit(onSubmit)}
           loading={loading}
@@ -95,6 +133,7 @@ export default function SignInScreen() {
         />
 
         <TouchableOpacity
+          testID="signin-goto-signup-btn"
           onPress={() => navigation.navigate('SignUp')}
           style={styles.linkBtn}>
           <Text style={styles.linkText}>Chưa có tài khoản? Đăng ký</Text>
@@ -122,7 +161,25 @@ const styles = StyleSheet.create({
   subtitle: {
     fontSize: 16,
     color: '#64748B',
-    marginBottom: 32,
+    marginBottom: 24,
+  },
+  oauthSection: {
+    marginBottom: 24,
+  },
+  dividerSection: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 24,
+  },
+  divider: {
+    flex: 1,
+    height: 1,
+    backgroundColor: '#E2E8F0',
+  },
+  dividerText: {
+    marginHorizontal: 12,
+    color: '#94A3B8',
+    fontSize: 13,
   },
   forgotBtn: {
     alignSelf: 'flex-end',

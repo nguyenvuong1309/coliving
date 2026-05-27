@@ -8,6 +8,8 @@ export type AuthStackParamList = {
   SignUp: undefined;
   ForgotPassword: undefined;
   JoinApartment: undefined;
+  RoleSelection: undefined;
+  ProfileCompletion: undefined;
 };
 
 // Tenant bottom tab screens

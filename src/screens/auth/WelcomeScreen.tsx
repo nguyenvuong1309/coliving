@@ -10,7 +10,7 @@ export default function WelcomeScreen() {
   const navigation = useNavigation<Nav>();
 
   return (
-    <View style={styles.container}>
+    <View testID="welcome-screen" style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.logo}>CoLiving</Text>
         <Text style={styles.subtitle}>
@@ -35,12 +35,14 @@ export default function WelcomeScreen() {
 
       <View style={styles.actions}>
         <TouchableOpacity
+          testID="welcome-signup-btn"
           style={styles.primaryBtn}
           onPress={() => navigation.navigate('SignUp')}>
           <Text style={styles.primaryText}>Đăng ký</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
+          testID="welcome-signin-btn"
           style={styles.secondaryBtn}
           onPress={() => navigation.navigate('SignIn')}>
           <Text style={styles.secondaryText}>Đã có tài khoản? Đăng nhập</Text>

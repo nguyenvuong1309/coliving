@@ -1,0 +1,6 @@
+{
+  "$schema": "https://raw.githubusercontent.com/appium/appium/master/packages/appium/schema/appium.schema.json",
+  "server": {
+    "use-drivers": ["xcuitest", "uiautomator2"]
+  }
+}
