@@ -6,5 +6,6 @@ export { default as EmptyState } from './EmptyState';
 export { default as LoadingOverlay } from './LoadingOverlay';
 export { default as Avatar } from './Avatar';
 export { default as ScreenWrapper } from './ScreenWrapper';
+export { default as ErrorToast } from './ErrorToast';
 export { GoogleSignInButton } from './GoogleSignInButton';
 export { AppleSignInButton } from './AppleSignInButton';

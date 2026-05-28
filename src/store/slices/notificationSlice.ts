@@ -1,10 +1,10 @@
 import {createSlice, PayloadAction} from '@reduxjs/toolkit';
 import {call, put, takeLatest} from 'redux-saga/effects';
 import {
-  fetchNotifications,
+  getNotifications,
   markAsRead,
   markAllAsRead,
-  fetchUnreadCount,
+  getUnreadCount,
 } from '../../services/notification';
 import type {Notification} from '../../types/database';
 
@@ -12,12 +12,14 @@ interface NotificationState {
   notifications: Notification[];
   unreadCount: number;
   loading: boolean;
+  error: string | null;
 }
 
 const initialState: NotificationState = {
   notifications: [],
   unreadCount: 0,
   loading: false,
+  error: null,
 };
 
 const notificationSlice = createSlice({
@@ -54,6 +56,10 @@ const notificationSlice = createSlice({
       state.notifications = [action.payload, ...state.notifications];
       state.unreadCount += 1;
     },
+    setError(state, action: PayloadAction<string | null>) {
+      state.error = action.payload;
+      state.loading = false;
+    },
   },
 });
 
@@ -65,6 +71,7 @@ export const {
   setNotifications,
   setUnreadCount,
   addNotification,
+  setError,
 } = notificationSlice.actions;
 
 // Sagas
@@ -74,13 +81,13 @@ function* handleFetchNotifications(
 ): Generator<any, void, any> {
   try {
     const notifications = yield call(
-      fetchNotifications,
+      getNotifications,
       action.payload.userId,
     );
     yield put(setNotifications(notifications));
   } catch (error: any) {
-    console.error('Failed to fetch notifications:', error.message);
     yield put(setNotifications([]));
+    yield put(setError(error?.message ?? 'Failed to fetch notifications'));
   }
 }
 
@@ -90,7 +97,7 @@ function* handleMarkAsRead(
   try {
     yield call(markAsRead, action.payload.id);
   } catch (error: any) {
-    console.error('Failed to mark as read:', error.message);
+    yield put(setError(error?.message ?? 'Failed to mark as read'));
   }
 }
 
@@ -101,7 +108,7 @@ function* handleMarkAllAsRead(
     yield call(markAllAsRead, action.payload.userId);
     yield put(setUnreadCount(0));
   } catch (error: any) {
-    console.error('Failed to mark all as read:', error.message);
+    yield put(setError(error?.message ?? 'Failed to mark all as read'));
   }
 }
 
@@ -109,11 +116,11 @@ function* handleFetchUnreadCount(
   action: ReturnType<typeof fetchUnreadCountRequest>,
 ): Generator<any, void, any> {
   try {
-    const count = yield call(fetchUnreadCount, action.payload.userId);
+    const count = yield call(getUnreadCount, action.payload.userId);
     yield put(setUnreadCount(count));
   } catch (error: any) {
-    console.error('Failed to fetch unread count:', error.message);
     yield put(setUnreadCount(0));
+    yield put(setError(error?.message ?? 'Failed to fetch unread count'));
   }
 }
 

@@ -106,7 +106,7 @@ const CreateBillingScreen: React.FC = () => {
     (data: CreateBillingFormData) => {
       Alert.alert(
         'Xac nhan tao ky thu tien',
-        `Thang ${data.month}/${data.year}\nTong: ${formatCurrency(totalAmount)}\nSo nguoi thue: ${tenantList.length}`,
+        `Thang ${data.month}/${data.year}\nHan: ${formatDate(dueDate.toISOString())}\nTong: ${formatCurrency(totalAmount)}\nSo nguoi thue: ${tenantList.length}`,
         [
           {text: 'Huy', style: 'cancel'},
           {
@@ -118,7 +118,7 @@ const CreateBillingScreen: React.FC = () => {
                     apartmentId: apartment.id,
                     month: data.month,
                     year: data.year,
-                    totalAmount,
+                    dueDate: dueDate.toISOString(),
                   }),
                 );
                 navigation.goBack();
@@ -128,7 +128,7 @@ const CreateBillingScreen: React.FC = () => {
         ],
       );
     },
-    [apartment?.id, totalAmount, tenantList.length, dispatch, navigation],
+    [apartment?.id, totalAmount, tenantList.length, dueDate, dispatch, navigation],
   );
 
   const renderTenantItem = ({

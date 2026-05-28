@@ -147,3 +147,28 @@ export async function confirmPayment(id: string, confirmedBy: string) {
 
   return data;
 }
+
+export async function rejectPayment(id: string, note?: string) {
+  const updates: Record<string, any> = {
+    status: 'unpaid',
+    paid_at: null,
+    payment_method: null,
+    receipt_image_url: null,
+    updated_at: new Date().toISOString(),
+  };
+  if (note !== undefined) {
+    updates.note = note;
+  }
+  const {data, error} = await supabase
+    .from('payments')
+    .update(updates)
+    .eq('id', id)
+    .select()
+    .single();
+
+  if (error) {
+    throw error;
+  }
+
+  return data;
+}

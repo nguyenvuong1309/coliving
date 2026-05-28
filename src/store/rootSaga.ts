@@ -5,6 +5,7 @@ import {borrowSaga} from './slices/borrowSlice';
 import {issueSaga} from './slices/issueSlice';
 import {paymentSaga} from './slices/paymentSlice';
 import {notificationSaga} from './slices/notificationSlice';
+import {assetSaga} from './slices/assetSlice';
 
 export default function* rootSaga() {
   yield all([
@@ -14,5 +15,6 @@ export default function* rootSaga() {
     fork(issueSaga),
     fork(paymentSaga),
     fork(notificationSaga),
+    fork(assetSaga),
   ]);
 }

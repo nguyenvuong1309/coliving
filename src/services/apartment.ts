@@ -1,6 +1,17 @@
 import {supabase} from '../config/supabase';
 import type {ApartmentInsert, ApartmentUpdate} from '../types/database';
 
+const INVITE_CODE_ALPHABET = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+
+export function generateInviteCode(length: number = 6): string {
+  let code = '';
+  for (let i = 0; i < length; i++) {
+    const idx = Math.floor(Math.random() * INVITE_CODE_ALPHABET.length);
+    code += INVITE_CODE_ALPHABET[idx];
+  }
+  return code;
+}
+
 export async function createApartment(
   data: Omit<ApartmentInsert, 'id' | 'created_at' | 'updated_at'>,
 ) {

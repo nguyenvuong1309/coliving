@@ -1,12 +1,28 @@
 import {createSlice, PayloadAction} from '@reduxjs/toolkit';
 import {call, put, takeLatest} from 'redux-saga/effects';
 import {
-  fetchIssues,
+  getIssues,
   createIssue,
   updateIssueStatus,
-  fetchIssueDetail,
+  getIssue,
+  addIssueImages,
 } from '../../services/issue';
-import type {Issue} from '../../types/database';
+import {uploadImage, getImageUrl} from '../../services/storage';
+import type {Issue, IssueInsert} from '../../types/database';
+
+type IssueStatus =
+  | 'open'
+  | 'in_progress'
+  | 'resolved'
+  | 'closed'
+  | 'reopened';
+
+type CreateIssuePayload = Omit<
+  IssueInsert,
+  'id' | 'created_at' | 'updated_at' | 'status'
+> & {
+  imageUris?: string[];
+};
 
 interface IssueState {
   issues: Issue[];
@@ -35,19 +51,14 @@ const issueSlice = createSlice({
     },
     createIssueRequest(
       state,
-      _action: PayloadAction<{
-        title: string;
-        description: string;
-        apartmentId: string;
-        reporterId: string;
-      }>,
+      _action: PayloadAction<CreateIssuePayload>,
     ) {
       state.loading = true;
       state.error = null;
     },
     updateIssueStatusRequest(
       state,
-      _action: PayloadAction<{id: string; status: string}>,
+      _action: PayloadAction<{id: string; status: IssueStatus; note?: string}>,
     ) {
       state.loading = true;
       state.error = null;
@@ -89,7 +100,7 @@ function* handleFetchIssues(
   action: ReturnType<typeof fetchIssuesRequest>,
 ): Generator<any, void, any> {
   try {
-    const issues = yield call(fetchIssues, action.payload.apartmentId);
+    const issues = yield call(getIssues, action.payload.apartmentId);
     yield put(setIssues(issues));
     yield put(setLoading(false));
   } catch (error: any) {
@@ -101,7 +112,27 @@ function* handleCreateIssue(
   action: ReturnType<typeof createIssueRequest>,
 ): Generator<any, void, any> {
   try {
-    const issue = yield call(createIssue, action.payload);
+    const {imageUris, ...issueData} = action.payload;
+    const issue = yield call(createIssue, issueData);
+
+    if (issue?.id && imageUris && imageUris.length > 0) {
+      const urls: string[] = [];
+      for (let i = 0; i < imageUris.length; i++) {
+        const uri = imageUris[i];
+        const ext = uri.split('.').pop()?.toLowerCase() || 'jpg';
+        const path = `${issue.id}/${Date.now()}-${i}.${ext}`;
+        yield call(uploadImage, 'issue-images', path, {
+          uri,
+          type: `image/${ext === 'jpg' ? 'jpeg' : ext}`,
+          name: path.split('/').pop()!,
+        });
+        urls.push(getImageUrl('issue-images', path));
+      }
+      if (urls.length > 0) {
+        yield call(addIssueImages, issue.id, urls);
+      }
+    }
+
     yield put(setCurrentIssue(issue));
     yield put(setLoading(false));
   } catch (error: any) {
@@ -117,6 +148,7 @@ function* handleUpdateIssueStatus(
       updateIssueStatus,
       action.payload.id,
       action.payload.status,
+      action.payload.note,
     );
     yield put(setCurrentIssue(issue));
     yield put(setLoading(false));
@@ -129,7 +161,7 @@ function* handleFetchIssueDetail(
   action: ReturnType<typeof fetchIssueDetailRequest>,
 ): Generator<any, void, any> {
   try {
-    const issue = yield call(fetchIssueDetail, action.payload.id);
+    const issue = yield call(getIssue, action.payload.id);
     yield put(setCurrentIssue(issue));
     yield put(setLoading(false));
   } catch (error: any) {

@@ -1,11 +1,16 @@
 import React, {useCallback} from 'react';
-import {View, Text, StyleSheet, Alert} from 'react-native';
-import {ScreenWrapper, Avatar, Card, Button, StatusBadge} from '../../components';
+import {View, Text, StyleSheet, Alert, TouchableOpacity} from 'react-native';
+import {useNavigation} from '@react-navigation/native';
+import type {NativeStackNavigationProp} from '@react-navigation/native-stack';
+import {ScreenWrapper, Avatar, Card, Button} from '../../components';
 import {useAuth} from '../../hooks/useAuth';
 import {useApartment} from '../../hooks/useApartment';
-import {useAppSelector} from '../../store';
+import type {TenantStackParamList} from '../../types/navigation';
+
+type NavigationProp = NativeStackNavigationProp<TenantStackParamList>;
 
 const ProfileScreen: React.FC = () => {
+  const navigation = useNavigation<NavigationProp>();
   const {user, signOut, loading} = useAuth();
   const {apartment, members} = useApartment();
 
@@ -83,19 +88,23 @@ const ProfileScreen: React.FC = () => {
         </Card>
       )}
 
-      {/* Settings */}
+      {/* Account actions */}
       <Card style={styles.card}>
-        <Text style={styles.sectionTitle}>Cai dat</Text>
+        <Text style={styles.sectionTitle}>Tai khoan</Text>
 
-        <View style={styles.settingRow}>
-          <Text style={styles.settingLabel}>Thong bao</Text>
-          <Text style={styles.settingValue}>Bat</Text>
-        </View>
+        <TouchableOpacity
+          style={styles.settingRow}
+          onPress={() => navigation.navigate('EditProfile')}>
+          <Text style={styles.settingLabel}>Chinh sua thong tin</Text>
+          <Text style={styles.settingChevron}>›</Text>
+        </TouchableOpacity>
 
-        <View style={styles.settingRow}>
-          <Text style={styles.settingLabel}>Ngon ngu</Text>
-          <Text style={styles.settingValue}>Tieng Viet</Text>
-        </View>
+        <TouchableOpacity
+          style={styles.settingRow}
+          onPress={() => navigation.navigate('ChangePassword')}>
+          <Text style={styles.settingLabel}>Doi mat khau</Text>
+          <Text style={styles.settingChevron}>›</Text>
+        </TouchableOpacity>
 
         <View style={styles.settingRow}>
           <Text style={styles.settingLabel}>Phien ban</Text>
@@ -190,6 +199,11 @@ const styles = StyleSheet.create({
   settingValue: {
     fontSize: 14,
     color: '#64748B',
+  },
+  settingChevron: {
+    fontSize: 20,
+    color: '#94A3B8',
+    fontWeight: '300',
   },
   signOutContainer: {
     marginTop: 16,

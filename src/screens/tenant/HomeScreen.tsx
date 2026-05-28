@@ -23,10 +23,10 @@ const HomeScreen: React.FC = () => {
   const borrowRequests = useAppSelector(state => state.borrow.requests);
   const issues = useAppSelector(state => state.issue.issues);
   const myPayments = useAppSelector(state => state.payment.myPayments);
-  const loading =
-    useAppSelector(state => state.borrow.loading) ||
-    useAppSelector(state => state.issue.loading) ||
-    useAppSelector(state => state.payment.loading);
+  const borrowLoading = useAppSelector(state => state.borrow.loading);
+  const issueLoading = useAppSelector(state => state.issue.loading);
+  const paymentLoading = useAppSelector(state => state.payment.loading);
+  const loading = borrowLoading || issueLoading || paymentLoading;
 
   useEffect(() => {
     if (apartment?.id && user?.id) {

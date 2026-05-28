@@ -40,10 +40,17 @@ const CATEGORY_LABELS: Record<string, string> = {
   other: 'Khac',
 };
 
+type IssueStatusValue =
+  | 'open'
+  | 'in_progress'
+  | 'resolved'
+  | 'closed'
+  | 'reopened';
+
 const STATUS_FLOW: {
-  status: string;
+  status: IssueStatusValue;
   label: string;
-  next: string;
+  next: IssueStatusValue;
   nextLabel: string;
 }[] = [
   {status: 'open', label: 'Mo', next: 'in_progress', nextLabel: 'Tiep nhan'},
@@ -86,7 +93,9 @@ const IssueDetailScreen: React.FC = () => {
   }, [issue]);
 
   const handleStatusUpdate = useCallback(
-    (newStatus: string) => {
+    (
+      newStatus: 'open' | 'in_progress' | 'resolved' | 'closed' | 'reopened',
+    ) => {
       if (!issue) return;
       Alert.alert('Xac nhan', `Ban muon chuyen trang thai sang "${getStatusLabel(newStatus)}"?`, [
         {text: 'Huy', style: 'cancel'},
@@ -97,6 +106,7 @@ const IssueDetailScreen: React.FC = () => {
               updateIssueStatusRequest({
                 id: issue.id,
                 status: newStatus,
+                note: note || undefined,
               }),
             );
             setNote('');

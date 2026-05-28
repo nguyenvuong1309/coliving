@@ -8,6 +8,7 @@ import {useAuth} from '../../../hooks/useAuth';
 import {useApartment} from '../../../hooks/useApartment';
 import {useAppSelector, useAppDispatch} from '../../../store';
 import {createBorrowRequestRequest} from '../../../store/slices/borrowSlice';
+import {fetchAssetsRequest} from '../../../store/slices/assetSlice';
 import {
   borrowRequestSchema,
   type BorrowRequestFormData,
@@ -20,11 +21,13 @@ const BorrowCreateScreen: React.FC = () => {
   const {user} = useAuth();
   const {apartment} = useApartment();
   const {loading} = useAppSelector(state => state.borrow);
+  const assets = useAppSelector(state => state.asset.assets) as Asset[];
 
-  // For a real app, we'd fetch assets from the store. Here we use a placeholder.
-  const assets = useAppSelector(
-    (state: any) => state.apartment?.assets ?? [],
-  ) as Asset[];
+  useEffect(() => {
+    if (apartment?.id) {
+      dispatch(fetchAssetsRequest({apartmentId: apartment.id}));
+    }
+  }, [apartment?.id, dispatch]);
 
   const {
     control,
@@ -50,10 +53,12 @@ const BorrowCreateScreen: React.FC = () => {
     }
     dispatch(
       createBorrowRequestRequest({
-        itemName: data.asset_id,
-        description: data.note,
-        borrowerId: user.id,
-        apartmentId: apartment.id,
+        apartment_id: apartment.id,
+        asset_id: data.asset_id,
+        borrower_id: user.id,
+        lender_id: data.lender_id,
+        note: data.note,
+        borrow_duration: data.borrow_duration,
       }),
     );
   };

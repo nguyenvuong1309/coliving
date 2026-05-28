@@ -73,8 +73,22 @@ const ProfileScreen: React.FC = () => {
 
       {/* Settings Section */}
       <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Cai dat</Text>
+        <Text style={styles.sectionTitle}>Tai khoan</Text>
         <Card>
+          <TouchableOpacity
+            style={styles.settingItem}
+            onPress={() => navigation.navigate('EditProfile')}>
+            <Text style={styles.settingText}>Chinh sua thong tin</Text>
+            <Text style={styles.settingChevron}>{'>'}</Text>
+          </TouchableOpacity>
+          <View style={styles.settingSeparator} />
+          <TouchableOpacity
+            style={styles.settingItem}
+            onPress={() => navigation.navigate('ChangePassword')}>
+            <Text style={styles.settingText}>Doi mat khau</Text>
+            <Text style={styles.settingChevron}>{'>'}</Text>
+          </TouchableOpacity>
+          <View style={styles.settingSeparator} />
           <TouchableOpacity
             style={styles.settingItem}
             onPress={() => navigation.navigate('RevenueHistory')}>

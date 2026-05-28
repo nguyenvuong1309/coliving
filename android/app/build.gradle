@@ -52,10 +52,19 @@ android {
             keyPassword 'android'
         }
         release {
-            storeFile file(RELEASE_STORE_FILE)
-            storePassword RELEASE_STORE_PASSWORD
-            keyAlias RELEASE_KEY_ALIAS
-            keyPassword RELEASE_KEY_PASSWORD
+            // Doc credentials tu gradle.properties (local) hoac bien moi truong (CI).
+            // Phai dat sau cac key: RELEASE_STORE_FILE, RELEASE_STORE_PASSWORD,
+            // RELEASE_KEY_ALIAS, RELEASE_KEY_PASSWORD.
+            def storeFileName = project.hasProperty('RELEASE_STORE_FILE') ? RELEASE_STORE_FILE : 'release.keystore'
+            def storePwd = project.hasProperty('RELEASE_STORE_PASSWORD') ? RELEASE_STORE_PASSWORD : ''
+            def keyAliasName = project.hasProperty('RELEASE_KEY_ALIAS') ? RELEASE_KEY_ALIAS : 'coliving'
+            def keyPwd = project.hasProperty('RELEASE_KEY_PASSWORD') ? RELEASE_KEY_PASSWORD : ''
+            if (file(storeFileName).exists() && storePwd && keyPwd) {
+                storeFile file(storeFileName)
+                storePassword storePwd
+                keyAlias keyAliasName
+                keyPassword keyPwd
+            }
         }
     }
     buildTypes {
@@ -63,7 +72,8 @@ android {
             signingConfig signingConfigs.debug
         }
         release {
-            signingConfig signingConfigs.release
+            // Neu chua co keystore release thi ky bang debug de tranh fail build local.
+            signingConfig signingConfigs.release.storeFile ? signingConfigs.release : signingConfigs.debug
             minifyEnabled enableProguardInReleaseBuilds
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
         }

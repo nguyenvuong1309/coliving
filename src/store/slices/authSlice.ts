@@ -1,6 +1,7 @@
 import {createSlice, PayloadAction} from '@reduxjs/toolkit';
-import {all, call, fork, put, takeLatest} from 'redux-saga/effects';
+import {all, call, fork, put, select, takeLatest} from 'redux-saga/effects';
 import {createMMKV} from 'react-native-mmkv';
+import type {RootState} from '../index';
 import {
   signUp,
   signIn,
@@ -8,8 +9,11 @@ import {
   resetPassword,
   signInWithGoogle,
   signInWithApple,
+  getProfile,
+  updateProfile,
+  changePassword,
 } from '../../services/auth';
-import type {Profile} from '../../types/database';
+import type {Profile, ProfileUpdate} from '../../types/database';
 
 const storage = createMMKV();
 
@@ -67,6 +71,20 @@ const authSlice = createSlice({
       state.loading = true;
       state.error = null;
     },
+    updateProfileRequest(
+      state,
+      _action: PayloadAction<{updates: ProfileUpdate}>,
+    ) {
+      state.loading = true;
+      state.error = null;
+    },
+    changePasswordRequest(
+      state,
+      _action: PayloadAction<{newPassword: string}>,
+    ) {
+      state.loading = true;
+      state.error = null;
+    },
     setUser(state, action: PayloadAction<Profile | null>) {
       state.user = action.payload;
     },
@@ -93,6 +111,8 @@ export const {
   resetPasswordRequest,
   signInWithGoogleRequest,
   signInWithAppleRequest,
+  updateProfileRequest,
+  changePasswordRequest,
   setUser,
   setSession,
   setLoading,
@@ -112,7 +132,10 @@ function* handleSignUp(
       storage.set('token', session.access_token);
     }
     yield put(setSession(session));
-    yield put(setUser(user));
+    if (user?.id) {
+      const profile = yield call(getProfile, user.id);
+      yield put(setUser(profile));
+    }
     yield put(setLoading(false));
   } catch (error: any) {
     yield put(setError(error.message ?? 'Sign up failed'));
@@ -123,12 +146,16 @@ function* handleSignIn(
   action: ReturnType<typeof signInRequest>,
 ): Generator<any, void, any> {
   try {
-    const {session, user} = yield call(signIn, action.payload);
+    const {email, password} = action.payload;
+    const {session, user} = yield call(signIn, email, password);
     if (session?.access_token) {
       storage.set('token', session.access_token);
     }
     yield put(setSession(session));
-    yield put(setUser(user));
+    if (user?.id) {
+      const profile = yield call(getProfile, user.id);
+      yield put(setUser(profile));
+    }
     yield put(setLoading(false));
   } catch (error: any) {
     yield put(setError(error.message ?? 'Sign in failed'));
@@ -138,7 +165,7 @@ function* handleSignIn(
 function* handleSignOut(): Generator<any, void, any> {
   try {
     yield call(signOut);
-    storage.delete('token');
+    storage.remove('token');
     yield put(setSession(null));
     yield put(setUser(null));
     yield put(setLoading(false));
@@ -171,7 +198,14 @@ function* handleSignInWithGoogle(
       storage.set('token', session.access_token);
     }
     yield put(setSession(session));
-    yield put(setUser(user));
+    if (user?.id) {
+      try {
+        const profile = yield call(getProfile, user.id);
+        yield put(setUser(profile));
+      } catch {
+        yield put(setUser(null));
+      }
+    }
     yield put(setLoading(false));
   } catch (error: any) {
     yield put(setError(error.message ?? 'Google sign in failed'));
@@ -191,7 +225,14 @@ function* handleSignInWithApple(
       storage.set('token', session.access_token);
     }
     yield put(setSession(session));
-    yield put(setUser(user));
+    if (user?.id) {
+      try {
+        const profile = yield call(getProfile, user.id);
+        yield put(setUser(profile));
+      } catch {
+        yield put(setUser(null));
+      }
+    }
     yield put(setLoading(false));
   } catch (error: any) {
     yield put(setError(error.message ?? 'Apple sign in failed'));
@@ -222,6 +263,41 @@ export function* watchSignInWithApple() {
   yield takeLatest(signInWithAppleRequest.type, handleSignInWithApple);
 }
 
+function* handleUpdateProfile(
+  action: ReturnType<typeof updateProfileRequest>,
+): Generator<any, void, any> {
+  try {
+    const userId = yield select((s: RootState) => s.auth.user?.id);
+    if (!userId) {
+      throw new Error('Chưa đăng nhập');
+    }
+    const updated = yield call(updateProfile, userId, action.payload.updates);
+    yield put(setUser(updated));
+    yield put(setLoading(false));
+  } catch (error: any) {
+    yield put(setError(error.message ?? 'Failed to update profile'));
+  }
+}
+
+function* handleChangePassword(
+  action: ReturnType<typeof changePasswordRequest>,
+): Generator<any, void, any> {
+  try {
+    yield call(changePassword, action.payload.newPassword);
+    yield put(setLoading(false));
+  } catch (error: any) {
+    yield put(setError(error.message ?? 'Failed to change password'));
+  }
+}
+
+export function* watchUpdateProfile() {
+  yield takeLatest(updateProfileRequest.type, handleUpdateProfile);
+}
+
+export function* watchChangePassword() {
+  yield takeLatest(changePasswordRequest.type, handleChangePassword);
+}
+
 export function* authSaga() {
   yield all([
     fork(watchSignUp),
@@ -230,6 +306,8 @@ export function* authSaga() {
     fork(watchResetPassword),
     fork(watchSignInWithGoogle),
     fork(watchSignInWithApple),
+    fork(watchUpdateProfile),
+    fork(watchChangePassword),
   ]);
 }
 

@@ -9,3 +9,4 @@ export const issueCreateSchema = z.object({
 });
 
 export type IssueCreateData = z.infer<typeof issueCreateSchema>;
+export type IssueCreateFormData = IssueCreateData;

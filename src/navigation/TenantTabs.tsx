@@ -18,6 +18,8 @@ import PaymentDetailScreen from '../screens/tenant/payments/PaymentDetailScreen'
 import RoommateListScreen from '../screens/tenant/RoommateListScreen';
 import NotificationsScreen from '../screens/tenant/NotificationsScreen';
 import TenantProfileScreen from '../screens/tenant/ProfileScreen';
+import EditProfileScreen from '../screens/shared/EditProfileScreen';
+import ChangePasswordScreen from '../screens/shared/ChangePasswordScreen';
 
 const Tab = createBottomTabNavigator<TenantTabParamList>();
 const Stack = createNativeStackNavigator<TenantStackParamList>();
@@ -101,6 +103,16 @@ export default function TenantStack() {
         name="Notifications"
         component={NotificationsScreen}
         options={{title: 'Thông báo'}}
+      />
+      <Stack.Screen
+        name="EditProfile"
+        component={EditProfileScreen}
+        options={{title: 'Chỉnh sửa thông tin'}}
+      />
+      <Stack.Screen
+        name="ChangePassword"
+        component={ChangePasswordScreen}
+        options={{title: 'Đổi mật khẩu'}}
       />
     </Stack.Navigator>
   );

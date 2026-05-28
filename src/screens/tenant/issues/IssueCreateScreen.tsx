@@ -77,10 +77,14 @@ const IssueCreateScreen: React.FC = () => {
     }
     dispatch(
       createIssueRequest({
+        apartment_id: apartment.id,
+        reporter_id: user.id,
+        category: data.category,
+        location: data.location,
+        urgency: data.urgency,
         title: data.title,
-        description: data.description ?? '',
-        apartmentId: apartment.id,
-        reporterId: user.id,
+        description: data.description ?? null,
+        imageUris: images,
       }),
     );
   };

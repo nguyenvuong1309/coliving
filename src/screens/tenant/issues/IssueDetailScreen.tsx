@@ -40,7 +40,7 @@ const IssueDetailScreen: React.FC = () => {
   }, [id, dispatch]);
 
   const handleUpdateStatus = useCallback(
-    (status: string) => {
+    (status: 'open' | 'in_progress' | 'resolved' | 'closed' | 'reopened') => {
       dispatch(updateIssueStatusRequest({id, status}));
     },
     [id, dispatch],

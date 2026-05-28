@@ -15,7 +15,7 @@ export function getItem(key: string): string | undefined {
 }
 
 export function removeItem(key: string): void {
-  storage.delete(key);
+  storage.remove(key);
 }
 
 export function clearAll(): void {
@@ -57,7 +57,7 @@ export function getApartmentId(): string | undefined {
 }
 
 export function clearAuth(): void {
-  storage.delete(AUTH_TOKEN_KEY);
-  storage.delete(USER_ROLE_KEY);
-  storage.delete(APARTMENT_ID_KEY);
+  storage.remove(AUTH_TOKEN_KEY);
+  storage.remove(USER_ROLE_KEY);
+  storage.remove(APARTMENT_ID_KEY);
 }

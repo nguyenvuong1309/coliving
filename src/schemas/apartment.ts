@@ -11,3 +11,4 @@ export const apartmentSetupSchema = z.object({
 });
 
 export type ApartmentSetupData = z.infer<typeof apartmentSetupSchema>;
+export type ApartmentSetupFormData = ApartmentSetupData;

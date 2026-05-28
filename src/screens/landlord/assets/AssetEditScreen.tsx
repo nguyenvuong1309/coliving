@@ -20,6 +20,13 @@ import {
   LoadingOverlay,
 } from '../../../components';
 import {useApartment} from '../../../hooks/useApartment';
+import {useAuth} from '../../../hooks/useAuth';
+import {useAppDispatch, useAppSelector} from '../../../store';
+import {
+  createAssetRequest,
+  updateAssetRequest,
+  deleteAssetRequest,
+} from '../../../store/slices/assetSlice';
 import type {LandlordStackParamList} from '../../../types/navigation';
 
 type NavigationProp = NativeStackNavigationProp<LandlordStackParamList>;
@@ -36,26 +43,33 @@ const CONDITIONS: {label: string; value: 'good' | 'fair' | 'poor'}[] = [
 const AssetEditScreen: React.FC = () => {
   const navigation = useNavigation<NavigationProp>();
   const route = useRoute<EditRouteProp>();
+  const dispatch = useAppDispatch();
   const {apartment} = useApartment();
+  const {user} = useAuth();
+  const {assets, loading} = useAppSelector(state => state.asset);
 
   const editId = route.params?.id;
   const isEditMode = !!editId;
+  const existing = isEditMode ? assets.find(a => a.id === editId) : undefined;
 
-  const [name, setName] = useState('');
-  const [category, setCategory] = useState(CATEGORIES[0]);
-  const [location, setLocation] = useState(LOCATIONS[0]);
-  const [condition, setCondition] = useState<'good' | 'fair' | 'poor'>('good');
-  const [isBorrowable, setIsBorrowable] = useState(true);
-  const [imageUri, setImageUri] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [name, setName] = useState(existing?.name ?? '');
+  const [category, setCategory] = useState(existing?.category ?? CATEGORIES[0]);
+  const [location, setLocation] = useState(existing?.location ?? LOCATIONS[0]);
+  const [condition, setCondition] = useState<'good' | 'fair' | 'poor'>(
+    existing?.condition ?? 'good',
+  );
+  const [isBorrowable, setIsBorrowable] = useState(
+    existing?.is_borrowable ?? true,
+  );
+  const [imageUri, setImageUri] = useState<string | null>(
+    existing?.image_url ?? null,
+  );
+  const [newImagePicked, setNewImagePicked] = useState(false);
 
   useEffect(() => {
-    if (isEditMode) {
-      // In a real app, fetch asset by editId and pre-fill fields
-      navigation.setOptions({title: 'Chinh sua tai san'});
-    } else {
-      navigation.setOptions({title: 'Them tai san'});
-    }
+    navigation.setOptions({
+      title: isEditMode ? 'Chinh sua tai san' : 'Them tai san',
+    });
   }, [isEditMode, navigation]);
 
   const handlePickImage = useCallback(async () => {
@@ -67,44 +81,90 @@ const AssetEditScreen: React.FC = () => {
         maxHeight: 1024,
       });
       if (result.assets && result.assets.length > 0) {
-        setImageUri(result.assets[0].uri ?? null);
+        const uri = result.assets[0].uri ?? null;
+        setImageUri(uri);
+        setNewImagePicked(true);
       }
     } catch {
       // User cancelled
     }
   }, []);
 
+  const prevLoadingRef = React.useRef(loading);
+  useEffect(() => {
+    if (prevLoadingRef.current && !loading) {
+      navigation.goBack();
+    }
+    prevLoadingRef.current = loading;
+  }, [loading, navigation]);
+
   const handleSubmit = useCallback(() => {
     if (!name.trim()) {
       Alert.alert('Loi', 'Vui long nhap ten tai san');
       return;
     }
-
-    setLoading(true);
-    // In a real app, dispatch create or update action
-    setTimeout(() => {
-      setLoading(false);
-      navigation.goBack();
-    }, 1000);
-  }, [name, category, location, condition, isBorrowable, imageUri, navigation]);
+    if (!apartment?.id) {
+      Alert.alert('Loi', 'Khong tim thay can ho');
+      return;
+    }
+    if (isEditMode && editId) {
+      dispatch(
+        updateAssetRequest({
+          id: editId,
+          updates: {
+            name: name.trim(),
+            category,
+            location,
+            condition,
+            is_borrowable: isBorrowable,
+          },
+          imageUri: newImagePicked && imageUri ? imageUri : undefined,
+        }),
+      );
+    } else {
+      dispatch(
+        createAssetRequest({
+          apartment_id: apartment.id,
+          owner_id: user?.id ?? null,
+          name: name.trim(),
+          category,
+          location,
+          condition,
+          is_borrowable: isBorrowable,
+          imageUri: imageUri ?? undefined,
+        }),
+      );
+    }
+  }, [
+    apartment?.id,
+    user?.id,
+    isEditMode,
+    editId,
+    name,
+    category,
+    location,
+    condition,
+    isBorrowable,
+    imageUri,
+    newImagePicked,
+    dispatch,
+  ]);
 
   const handleDelete = useCallback(() => {
+    if (!editId) {
+      return;
+    }
     Alert.alert('Xoa tai san', 'Ban co chac chan muon xoa tai san nay?', [
       {text: 'Huy', style: 'cancel'},
       {
         text: 'Xoa',
         style: 'destructive',
         onPress: () => {
-          setLoading(true);
-          // In a real app, dispatch delete action
-          setTimeout(() => {
-            setLoading(false);
-            navigation.goBack();
-          }, 500);
+          dispatch(deleteAssetRequest({id: editId}));
         },
       },
     ]);
-  }, [navigation]);
+  }, [editId, dispatch]);
 
   return (
     <ScreenWrapper scroll>

@@ -65,7 +65,8 @@ const PaymentDetailScreen: React.FC = () => {
     dispatch(
       reportPaymentRequest({
         paymentId: id,
-        proofUrl: receiptImage ?? undefined,
+        method: selectedMethod,
+        receiptUri: receiptImage ?? undefined,
       }),
     );
   }, [id, selectedMethod, receiptImage, dispatch]);

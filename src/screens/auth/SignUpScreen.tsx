@@ -16,12 +16,15 @@ import type {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import {useAuth} from '../../hooks/useAuth';
 import {signUpSchema, type SignUpData} from '../../schemas/auth';
 import {Input, Button, GoogleSignInButton, AppleSignInButton} from '../../components';
+import {useAppDispatch} from '../../store';
+import {setError as setAuthError} from '../../store/slices/authSlice';
 import type {AuthStackParamList} from '../../types/navigation';
 
 type Nav = NativeStackNavigationProp<AuthStackParamList, 'SignUp'>;
 
 export default function SignUpScreen() {
   const navigation = useNavigation<Nav>();
+  const dispatch = useAppDispatch();
   const {signUp, signInWithGoogle, signInWithApple, loading, error} = useAuth();
   const [selectedRole, setSelectedRole] = useState<'tenant' | 'landlord'>(
     'tenant',
@@ -48,12 +51,16 @@ export default function SignUpScreen() {
 
   const handleGoogleSuccess = (idToken: string, accessToken: string) => {
     signInWithGoogle(idToken, accessToken);
-    navigation.navigate('RoleSelection');
   };
 
   const handleAppleSuccess = (idToken: string, fullName?: any) => {
     signInWithApple(idToken, fullName);
-    navigation.navigate('RoleSelection');
+  };
+
+  const handleOAuthError = (err: unknown) => {
+    const message =
+      err instanceof Error ? err.message : 'Đăng nhập với nhà cung cấp thất bại';
+    dispatch(setAuthError(message));
   };
 
   return (
@@ -69,12 +76,12 @@ export default function SignUpScreen() {
         <View style={styles.oauthSection}>
           <GoogleSignInButton
             onSuccess={handleGoogleSuccess}
-            onError={(error) => console.error('Google sign in error:', error)}
+            onError={handleOAuthError}
             loading={loading}
           />
           <AppleSignInButton
             onSuccess={handleAppleSuccess}
-            onError={(error) => console.error('Apple sign in error:', error)}
+            onError={handleOAuthError}
             loading={loading}
           />
         </View>

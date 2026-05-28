@@ -1,14 +1,16 @@
 import {createSlice, PayloadAction} from '@reduxjs/toolkit';
-import {call, put, takeLatest} from 'redux-saga/effects';
+import {call, put, select, takeLatest} from 'redux-saga/effects';
 import {
   createApartment,
-  fetchApartment,
+  getApartment,
   getApartmentByInviteCode,
   joinApartment,
-  fetchMembers,
+  getMembers,
   removeMember,
+  generateInviteCode,
 } from '../../services/apartment';
 import type {Apartment, ApartmentMember} from '../../types/database';
+import type {RootState} from '../index';
 
 interface ApartmentMemberWithProfile extends ApartmentMember {
   profile: any;
@@ -34,7 +36,11 @@ const apartmentSlice = createSlice({
   reducers: {
     createApartmentRequest(
       state,
-      _action: PayloadAction<{name: string; address: string}>,
+      _action: PayloadAction<{
+        name: string;
+        address: string;
+        num_rooms: number;
+      }>,
     ) {
       state.loading = true;
       state.error = null;
@@ -98,7 +104,16 @@ function* handleCreateApartment(
   action: ReturnType<typeof createApartmentRequest>,
 ): Generator<any, void, any> {
   try {
-    const apartment = yield call(createApartment, action.payload);
+    const userId = yield select((s: RootState) => s.auth.user?.id);
+    if (!userId) {
+      throw new Error('Chưa đăng nhập');
+    }
+    const inviteCode = generateInviteCode();
+    const apartment = yield call(createApartment, {
+      ...action.payload,
+      landlord_id: userId,
+      invite_code: inviteCode,
+    });
     yield put(setApartment(apartment));
     yield put(setLoading(false));
   } catch (error: any) {
@@ -110,7 +125,7 @@ function* handleFetchApartment(
   action: ReturnType<typeof fetchApartmentRequest>,
 ): Generator<any, void, any> {
   try {
-    const apartment = yield call(fetchApartment, action.payload.id);
+    const apartment = yield call(getApartment, action.payload.id);
     yield put(setApartment(apartment));
     yield put(setLoading(false));
   } catch (error: any) {
@@ -122,11 +137,15 @@ function* handleJoinApartment(
   action: ReturnType<typeof joinApartmentRequest>,
 ): Generator<any, void, any> {
   try {
+    const userId = yield select((s: RootState) => s.auth.user?.id);
+    if (!userId) {
+      throw new Error('Chưa đăng nhập');
+    }
     const apartment = yield call(
       getApartmentByInviteCode,
       action.payload.inviteCode,
     );
-    yield call(joinApartment, apartment.id);
+    yield call(joinApartment, apartment.id, userId);
     yield put(setApartment(apartment));
     yield put(setLoading(false));
   } catch (error: any) {
@@ -138,7 +157,7 @@ function* handleFetchMembers(
   action: ReturnType<typeof fetchMembersRequest>,
 ): Generator<any, void, any> {
   try {
-    const members = yield call(fetchMembers, action.payload.apartmentId);
+    const members = yield call(getMembers, action.payload.apartmentId);
     yield put(setMembers(members));
     yield put(setLoading(false));
   } catch (error: any) {

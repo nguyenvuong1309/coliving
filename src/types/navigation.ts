@@ -40,6 +40,8 @@ export type TenantStackParamList = TenantTabParamList & {
   PaymentDetail: {id: string};
   RoommateList: undefined;
   Notifications: undefined;
+  EditProfile: undefined;
+  ChangePassword: undefined;
 };
 
 // Landlord stack (tabs + detail screens)
@@ -53,6 +55,8 @@ export type LandlordStackParamList = LandlordTabParamList & {
   PaymentOverview: {billingId: string};
   PaymentConfirm: {id: string};
   RevenueHistory: undefined;
+  EditProfile: undefined;
+  ChangePassword: undefined;
 };
 
 // Root navigator

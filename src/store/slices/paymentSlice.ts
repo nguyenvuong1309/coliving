@@ -1,14 +1,17 @@
 import {createSlice, PayloadAction} from '@reduxjs/toolkit';
-import {call, put, takeLatest} from 'redux-saga/effects';
+import {call, put, select, takeLatest} from 'redux-saga/effects';
 import {
-  createBilling,
-  fetchBillingPeriods,
-  fetchPayments,
-  fetchMyPayments,
+  createBillingPeriod,
+  getBillingPeriods,
+  getPayments,
+  getMyPayments,
   reportPayment,
   confirmPayment,
+  rejectPayment,
 } from '../../services/payment';
+import {uploadImage, getImageUrl} from '../../services/storage';
 import type {BillingPeriod, Payment} from '../../types/database';
+import type {RootState} from '../index';
 
 interface PaymentState {
   billingPeriods: BillingPeriod[];
@@ -36,7 +39,7 @@ const paymentSlice = createSlice({
         apartmentId: string;
         month: number;
         year: number;
-        totalAmount: number;
+        dueDate: string;
       }>,
     ) {
       state.loading = true;
@@ -65,7 +68,11 @@ const paymentSlice = createSlice({
     },
     reportPaymentRequest(
       state,
-      _action: PayloadAction<{paymentId: string; proofUrl?: string}>,
+      _action: PayloadAction<{
+        paymentId: string;
+        method: 'bank_transfer' | 'cash';
+        receiptUri?: string;
+      }>,
     ) {
       state.loading = true;
       state.error = null;
@@ -73,6 +80,13 @@ const paymentSlice = createSlice({
     confirmPaymentRequest(
       state,
       _action: PayloadAction<{paymentId: string}>,
+    ) {
+      state.loading = true;
+      state.error = null;
+    },
+    rejectPaymentRequest(
+      state,
+      _action: PayloadAction<{paymentId: string; note?: string}>,
     ) {
       state.loading = true;
       state.error = null;
@@ -103,6 +117,7 @@ export const {
   fetchMyPaymentsRequest,
   reportPaymentRequest,
   confirmPaymentRequest,
+  rejectPaymentRequest,
   setBillingPeriods,
   setPayments,
   setMyPayments,
@@ -116,7 +131,23 @@ function* handleCreateBilling(
   action: ReturnType<typeof createBillingRequest>,
 ): Generator<any, void, any> {
   try {
-    yield call(createBilling, action.payload);
+    const userId = yield select((s: RootState) => s.auth.user?.id);
+    if (!userId) {
+      throw new Error('Chưa đăng nhập');
+    }
+    yield call(
+      createBillingPeriod,
+      action.payload.apartmentId,
+      action.payload.month,
+      action.payload.year,
+      action.payload.dueDate,
+      userId,
+    );
+    const periods = yield call(
+      getBillingPeriods,
+      action.payload.apartmentId,
+    );
+    yield put(setBillingPeriods(periods));
     yield put(setLoading(false));
   } catch (error: any) {
     yield put(setError(error.message ?? 'Failed to create billing'));
@@ -128,7 +159,7 @@ function* handleFetchBillingPeriods(
 ): Generator<any, void, any> {
   try {
     const periods = yield call(
-      fetchBillingPeriods,
+      getBillingPeriods,
       action.payload.apartmentId,
     );
     yield put(setBillingPeriods(periods));
@@ -143,7 +174,7 @@ function* handleFetchPayments(
 ): Generator<any, void, any> {
   try {
     const payments = yield call(
-      fetchPayments,
+      getPayments,
       action.payload.billingPeriodId,
     );
     yield put(setPayments(payments));
@@ -157,7 +188,7 @@ function* handleFetchMyPayments(
   action: ReturnType<typeof fetchMyPaymentsRequest>,
 ): Generator<any, void, any> {
   try {
-    const payments = yield call(fetchMyPayments, action.payload.userId);
+    const payments = yield call(getMyPayments, action.payload.userId);
     yield put(setMyPayments(payments));
     yield put(setLoading(false));
   } catch (error: any) {
@@ -169,12 +200,27 @@ function* handleReportPayment(
   action: ReturnType<typeof reportPaymentRequest>,
 ): Generator<any, void, any> {
   try {
-    yield call(
-      reportPayment,
-      action.payload.paymentId,
-      action.payload.proofUrl,
-    );
+    const {paymentId, method, receiptUri} = action.payload;
+    let receiptUrl: string | undefined;
+    if (receiptUri) {
+      const ext = receiptUri.split('.').pop()?.toLowerCase() || 'jpg';
+      const path = `${paymentId}/${Date.now()}.${ext}`;
+      yield call(uploadImage, 'payment-receipts', path, {
+        uri: receiptUri,
+        type: `image/${ext === 'jpg' ? 'jpeg' : ext}`,
+        name: path.split('/').pop()!,
+      });
+      receiptUrl = getImageUrl('payment-receipts', path);
+    }
+    const updated = yield call(reportPayment, paymentId, method, receiptUrl);
+
+    const userId = yield select((s: RootState) => s.auth.user?.id);
+    if (userId) {
+      const payments = yield call(getMyPayments, userId);
+      yield put(setMyPayments(payments));
+    }
     yield put(setLoading(false));
+    return updated;
   } catch (error: any) {
     yield put(setError(error.message ?? 'Failed to report payment'));
   }
@@ -184,10 +230,29 @@ function* handleConfirmPayment(
   action: ReturnType<typeof confirmPaymentRequest>,
 ): Generator<any, void, any> {
   try {
-    yield call(confirmPayment, action.payload.paymentId);
+    const userId = yield select((s: RootState) => s.auth.user?.id);
+    if (!userId) {
+      throw new Error('Chưa đăng nhập');
+    }
+    yield call(confirmPayment, action.payload.paymentId, userId);
     yield put(setLoading(false));
   } catch (error: any) {
     yield put(setError(error.message ?? 'Failed to confirm payment'));
+  }
+}
+
+function* handleRejectPayment(
+  action: ReturnType<typeof rejectPaymentRequest>,
+): Generator<any, void, any> {
+  try {
+    yield call(
+      rejectPayment,
+      action.payload.paymentId,
+      action.payload.note,
+    );
+    yield put(setLoading(false));
+  } catch (error: any) {
+    yield put(setError(error.message ?? 'Failed to reject payment'));
   }
 }
 
@@ -198,6 +263,7 @@ export function* paymentSaga() {
   yield takeLatest(fetchMyPaymentsRequest.type, handleFetchMyPayments);
   yield takeLatest(reportPaymentRequest.type, handleReportPayment);
   yield takeLatest(confirmPaymentRequest.type, handleConfirmPayment);
+  yield takeLatest(rejectPaymentRequest.type, handleRejectPayment);
 }
 
 export default paymentSlice.reducer;

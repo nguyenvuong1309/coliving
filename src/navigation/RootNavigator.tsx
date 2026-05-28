@@ -12,20 +12,12 @@ const Stack = createNativeStackNavigator<RootStackParamList>();
 
 export default function RootNavigator() {
   const {user, session} = useAppSelector(state => state.auth);
-
-  const getInitialRoute = (): keyof RootStackParamList => {
-    if (!session || !user) {
-      return 'Auth';
-    }
-    return user.role === 'landlord' ? 'Landlord' : 'Tenant';
-  };
+  const isAuthenticated = !!session && !!user;
 
   return (
     <NavigationContainer>
-      <Stack.Navigator
-        initialRouteName={getInitialRoute()}
-        screenOptions={{headerShown: false}}>
-        {!session ? (
+      <Stack.Navigator screenOptions={{headerShown: false}}>
+        {!isAuthenticated ? (
           <Stack.Screen name="Auth" component={AuthStack} />
         ) : user?.role === 'landlord' ? (
           <Stack.Screen name="Landlord" component={LandlordStack} />

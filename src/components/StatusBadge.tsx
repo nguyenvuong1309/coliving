@@ -30,6 +30,9 @@ const STATUS_MAP: Record<string, StatusConfig> = {
   reopened: { label: 'Mở lại', backgroundColor: '#FFF7ED', textColor: '#EA580C' },
   tenant_reported: { label: 'Đã báo trả', backgroundColor: '#FEFCE8', textColor: '#CA8A04' },
   overdue: { label: 'Quá hạn', backgroundColor: '#FEF2F2', textColor: '#DC2626' },
+  good: { label: 'Tốt', backgroundColor: '#F0FDF4', textColor: '#16A34A' },
+  fair: { label: 'Khá', backgroundColor: '#FEFCE8', textColor: '#CA8A04' },
+  poor: { label: 'Kém', backgroundColor: '#FEF2F2', textColor: '#DC2626' },
 };
 
 const DEFAULT_CONFIG: StatusConfig = {

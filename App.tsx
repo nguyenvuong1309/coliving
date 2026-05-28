@@ -5,6 +5,7 @@ import {GestureHandlerRootView} from 'react-native-gesture-handler';
 import {Provider} from 'react-redux';
 import {store} from './src/store';
 import RootNavigator from './src/navigation/RootNavigator';
+import {ErrorToast} from './src/components';
 
 export default function App() {
   return (
@@ -13,6 +14,7 @@ export default function App() {
         <SafeAreaProvider>
           <StatusBar barStyle="dark-content" backgroundColor="#F8FAFC" />
           <RootNavigator />
+          <ErrorToast />
         </SafeAreaProvider>
       </Provider>
     </GestureHandlerRootView>

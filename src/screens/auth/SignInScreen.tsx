@@ -15,12 +15,15 @@ import type {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import {useAuth} from '../../hooks/useAuth';
 import {signInSchema, type SignInData} from '../../schemas/auth';
 import {Input, Button, GoogleSignInButton, AppleSignInButton} from '../../components';
+import {useAppDispatch} from '../../store';
+import {setError as setAuthError} from '../../store/slices/authSlice';
 import type {AuthStackParamList} from '../../types/navigation';
 
 type Nav = NativeStackNavigationProp<AuthStackParamList, 'SignIn'>;
 
 export default function SignInScreen() {
   const navigation = useNavigation<Nav>();
+  const dispatch = useAppDispatch();
   const {signIn, signInWithGoogle, signInWithApple, loading, error} = useAuth();
 
   const {
@@ -38,12 +41,16 @@ export default function SignInScreen() {
 
   const handleGoogleSuccess = (idToken: string, accessToken: string) => {
     signInWithGoogle(idToken, accessToken);
-    navigation.navigate('RoleSelection');
   };
 
   const handleAppleSuccess = (idToken: string, fullName?: any) => {
     signInWithApple(idToken, fullName);
-    navigation.navigate('RoleSelection');
+  };
+
+  const handleOAuthError = (err: unknown) => {
+    const message =
+      err instanceof Error ? err.message : 'Đăng nhập với nhà cung cấp thất bại';
+    dispatch(setAuthError(message));
   };
 
   return (
@@ -60,12 +67,12 @@ export default function SignInScreen() {
         <View style={styles.oauthSection}>
           <GoogleSignInButton
             onSuccess={handleGoogleSuccess}
-            onError={(error) => console.error('Google sign in error:', error)}
+            onError={handleOAuthError}
             loading={loading}
           />
           <AppleSignInButton
             onSuccess={handleAppleSuccess}
-            onError={(error) => console.error('Apple sign in error:', error)}
+            onError={handleOAuthError}
             loading={loading}
           />
         </View>

@@ -12,7 +12,10 @@ import {
 } from '../../../components';
 import {useApartment} from '../../../hooks/useApartment';
 import {useAppSelector, useAppDispatch} from '../../../store';
-import {confirmPaymentRequest} from '../../../store/slices/paymentSlice';
+import {
+  confirmPaymentRequest,
+  rejectPaymentRequest,
+} from '../../../store/slices/paymentSlice';
 import {formatCurrency, formatDate, getStatusLabel} from '../../../utils/formatters';
 import type {LandlordStackParamList} from '../../../types/navigation';
 
@@ -65,13 +68,13 @@ const PaymentConfirmScreen: React.FC = () => {
           text: 'Chua nhan duoc',
           style: 'destructive',
           onPress: () => {
-            // In a real app, dispatch a reject action
+            dispatch(rejectPaymentRequest({paymentId: id}));
             navigation.goBack();
           },
         },
       ],
     );
-  }, [tenantName, navigation]);
+  }, [id, tenantName, dispatch, navigation]);
 
   if (!payment) {
     return (

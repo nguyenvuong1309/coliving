@@ -12,8 +12,8 @@ import {useNavigation} from '@react-navigation/native';
 import type {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import {Card, StatusBadge, EmptyState, LoadingOverlay} from '../../../components';
 import {useApartment} from '../../../hooks/useApartment';
-import {useAppSelector} from '../../../store';
-import {getStatusLabel} from '../../../utils/formatters';
+import {useAppSelector, useAppDispatch} from '../../../store';
+import {fetchAssetsRequest} from '../../../store/slices/assetSlice';
 import type {LandlordStackParamList} from '../../../types/navigation';
 import type {Asset} from '../../../types/database';
 
@@ -21,13 +21,10 @@ type NavigationProp = NativeStackNavigationProp<LandlordStackParamList>;
 
 const AssetListScreen: React.FC = () => {
   const navigation = useNavigation<NavigationProp>();
+  const dispatch = useAppDispatch();
   const {apartment} = useApartment();
   const {requests: borrowRequests} = useAppSelector(state => state.borrow);
-
-  // Assets would typically come from a dedicated asset slice; using borrow slice data
-  // to derive the currently borrowed assets.
-  const [assets, setAssets] = React.useState<Asset[]>([]);
-  const [loading, setLoading] = React.useState(false);
+  const {assets, loading} = useAppSelector(state => state.asset);
   const [refreshing, setRefreshing] = React.useState(false);
 
   const borrowedAssetMap = useMemo(() => {
@@ -40,10 +37,20 @@ const AssetListScreen: React.FC = () => {
     return map;
   }, [borrowRequests]);
 
+  useEffect(() => {
+    if (apartment?.id) {
+      dispatch(fetchAssetsRequest({apartmentId: apartment.id}));
+    }
+  }, [apartment?.id, dispatch]);
+
   const onRefresh = React.useCallback(() => {
+    if (!apartment?.id) {
+      return;
+    }
     setRefreshing(true);
-    setTimeout(() => setRefreshing(false), 1000);
-  }, []);
+    dispatch(fetchAssetsRequest({apartmentId: apartment.id}));
+    setTimeout(() => setRefreshing(false), 600);
+  }, [apartment?.id, dispatch]);
 
   const renderItem = ({item}: {item: Asset}) => {
     const borrowerId = borrowedAssetMap[item.id];

@@ -21,6 +21,8 @@ import ApartmentSetupScreen from '../screens/landlord/apartment/ApartmentSetupSc
 import InviteCodeScreen from '../screens/landlord/apartment/InviteCodeScreen';
 import RevenueHistoryScreen from '../screens/landlord/RevenueHistoryScreen';
 import LandlordProfileScreen from '../screens/landlord/ProfileScreen';
+import EditProfileScreen from '../screens/shared/EditProfileScreen';
+import ChangePasswordScreen from '../screens/shared/ChangePasswordScreen';
 
 const Tab = createBottomTabNavigator<LandlordTabParamList>();
 const Stack = createNativeStackNavigator<LandlordStackParamList>();
@@ -57,6 +59,11 @@ function LandlordTabNavigator() {
         name="LandlordPayments"
         component={LandlordPaymentsScreen}
         options={{tabBarLabel: 'Thu tiền'}}
+      />
+      <Tab.Screen
+        name="LandlordProfile"
+        component={LandlordProfileScreen}
+        options={{tabBarLabel: 'Cá nhân'}}
       />
     </Tab.Navigator>
   );
@@ -116,9 +123,14 @@ export default function LandlordStack() {
         options={{title: 'Lịch sử doanh thu'}}
       />
       <Stack.Screen
-        name="LandlordProfile"
-        component={LandlordProfileScreen}
-        options={{title: 'Cá nhân'}}
+        name="EditProfile"
+        component={EditProfileScreen}
+        options={{title: 'Chỉnh sửa thông tin'}}
+      />
+      <Stack.Screen
+        name="ChangePassword"
+        component={ChangePasswordScreen}
+        options={{title: 'Đổi mật khẩu'}}
       />
     </Stack.Navigator>
   );

@@ -8,6 +8,8 @@ import SignUpScreen from '../screens/auth/SignUpScreen';
 import SignInScreen from '../screens/auth/SignInScreen';
 import ForgotPasswordScreen from '../screens/auth/ForgotPasswordScreen';
 import JoinApartmentScreen from '../screens/auth/JoinApartmentScreen';
+import RoleSelectionScreen from '../screens/auth/RoleSelectionScreen';
+import ProfileCompletionScreen from '../screens/auth/ProfileCompletionScreen';
 
 const Stack = createNativeStackNavigator<AuthStackParamList>();
 
@@ -51,6 +53,24 @@ export default function AuthStack() {
         options={{
           headerShown: true,
           title: 'Tham gia căn hộ',
+          headerBackTitle: 'Quay lại',
+        }}
+      />
+      <Stack.Screen
+        name="RoleSelection"
+        component={RoleSelectionScreen}
+        options={{
+          headerShown: true,
+          title: 'Chọn vai trò',
+          headerBackTitle: 'Quay lại',
+        }}
+      />
+      <Stack.Screen
+        name="ProfileCompletion"
+        component={ProfileCompletionScreen}
+        options={{
+          headerShown: true,
+          title: 'Hoàn tất hồ sơ',
           headerBackTitle: 'Quay lại',
         }}
       />

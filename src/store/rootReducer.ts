@@ -5,6 +5,7 @@ import borrowReducer from './slices/borrowSlice';
 import issueReducer from './slices/issueSlice';
 import paymentReducer from './slices/paymentSlice';
 import notificationReducer from './slices/notificationSlice';
+import assetReducer from './slices/assetSlice';
 
 const rootReducer = combineReducers({
   auth: authReducer,
@@ -13,6 +14,7 @@ const rootReducer = combineReducers({
   issue: issueReducer,
   payment: paymentReducer,
   notification: notificationReducer,
+  asset: assetReducer,
 });
 
 export default rootReducer;

@@ -19,4 +19,5 @@ export const reportPaymentSchema = z.object({
 });
 
 export type CreateBillingData = z.infer<typeof createBillingSchema>;
+export type CreateBillingFormData = CreateBillingData;
 export type ReportPaymentData = z.infer<typeof reportPaymentSchema>;

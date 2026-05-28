@@ -1,12 +1,25 @@
 import {createSlice, PayloadAction} from '@reduxjs/toolkit';
 import {call, put, takeLatest} from 'redux-saga/effects';
 import {
-  fetchBorrowRequests,
+  getBorrowRequests,
   createBorrowRequest,
   updateBorrowStatus,
-  fetchBorrowDetail,
+  getBorrowRequest,
 } from '../../services/borrow';
-import type {BorrowRequest} from '../../types/database';
+import type {BorrowRequest, BorrowRequestInsert} from '../../types/database';
+
+type BorrowStatus =
+  | 'pending'
+  | 'approved'
+  | 'rejected'
+  | 'in_use'
+  | 'return_requested'
+  | 'returned';
+
+type CreateBorrowPayload = Omit<
+  BorrowRequestInsert,
+  'id' | 'created_at' | 'updated_at' | 'status'
+>;
 
 interface BorrowState {
   requests: BorrowRequest[];
@@ -35,19 +48,14 @@ const borrowSlice = createSlice({
     },
     createBorrowRequestRequest(
       state,
-      _action: PayloadAction<{
-        itemName: string;
-        description?: string;
-        borrowerId: string;
-        apartmentId: string;
-      }>,
+      _action: PayloadAction<CreateBorrowPayload>,
     ) {
       state.loading = true;
       state.error = null;
     },
     updateBorrowStatusRequest(
       state,
-      _action: PayloadAction<{id: string; status: string}>,
+      _action: PayloadAction<{id: string; status: BorrowStatus}>,
     ) {
       state.loading = true;
       state.error = null;
@@ -90,7 +98,7 @@ function* handleFetchBorrowRequests(
 ): Generator<any, void, any> {
   try {
     const requests = yield call(
-      fetchBorrowRequests,
+      getBorrowRequests,
       action.payload.apartmentId,
     );
     yield put(setRequests(requests));
@@ -132,7 +140,7 @@ function* handleFetchBorrowDetail(
   action: ReturnType<typeof fetchBorrowDetailRequest>,
 ): Generator<any, void, any> {
   try {
-    const request = yield call(fetchBorrowDetail, action.payload.id);
+    const request = yield call(getBorrowRequest, action.payload.id);
     yield put(setCurrentRequest(request));
     yield put(setLoading(false));
   } catch (error: any) {

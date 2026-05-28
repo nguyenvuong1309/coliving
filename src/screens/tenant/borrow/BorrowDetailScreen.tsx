@@ -39,7 +39,15 @@ const BorrowDetailScreen: React.FC = () => {
   );
 
   const handleUpdateStatus = useCallback(
-    (status: string) => {
+    (
+      status:
+        | 'pending'
+        | 'approved'
+        | 'rejected'
+        | 'in_use'
+        | 'return_requested'
+        | 'returned',
+    ) => {
       dispatch(updateBorrowStatusRequest({id, status}));
     },
     [id, dispatch],

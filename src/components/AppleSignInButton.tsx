@@ -9,8 +9,8 @@ import {
   Alert,
 } from 'react-native';
 import appleAuth, {
-  AppleAuthRequestScope,
-  AppleAuthError,
+  AppleRequestScope,
+  AppleError,
 } from '@invertase/react-native-apple-authentication';
 
 interface AppleSignInButtonProps {
@@ -38,8 +38,8 @@ export function AppleSignInButton({
       const appleAuthRequestResponse = await appleAuth.performRequest({
         requestedOperation: appleAuth.Operation.LOGIN,
         requestedScopes: [
-          AppleAuthRequestScope.FULL_NAME,
-          AppleAuthRequestScope.EMAIL,
+          AppleRequestScope.FULL_NAME,
+          AppleRequestScope.EMAIL,
         ],
       });
 
@@ -60,7 +60,7 @@ export function AppleSignInButton({
         onError('Apple Sign-In authorization failed');
       }
     } catch (error: any) {
-      if (error.code === AppleAuthError.CANCELED) {
+      if (error.code === AppleError.CANCELED) {
         // User cancelled
       } else {
         onError(error.message || 'Apple sign-in failed');
