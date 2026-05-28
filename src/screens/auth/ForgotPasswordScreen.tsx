@@ -1,22 +1,26 @@
-import React, {useState} from 'react';
-import {View, Text, StyleSheet, Alert} from 'react-native';
-import {useForm, Controller} from 'react-hook-form';
-import {zodResolver} from '@hookform/resolvers/zod';
-import {useAuth} from '../../hooks/useAuth';
-import {forgotPasswordSchema, type ForgotPasswordData} from '../../schemas/auth';
-import {Input, Button} from '../../components';
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, Alert } from 'react-native';
+import { useForm, Controller } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useAuth } from '../../hooks/useAuth';
+import {
+  forgotPasswordSchema,
+  type ForgotPasswordData,
+} from '../../schemas/auth';
+import Input from '../../components/Input';
+import Button from '../../components/Button';
 
 export default function ForgotPasswordScreen() {
-  const {resetPassword, loading} = useAuth();
+  const { resetPassword, loading } = useAuth();
   const [sent, setSent] = useState(false);
 
   const {
     control,
     handleSubmit,
-    formState: {errors},
+    formState: { errors },
   } = useForm<ForgotPasswordData>({
     resolver: zodResolver(forgotPasswordSchema),
-    defaultValues: {email: ''},
+    defaultValues: { email: '' },
   });
 
   const onSubmit = (data: ForgotPasswordData) => {
@@ -46,7 +50,7 @@ export default function ForgotPasswordScreen() {
       <Controller
         control={control}
         name="email"
-        render={({field: {onChange, onBlur, value}}) => (
+        render={({ field: { onChange, onBlur, value } }) => (
           <Input
             label="Email"
             placeholder="email@example.com"

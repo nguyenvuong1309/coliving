@@ -1,18 +1,16 @@
-import React, {useEffect} from 'react';
-import {View, Text, StyleSheet} from 'react-native';
-import {useNavigation, useRoute} from '@react-navigation/native';
-import type {NativeStackNavigationProp} from '@react-navigation/native-stack';
-import type {RouteProp} from '@react-navigation/native';
-import {useForm, Controller} from 'react-hook-form';
-import {zodResolver} from '@hookform/resolvers/zod';
-import {
-  ScreenWrapper,
-  Input,
-  Button,
-  LoadingOverlay,
-} from '../../../components';
-import {useApartment} from '../../../hooks/useApartment';
-import {useAppDispatch, useAppSelector} from '../../../store';
+import React, { useEffect } from 'react';
+import { View, Text, StyleSheet } from 'react-native';
+import { useNavigation, useRoute } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import type { RouteProp } from '@react-navigation/native';
+import { useForm, Controller } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import ScreenWrapper from '../../../components/ScreenWrapper';
+import Input from '../../../components/Input';
+import Button from '../../../components/Button';
+import LoadingOverlay from '../../../components/LoadingOverlay';
+import { useApartment } from '../../../hooks/useApartment';
+import { useAppDispatch, useAppSelector } from '../../../store';
 import {
   createApartmentRequest,
   fetchApartmentRequest,
@@ -21,7 +19,7 @@ import {
   apartmentSetupSchema,
   type ApartmentSetupFormData,
 } from '../../../schemas/apartment';
-import type {LandlordStackParamList} from '../../../types/navigation';
+import type { LandlordStackParamList } from '../../../types/navigation';
 
 type NavigationProp = NativeStackNavigationProp<LandlordStackParamList>;
 type SetupRouteProp = RouteProp<LandlordStackParamList, 'ApartmentSetup'>;
@@ -30,7 +28,7 @@ const ApartmentSetupScreen: React.FC = () => {
   const navigation = useNavigation<NavigationProp>();
   const route = useRoute<SetupRouteProp>();
   const dispatch = useAppDispatch();
-  const {apartment, loading} = useApartment();
+  const { apartment, loading } = useApartment();
 
   const editId = route.params?.id;
   const isEditMode = !!editId;
@@ -39,7 +37,7 @@ const ApartmentSetupScreen: React.FC = () => {
     control,
     handleSubmit,
     reset,
-    formState: {errors},
+    formState: { errors },
   } = useForm<ApartmentSetupFormData>({
     resolver: zodResolver(apartmentSetupSchema),
     defaultValues: {
@@ -51,7 +49,7 @@ const ApartmentSetupScreen: React.FC = () => {
 
   useEffect(() => {
     if (isEditMode && editId) {
-      dispatch(fetchApartmentRequest({id: editId}));
+      dispatch(fetchApartmentRequest({ id: editId }));
     }
   }, [editId, isEditMode, dispatch]);
 
@@ -68,7 +66,7 @@ const ApartmentSetupScreen: React.FC = () => {
   const prevLoadingRef = React.useRef(loading);
   useEffect(() => {
     if (prevLoadingRef.current && !loading && apartment && !isEditMode) {
-      navigation.navigate('InviteCode', {apartmentId: apartment.id});
+      navigation.navigate('InviteCode', { apartmentId: apartment.id });
     }
     prevLoadingRef.current = loading;
   }, [loading, apartment, isEditMode, navigation]);
@@ -94,7 +92,7 @@ const ApartmentSetupScreen: React.FC = () => {
         <Controller
           control={control}
           name="name"
-          render={({field: {onChange, value}}) => (
+          render={({ field: { onChange, value } }) => (
             <Input
               label="Ten can ho"
               placeholder="VD: Chung cu Sunrise"
@@ -108,7 +106,7 @@ const ApartmentSetupScreen: React.FC = () => {
         <Controller
           control={control}
           name="address"
-          render={({field: {onChange, value}}) => (
+          render={({ field: { onChange, value } }) => (
             <Input
               label="Dia chi"
               placeholder="VD: 123 Nguyen Hue, Q.1, TP.HCM"
@@ -122,7 +120,7 @@ const ApartmentSetupScreen: React.FC = () => {
         <Controller
           control={control}
           name="num_rooms"
-          render={({field: {onChange, value}}) => (
+          render={({ field: { onChange, value } }) => (
             <Input
               label="So phong"
               placeholder="VD: 10"

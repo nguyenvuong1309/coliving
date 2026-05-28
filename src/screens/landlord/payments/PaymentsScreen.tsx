@@ -1,29 +1,25 @@
-import React, {useEffect, useMemo} from 'react';
-import {
-  View,
-  Text,
-  FlatList,
-  TouchableOpacity,
-  StyleSheet,
-  RefreshControl,
-} from 'react-native';
-import {useNavigation} from '@react-navigation/native';
-import type {NativeStackNavigationProp} from '@react-navigation/native-stack';
-import {Card, EmptyState, LoadingOverlay} from '../../../components';
-import {useApartment} from '../../../hooks/useApartment';
-import {useAppSelector, useAppDispatch} from '../../../store';
-import {fetchBillingPeriodsRequest} from '../../../store/slices/paymentSlice';
-import {formatCurrency} from '../../../utils/formatters';
-import type {LandlordStackParamList} from '../../../types/navigation';
-import type {BillingPeriod} from '../../../types/database';
+import React, { useEffect, useMemo } from 'react';
+import { View, Text, FlatList, StyleSheet } from 'react-native';
+import PressableOpacity from '../../../components/PressableOpacity';
+import { useNavigation } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import Card from '../../../components/Card';
+import EmptyState from '../../../components/EmptyState';
+import LoadingOverlay from '../../../components/LoadingOverlay';
+import { useApartment } from '../../../hooks/useApartment';
+import { useAppSelector, useAppDispatch } from '../../../store';
+import { fetchBillingPeriodsRequest } from '../../../store/slices/paymentSlice';
+import { formatCurrency } from '../../../utils/formatters';
+import type { LandlordStackParamList } from '../../../types/navigation';
+import type { BillingPeriod } from '../../../types/database';
 
 type NavigationProp = NativeStackNavigationProp<LandlordStackParamList>;
 
 const PaymentsScreen: React.FC = () => {
   const navigation = useNavigation<NavigationProp>();
   const dispatch = useAppDispatch();
-  const {apartment} = useApartment();
-  const {billingPeriods, payments, loading} = useAppSelector(
+  const { apartment } = useApartment();
+  const { billingPeriods, payments, loading } = useAppSelector(
     state => state.payment,
   );
 
@@ -31,18 +27,19 @@ const PaymentsScreen: React.FC = () => {
 
   useEffect(() => {
     if (apartment?.id) {
-      dispatch(fetchBillingPeriodsRequest({apartmentId: apartment.id}));
+      dispatch(fetchBillingPeriodsRequest({ apartmentId: apartment.id }));
     }
   }, [apartment?.id, dispatch]);
 
   useEffect(() => {
     navigation.setOptions({
       headerRight: () => (
-        <TouchableOpacity
+        <PressableOpacity
           onPress={() => navigation.navigate('CreateBilling')}
-          style={styles.headerBtn}>
+          style={styles.headerBtn}
+        >
           <Text style={styles.headerBtnText}>Tao ky thu</Text>
-        </TouchableOpacity>
+        </PressableOpacity>
       ),
     });
   }, [navigation]);
@@ -50,15 +47,20 @@ const PaymentsScreen: React.FC = () => {
   const onRefresh = React.useCallback(() => {
     if (apartment?.id) {
       setRefreshing(true);
-      dispatch(fetchBillingPeriodsRequest({apartmentId: apartment.id}));
+      dispatch(fetchBillingPeriodsRequest({ apartmentId: apartment.id }));
       setTimeout(() => setRefreshing(false), 1000);
     }
   }, [apartment?.id, dispatch]);
 
+  const renderSeparator = React.useCallback(
+    () => <View style={styles.gap} />,
+    [],
+  );
+
   const periodStats = useMemo(() => {
     const stats: Record<
       string,
-      {total: number; confirmed: number; count: number}
+      { total: number; confirmed: number; count: number }
     > = {};
     billingPeriods.forEach(bp => {
       const periodPayments = payments.filter(
@@ -68,20 +70,20 @@ const PaymentsScreen: React.FC = () => {
       const confirmed = periodPayments
         .filter(p => p.status === 'confirmed')
         .reduce((sum, p) => sum + p.amount, 0);
-      stats[bp.id] = {total, confirmed, count: periodPayments.length};
+      stats[bp.id] = { total, confirmed, count: periodPayments.length };
     });
     return stats;
   }, [billingPeriods, payments]);
 
   const sortedPeriods = useMemo(() => {
-    return [...billingPeriods].sort((a, b) => {
+    return billingPeriods.slice().sort((a, b) => {
       if (a.year !== b.year) return b.year - a.year;
       return b.month - a.month;
     });
   }, [billingPeriods]);
 
-  const renderItem = ({item}: {item: BillingPeriod}) => {
-    const stats = periodStats[item.id] ?? {total: 0, confirmed: 0, count: 0};
+  const renderItem = ({ item }: { item: BillingPeriod }) => {
+    const stats = periodStats[item.id] ?? { total: 0, confirmed: 0, count: 0 };
     const progress =
       stats.total > 0 ? Math.min(stats.confirmed / stats.total, 1) : 0;
 
@@ -89,8 +91,9 @@ const PaymentsScreen: React.FC = () => {
       <Card
         style={styles.periodCard}
         onPress={() =>
-          navigation.navigate('PaymentOverview', {billingId: item.id})
-        }>
+          navigation.navigate('PaymentOverview', { billingId: item.id })
+        }
+      >
         <Text style={styles.periodTitle}>
           Thang {item.month}/{item.year}
         </Text>
@@ -98,25 +101,20 @@ const PaymentsScreen: React.FC = () => {
         {/* Progress Bar */}
         <View style={styles.progressBarBg}>
           <View
-            style={[
-              styles.progressBarFill,
-              {width: `${progress * 100}%`},
-            ]}
+            style={[styles.progressBarFill, { width: `${progress * 100}%` }]}
           />
         </View>
 
         <View style={styles.periodStats}>
           <View>
             <Text style={styles.statsLabel}>Da thu</Text>
-            <Text style={[styles.statsValue, {color: '#16A34A'}]}>
+            <Text style={[styles.statsValue, { color: '#16A34A' }]}>
               {formatCurrency(stats.confirmed)}
             </Text>
           </View>
           <View style={styles.statsRight}>
             <Text style={styles.statsLabel}>Tong</Text>
-            <Text style={styles.statsValue}>
-              {formatCurrency(stats.total)}
-            </Text>
+            <Text style={styles.statsValue}>{formatCurrency(stats.total)}</Text>
           </View>
         </View>
       </Card>
@@ -144,10 +142,9 @@ const PaymentsScreen: React.FC = () => {
         keyExtractor={item => item.id}
         renderItem={renderItem}
         contentContainerStyle={styles.list}
-        refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-        }
-        ItemSeparatorComponent={() => <View style={styles.gap} />}
+        refreshing={refreshing}
+        onRefresh={onRefresh}
+        ItemSeparatorComponent={renderSeparator}
       />
     </View>
   );

@@ -1,5 +1,5 @@
-import {supabase} from '../config/supabase';
-import type {ProfileInsert, ProfileUpdate} from '../types/database';
+import { supabase } from '../config/supabase';
+import type { ProfileInsert, ProfileUpdate } from '../types/database';
 
 export async function signUp(
   email: string,
@@ -7,7 +7,7 @@ export async function signUp(
   fullName: string,
   role: 'tenant' | 'landlord',
 ) {
-  const {data: authData, error: authError} = await supabase.auth.signUp({
+  const { data: authData, error: authError } = await supabase.auth.signUp({
     email,
     password,
   });
@@ -26,7 +26,7 @@ export async function signUp(
     role,
   };
 
-  const {error: profileError} = await supabase
+  const { error: profileError } = await supabase
     .from('profiles')
     .insert(profile);
 
@@ -38,7 +38,7 @@ export async function signUp(
 }
 
 export async function signIn(email: string, password: string) {
-  const {data, error} = await supabase.auth.signInWithPassword({
+  const { data, error } = await supabase.auth.signInWithPassword({
     email,
     password,
   });
@@ -51,14 +51,14 @@ export async function signIn(email: string, password: string) {
 }
 
 export async function signOut() {
-  const {error} = await supabase.auth.signOut();
+  const { error } = await supabase.auth.signOut();
   if (error) {
     throw error;
   }
 }
 
 export async function resetPassword(email: string) {
-  const {data, error} = await supabase.auth.resetPasswordForEmail(email);
+  const { data, error } = await supabase.auth.resetPasswordForEmail(email);
   if (error) {
     throw error;
   }
@@ -66,23 +66,17 @@ export async function resetPassword(email: string) {
 }
 
 export async function changePassword(newPassword: string) {
-  const {data, error} = await supabase.auth.updateUser({password: newPassword});
+  const { data, error } = await supabase.auth.updateUser({
+    password: newPassword,
+  });
   if (error) {
     throw error;
   }
   return data;
 }
 
-export async function getSession() {
-  const {data, error} = await supabase.auth.getSession();
-  if (error) {
-    throw error;
-  }
-  return data.session;
-}
-
 export async function getProfile(userId: string) {
-  const {data, error} = await supabase
+  const { data, error } = await supabase
     .from('profiles')
     .select('*')
     .eq('id', userId)
@@ -96,9 +90,9 @@ export async function getProfile(userId: string) {
 }
 
 export async function updateProfile(userId: string, updates: ProfileUpdate) {
-  const {data, error} = await supabase
+  const { data, error } = await supabase
     .from('profiles')
-    .update({...updates, updated_at: new Date().toISOString()})
+    .update({ ...updates, updated_at: new Date().toISOString() })
     .eq('id', userId)
     .select()
     .single();
@@ -113,7 +107,7 @@ export async function updateProfile(userId: string, updates: ProfileUpdate) {
 // ── OAuth Functions ──────────────────────────────────────────────
 
 export async function signInWithGoogle(idToken: string, accessToken: string) {
-  const {data, error} = await supabase.auth.signInWithIdToken({
+  const { data, error } = await supabase.auth.signInWithIdToken({
     provider: 'google',
     token: idToken,
     access_token: accessToken,
@@ -128,9 +122,9 @@ export async function signInWithGoogle(idToken: string, accessToken: string) {
 
 export async function signInWithApple(
   idToken: string,
-  fullName?: {givenName?: string; familyName?: string},
+  fullName?: { givenName?: string; familyName?: string },
 ) {
-  const {data, error} = await supabase.auth.signInWithIdToken({
+  const { data, error } = await supabase.auth.signInWithIdToken({
     provider: 'apple',
     token: idToken,
   });

@@ -1,33 +1,25 @@
-import React, {useEffect, useMemo} from 'react';
-import {
-  View,
-  Text,
-  FlatList,
-  TouchableOpacity,
-  StyleSheet,
-  RefreshControl,
-} from 'react-native';
-import {useNavigation} from '@react-navigation/native';
-import type {NativeStackNavigationProp} from '@react-navigation/native-stack';
-import {
-  Card,
-  Avatar,
-  StatusBadge,
-  EmptyState,
-  LoadingOverlay,
-  ScreenWrapper,
-} from '../../../components';
-import {useApartment} from '../../../hooks/useApartment';
-import {useAppSelector} from '../../../store';
-import {formatCurrency} from '../../../utils/formatters';
-import type {LandlordStackParamList} from '../../../types/navigation';
+import React, { useEffect, useMemo } from 'react';
+import { View, Text, FlatList, StyleSheet } from 'react-native';
+import PressableOpacity from '../../../components/PressableOpacity';
+import { useNavigation } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import Card from '../../../components/Card';
+import Avatar from '../../../components/Avatar';
+import StatusBadge from '../../../components/StatusBadge';
+import EmptyState from '../../../components/EmptyState';
+import LoadingOverlay from '../../../components/LoadingOverlay';
+import ScreenWrapper from '../../../components/ScreenWrapper';
+import { useApartment } from '../../../hooks/useApartment';
+import { useAppSelector } from '../../../store';
+import { formatCurrency } from '../../../utils/formatters';
+import type { LandlordStackParamList } from '../../../types/navigation';
 
 type NavigationProp = NativeStackNavigationProp<LandlordStackParamList>;
 
 const TenantListScreen: React.FC = () => {
   const navigation = useNavigation<NavigationProp>();
-  const {apartment, members, loading, fetchMembers} = useApartment();
-  const {payments} = useAppSelector(state => state.payment);
+  const { apartment, members, loading, fetchMembers } = useApartment();
+  const { payments } = useAppSelector(state => state.payment);
 
   const [refreshing, setRefreshing] = React.useState(false);
 
@@ -40,7 +32,7 @@ const TenantListScreen: React.FC = () => {
   useEffect(() => {
     navigation.setOptions({
       headerRight: () => (
-        <TouchableOpacity
+        <PressableOpacity
           onPress={() => {
             if (apartment?.id) {
               navigation.navigate('InviteCode', {
@@ -48,9 +40,10 @@ const TenantListScreen: React.FC = () => {
               });
             }
           }}
-          style={styles.headerBtn}>
+          style={styles.headerBtn}
+        >
           <Text style={styles.headerBtnText}>Ma moi</Text>
-        </TouchableOpacity>
+        </PressableOpacity>
       ),
     });
   }, [navigation, apartment?.id]);
@@ -63,6 +56,11 @@ const TenantListScreen: React.FC = () => {
     }
   }, [apartment?.id, fetchMembers]);
 
+  const renderSeparator = React.useCallback(
+    () => <View style={styles.gap} />,
+    [],
+  );
+
   const currentMonth = new Date().getMonth() + 1;
   const currentYear = new Date().getFullYear();
 
@@ -74,7 +72,7 @@ const TenantListScreen: React.FC = () => {
     return map;
   }, [payments]);
 
-  const renderItem = ({item}: {item: (typeof members)[0]}) => {
+  const renderItem = ({ item }: { item: (typeof members)[0] }) => {
     const profile = item.profile;
     const name = profile?.full_name ?? 'Nguoi thue';
     const paymentStatus = paymentStatusMap[item.user_id] ?? 'unpaid';
@@ -82,13 +80,12 @@ const TenantListScreen: React.FC = () => {
     return (
       <Card
         style={styles.tenantCard}
-        onPress={() => navigation.navigate('TenantDetail', {id: item.user_id})}>
+        onPress={() =>
+          navigation.navigate('TenantDetail', { id: item.user_id })
+        }
+      >
         <View style={styles.tenantRow}>
-          <Avatar
-            uri={profile?.avatar_url}
-            name={name}
-            size={48}
-          />
+          <Avatar uri={profile?.avatar_url} name={name} size={48} />
           <View style={styles.tenantInfo}>
             <Text style={styles.tenantName}>{name}</Text>
             <Text style={styles.tenantRoom}>
@@ -129,10 +126,9 @@ const TenantListScreen: React.FC = () => {
         keyExtractor={item => item.id}
         renderItem={renderItem}
         contentContainerStyle={styles.list}
-        refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-        }
-        ItemSeparatorComponent={() => <View style={styles.gap} />}
+        refreshing={refreshing}
+        onRefresh={onRefresh}
+        ItemSeparatorComponent={renderSeparator}
       />
     </ScreenWrapper>
   );

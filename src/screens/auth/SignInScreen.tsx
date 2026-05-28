@@ -3,36 +3,40 @@ import {
   View,
   Text,
   StyleSheet,
-  TouchableOpacity,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
 } from 'react-native';
-import {useForm, Controller} from 'react-hook-form';
-import {zodResolver} from '@hookform/resolvers/zod';
-import {useNavigation} from '@react-navigation/native';
-import type {NativeStackNavigationProp} from '@react-navigation/native-stack';
-import {useAuth} from '../../hooks/useAuth';
-import {signInSchema, type SignInData} from '../../schemas/auth';
-import {Input, Button, GoogleSignInButton, AppleSignInButton} from '../../components';
-import {useAppDispatch} from '../../store';
-import {setError as setAuthError} from '../../store/slices/authSlice';
-import type {AuthStackParamList} from '../../types/navigation';
+import PressableOpacity from '../../components/PressableOpacity';
+import { useForm, Controller } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useNavigation } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { useAuth } from '../../hooks/useAuth';
+import { signInSchema, type SignInData } from '../../schemas/auth';
+import Input from '../../components/Input';
+import Button from '../../components/Button';
+import { GoogleSignInButton } from '../../components/GoogleSignInButton';
+import { AppleSignInButton } from '../../components/AppleSignInButton';
+import { useAppDispatch } from '../../store';
+import { setError as setAuthError } from '../../store/slices/authSlice';
+import type { AuthStackParamList } from '../../types/navigation';
 
 type Nav = NativeStackNavigationProp<AuthStackParamList, 'SignIn'>;
 
 export default function SignInScreen() {
   const navigation = useNavigation<Nav>();
   const dispatch = useAppDispatch();
-  const {signIn, signInWithGoogle, signInWithApple, loading, error} = useAuth();
+  const { signIn, signInWithGoogle, signInWithApple, loading, error } =
+    useAuth();
 
   const {
     control,
     handleSubmit,
-    formState: {errors},
+    formState: { errors },
   } = useForm<SignInData>({
     resolver: zodResolver(signInSchema),
-    defaultValues: {email: '', password: ''},
+    defaultValues: { email: '', password: '' },
   });
 
   const onSubmit = (data: SignInData) => {
@@ -49,7 +53,9 @@ export default function SignInScreen() {
 
   const handleOAuthError = (err: unknown) => {
     const message =
-      err instanceof Error ? err.message : 'Đăng nhập với nhà cung cấp thất bại';
+      err instanceof Error
+        ? err.message
+        : 'Đăng nhập với nhà cung cấp thất bại';
     dispatch(setAuthError(message));
   };
 
@@ -57,10 +63,12 @@ export default function SignInScreen() {
     <KeyboardAvoidingView
       testID="signin-screen"
       style={styles.container}
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+    >
       <ScrollView
         contentContainerStyle={styles.scroll}
-        keyboardShouldPersistTaps="handled">
+        keyboardShouldPersistTaps="handled"
+      >
         <Text style={styles.title}>Chào mừng trở lại</Text>
         <Text style={styles.subtitle}>Đăng nhập để tiếp tục</Text>
 
@@ -86,7 +94,7 @@ export default function SignInScreen() {
         <Controller
           control={control}
           name="email"
-          render={({field: {onChange, onBlur, value}}) => (
+          render={({ field: { onChange, onBlur, value } }) => (
             <Input
               testID="signin-email-input"
               label="Email"
@@ -104,7 +112,7 @@ export default function SignInScreen() {
         <Controller
           control={control}
           name="password"
-          render={({field: {onChange, onBlur, value}}) => (
+          render={({ field: { onChange, onBlur, value } }) => (
             <Input
               testID="signin-password-input"
               label="Mật khẩu"
@@ -118,12 +126,13 @@ export default function SignInScreen() {
           )}
         />
 
-        <TouchableOpacity
+        <PressableOpacity
           testID="signin-forgot-password-btn"
           onPress={() => navigation.navigate('ForgotPassword')}
-          style={styles.forgotBtn}>
+          style={styles.forgotBtn}
+        >
           <Text style={styles.forgotText}>Quên mật khẩu?</Text>
-        </TouchableOpacity>
+        </PressableOpacity>
 
         {error && (
           <Text testID="signin-error-message" style={styles.error}>
@@ -139,12 +148,13 @@ export default function SignInScreen() {
           style={styles.submitBtn}
         />
 
-        <TouchableOpacity
+        <PressableOpacity
           testID="signin-goto-signup-btn"
           onPress={() => navigation.navigate('SignUp')}
-          style={styles.linkBtn}>
+          style={styles.linkBtn}
+        >
           <Text style={styles.linkText}>Chưa có tài khoản? Đăng ký</Text>
-        </TouchableOpacity>
+        </PressableOpacity>
       </ScrollView>
     </KeyboardAvoidingView>
   );

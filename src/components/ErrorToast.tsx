@@ -1,14 +1,21 @@
-import React, {useEffect, useRef, useState} from 'react';
-import {Animated, StyleSheet, Text, TouchableOpacity} from 'react-native';
-import {useSafeAreaInsets} from 'react-native-safe-area-context';
-import {useAppDispatch, useAppSelector} from '../store';
-import {setError as setAuthError} from '../store/slices/authSlice';
-import {setError as setApartmentError} from '../store/slices/apartmentSlice';
-import {setError as setBorrowError} from '../store/slices/borrowSlice';
-import {setError as setIssueError} from '../store/slices/issueSlice';
-import {setError as setPaymentError} from '../store/slices/paymentSlice';
-import {setError as setAssetError} from '../store/slices/assetSlice';
-import {setError as setNotificationError} from '../store/slices/notificationSlice';
+import React, { useCallback, useEffect, useState } from 'react';
+import { StyleSheet, Text } from 'react-native';
+import Animated, {
+  runOnJS,
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming,
+} from 'react-native-reanimated';
+import PressableOpacity from './PressableOpacity';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useAppDispatch, useAppSelector } from '../store';
+import { setError as setAuthError } from '../store/slices/authSlice';
+import { setError as setApartmentError } from '../store/slices/apartmentSlice';
+import { setError as setBorrowError } from '../store/slices/borrowSlice';
+import { setError as setIssueError } from '../store/slices/issueSlice';
+import { setError as setPaymentError } from '../store/slices/paymentSlice';
+import { setError as setAssetError } from '../store/slices/assetSlice';
+import { setError as setNotificationError } from '../store/slices/notificationSlice';
 
 const ErrorToast: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -35,22 +42,28 @@ const ErrorToast: React.FC = () => {
       | null;
   } | null>(null);
 
-  const opacity = useRef(new Animated.Value(0)).current;
-  const translateY = useRef(new Animated.Value(-20)).current;
+  const opacity = useSharedValue(0);
+  const translateY = useSharedValue(-20);
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    opacity: opacity.value,
+    transform: [{ translateY: translateY.value }],
+  }));
 
   useEffect(() => {
-    const pairs: Array<[string | null, NonNullable<typeof visible>['source']]> = [
-      [authError, 'auth'],
-      [apartmentError, 'apartment'],
-      [borrowError, 'borrow'],
-      [issueError, 'issue'],
-      [paymentError, 'payment'],
-      [assetError, 'asset'],
-      [notificationError, 'notification'],
-    ];
+    const pairs: Array<[string | null, NonNullable<typeof visible>['source']]> =
+      [
+        [authError, 'auth'],
+        [apartmentError, 'apartment'],
+        [borrowError, 'borrow'],
+        [issueError, 'issue'],
+        [paymentError, 'payment'],
+        [assetError, 'asset'],
+        [notificationError, 'notification'],
+      ];
     const active = pairs.find(([msg]) => !!msg);
     if (active && active[0]) {
-      setVisible({message: active[0], source: active[1]});
+      setVisible({ message: active[0], source: active[1] });
     }
   }, [
     authError,
@@ -62,69 +75,55 @@ const ErrorToast: React.FC = () => {
     notificationError,
   ]);
 
+  const clearVisible = useCallback(() => {
+    if (visible) {
+      switch (visible.source) {
+        case 'auth':
+          dispatch(setAuthError(null));
+          break;
+        case 'apartment':
+          dispatch(setApartmentError(null));
+          break;
+        case 'borrow':
+          dispatch(setBorrowError(null));
+          break;
+        case 'issue':
+          dispatch(setIssueError(null));
+          break;
+        case 'payment':
+          dispatch(setPaymentError(null));
+          break;
+        case 'asset':
+          dispatch(setAssetError(null));
+          break;
+        case 'notification':
+          dispatch(setNotificationError(null));
+          break;
+      }
+    }
+    setVisible(null);
+  }, [dispatch, visible]);
+
+  const dismiss = useCallback(() => {
+    opacity.value = withTiming(0, { duration: 180 });
+    translateY.value = withTiming(-20, { duration: 180 }, finished => {
+      if (finished) {
+        runOnJS(clearVisible)();
+      }
+    });
+  }, [clearVisible, opacity, translateY]);
+
   useEffect(() => {
     if (!visible) {
       return;
     }
-    Animated.parallel([
-      Animated.timing(opacity, {
-        toValue: 1,
-        duration: 200,
-        useNativeDriver: true,
-      }),
-      Animated.timing(translateY, {
-        toValue: 0,
-        duration: 200,
-        useNativeDriver: true,
-      }),
-    ]).start();
 
-    const timer = setTimeout(() => dismiss(), 4000);
+    opacity.value = withTiming(1, { duration: 200 });
+    translateY.value = withTiming(0, { duration: 200 });
+
+    const timer = setTimeout(dismiss, 4000);
     return () => clearTimeout(timer);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [visible]);
-
-  const dismiss = () => {
-    Animated.parallel([
-      Animated.timing(opacity, {
-        toValue: 0,
-        duration: 180,
-        useNativeDriver: true,
-      }),
-      Animated.timing(translateY, {
-        toValue: -20,
-        duration: 180,
-        useNativeDriver: true,
-      }),
-    ]).start(() => {
-      if (visible) {
-        switch (visible.source) {
-          case 'auth':
-            dispatch(setAuthError(null));
-            break;
-          case 'apartment':
-            dispatch(setApartmentError(null));
-            break;
-          case 'borrow':
-            dispatch(setBorrowError(null));
-            break;
-          case 'issue':
-            dispatch(setIssueError(null));
-            break;
-          case 'payment':
-            dispatch(setPaymentError(null));
-            break;
-          case 'asset':
-            dispatch(setAssetError(null));
-            break;
-          case 'notification':
-            dispatch(setNotificationError(null));
-            break;
-        }
-      }
-      setVisible(null);
-    });
-  };
+  }, [dismiss, opacity, translateY, visible]);
 
   if (!visible) {
     return null;
@@ -133,18 +132,17 @@ const ErrorToast: React.FC = () => {
   return (
     <Animated.View
       pointerEvents="box-none"
-      style={[
-        styles.container,
-        {top: insets.top + 12, opacity, transform: [{translateY}]},
-      ]}>
-      <TouchableOpacity
+      style={[styles.container, { top: insets.top + 12 }, animatedStyle]}
+    >
+      <PressableOpacity
         style={styles.toast}
         activeOpacity={0.9}
-        onPress={dismiss}>
+        onPress={dismiss}
+      >
         <Text style={styles.text} numberOfLines={3}>
           {visible.message}
         </Text>
-      </TouchableOpacity>
+      </PressableOpacity>
     </Animated.View>
   );
 };
@@ -154,19 +152,14 @@ const styles = StyleSheet.create({
     position: 'absolute',
     left: 16,
     right: 16,
-    zIndex: 9999,
-    elevation: 9999,
+    zIndex: 30,
   },
   toast: {
     backgroundColor: '#DC2626',
     paddingHorizontal: 14,
     paddingVertical: 12,
     borderRadius: 12,
-    shadowColor: '#000',
-    shadowOffset: {width: 0, height: 2},
-    shadowOpacity: 0.15,
-    shadowRadius: 8,
-    elevation: 6,
+    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.15)',
   },
   text: {
     color: '#FFFFFF',

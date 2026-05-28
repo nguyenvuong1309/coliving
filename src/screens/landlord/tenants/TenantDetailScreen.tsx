@@ -1,21 +1,23 @@
-import React, {useEffect, useMemo, useCallback} from 'react';
-import {View, Text, FlatList, Alert, StyleSheet} from 'react-native';
-import {useNavigation, useRoute} from '@react-navigation/native';
-import type {NativeStackNavigationProp} from '@react-navigation/native-stack';
-import type {RouteProp} from '@react-navigation/native';
+import React, { useEffect, useMemo, useCallback } from 'react';
+import { View, Text, FlatList, Alert, StyleSheet } from 'react-native';
+import { useNavigation, useRoute } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import type { RouteProp } from '@react-navigation/native';
+import ScreenWrapper from '../../../components/ScreenWrapper';
+import Card from '../../../components/Card';
+import Avatar from '../../../components/Avatar';
+import StatusBadge from '../../../components/StatusBadge';
+import Button from '../../../components/Button';
+import LoadingOverlay from '../../../components/LoadingOverlay';
+import { useApartment } from '../../../hooks/useApartment';
+import { useAppSelector } from '../../../store';
 import {
-  ScreenWrapper,
-  Card,
-  Avatar,
-  StatusBadge,
-  Button,
-  LoadingOverlay,
-} from '../../../components';
-import {useApartment} from '../../../hooks/useApartment';
-import {useAppSelector} from '../../../store';
-import {formatCurrency, formatDate, formatRelativeTime} from '../../../utils/formatters';
-import type {LandlordStackParamList} from '../../../types/navigation';
-import type {Payment, Issue} from '../../../types/database';
+  formatCurrency,
+  formatDate,
+  formatRelativeTime,
+} from '../../../utils/formatters';
+import type { LandlordStackParamList } from '../../../types/navigation';
+import type { Payment, Issue } from '../../../types/database';
 
 type NavigationProp = NativeStackNavigationProp<LandlordStackParamList>;
 type DetailRouteProp = RouteProp<LandlordStackParamList, 'TenantDetail'>;
@@ -23,12 +25,12 @@ type DetailRouteProp = RouteProp<LandlordStackParamList, 'TenantDetail'>;
 const TenantDetailScreen: React.FC = () => {
   const navigation = useNavigation<NavigationProp>();
   const route = useRoute<DetailRouteProp>();
-  const {id} = route.params;
-  const {apartment, members, loading, fetchMembers, removeMember} =
+  const { id } = route.params;
+  const { apartment, members, loading, fetchMembers, removeMember } =
     useApartment();
 
-  const {payments} = useAppSelector(state => state.payment);
-  const {issues} = useAppSelector(state => state.issue);
+  const { payments } = useAppSelector(state => state.payment);
+  const { issues } = useAppSelector(state => state.issue);
 
   useEffect(() => {
     if (apartment?.id) {
@@ -50,8 +52,7 @@ const TenantDetailScreen: React.FC = () => {
         .filter(p => p.tenant_id === id)
         .sort(
           (a, b) =>
-            new Date(b.created_at).getTime() -
-            new Date(a.created_at).getTime(),
+            new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),
         )
         .slice(0, 10),
     [payments, id],
@@ -63,8 +64,7 @@ const TenantDetailScreen: React.FC = () => {
         .filter(i => i.reporter_id === id)
         .sort(
           (a, b) =>
-            new Date(b.created_at).getTime() -
-            new Date(a.created_at).getTime(),
+            new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),
         )
         .slice(0, 10),
     [issues, id],
@@ -75,7 +75,7 @@ const TenantDetailScreen: React.FC = () => {
       'Xoa nguoi thue',
       `Ban co chac chan muon xoa ${name} khoi can ho?`,
       [
-        {text: 'Huy', style: 'cancel'},
+        { text: 'Huy', style: 'cancel' },
         {
           text: 'Xoa',
           style: 'destructive',
@@ -90,7 +90,7 @@ const TenantDetailScreen: React.FC = () => {
     );
   }, [member, name, removeMember, navigation]);
 
-  const renderPaymentItem = ({item}: {item: Payment}) => (
+  const renderPaymentItem = ({ item }: { item: Payment }) => (
     <View style={styles.listItem}>
       <View style={styles.listItemInfo}>
         <Text style={styles.listItemTitle}>{formatCurrency(item.amount)}</Text>
@@ -100,7 +100,7 @@ const TenantDetailScreen: React.FC = () => {
     </View>
   );
 
-  const renderIssueItem = ({item}: {item: Issue}) => (
+  const renderIssueItem = ({ item }: { item: Issue }) => (
     <View style={styles.listItem}>
       <View style={styles.listItemInfo}>
         <Text style={styles.listItemTitle} numberOfLines={1}>
@@ -122,9 +122,7 @@ const TenantDetailScreen: React.FC = () => {
       <View style={styles.profileSection}>
         <Avatar uri={profile?.avatar_url} name={name} size={72} />
         <Text style={styles.name}>{name}</Text>
-        {profile?.phone && (
-          <Text style={styles.infoText}>{profile.phone}</Text>
-        )}
+        {profile?.phone && <Text style={styles.infoText}>{profile.phone}</Text>}
         <View style={styles.detailRow}>
           <View style={styles.detailItem}>
             <Text style={styles.detailLabel}>Phong</Text>

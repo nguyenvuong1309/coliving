@@ -1,15 +1,23 @@
-import React, {useEffect, useCallback} from 'react';
-import {View, Text, Image, ScrollView, StyleSheet} from 'react-native';
-import {useRoute} from '@react-navigation/native';
-import type {RouteProp} from '@react-navigation/native';
-import {ScreenWrapper, Card, Button, StatusBadge, LoadingOverlay} from '../../../components';
-import {useAppSelector, useAppDispatch} from '../../../store';
+import React, { useEffect, useCallback } from 'react';
+import { View, Text, Image, ScrollView, StyleSheet } from 'react-native';
+import { useRoute } from '@react-navigation/native';
+import type { RouteProp } from '@react-navigation/native';
+import ScreenWrapper from '../../../components/ScreenWrapper';
+import Card from '../../../components/Card';
+import Button from '../../../components/Button';
+import StatusBadge from '../../../components/StatusBadge';
+import LoadingOverlay from '../../../components/LoadingOverlay';
+import { useAppSelector, useAppDispatch } from '../../../store';
 import {
   fetchIssueDetailRequest,
   updateIssueStatusRequest,
 } from '../../../store/slices/issueSlice';
-import {formatDate, formatDateTime, getStatusLabel} from '../../../utils/formatters';
-import type {TenantStackParamList} from '../../../types/navigation';
+import {
+  formatDate,
+  formatDateTime,
+  getStatusLabel,
+} from '../../../utils/formatters';
+import type { TenantStackParamList } from '../../../types/navigation';
 
 type ScreenRouteProp = RouteProp<TenantStackParamList, 'IssueDetail'>;
 
@@ -31,17 +39,17 @@ const LOCATION_LABELS: Record<string, string> = {
 
 const IssueDetailScreen: React.FC = () => {
   const route = useRoute<ScreenRouteProp>();
-  const {id} = route.params;
+  const { id } = route.params;
   const dispatch = useAppDispatch();
-  const {currentIssue, loading} = useAppSelector(state => state.issue);
+  const { currentIssue, loading } = useAppSelector(state => state.issue);
 
   useEffect(() => {
-    dispatch(fetchIssueDetailRequest({id}));
+    dispatch(fetchIssueDetailRequest({ id }));
   }, [id, dispatch]);
 
   const handleUpdateStatus = useCallback(
     (status: 'open' | 'in_progress' | 'resolved' | 'closed' | 'reopened') => {
-      dispatch(updateIssueStatusRequest({id, status}));
+      dispatch(updateIssueStatusRequest({ id, status }));
     },
     [id, dispatch],
   );
@@ -55,7 +63,7 @@ const IssueDetailScreen: React.FC = () => {
     );
   }
 
-  const {status} = currentIssue;
+  const { status } = currentIssue;
 
   return (
     <ScreenWrapper>
@@ -95,14 +103,16 @@ const IssueDetailScreen: React.FC = () => {
               currentIssue.urgency === 'urgent'
                 ? styles.urgentBg
                 : styles.normalBg,
-            ]}>
+            ]}
+          >
             <Text
               style={[
                 styles.urgencyInlineText,
                 currentIssue.urgency === 'urgent'
                   ? styles.urgentColor
                   : styles.normalColor,
-              ]}>
+              ]}
+            >
               {getStatusLabel(currentIssue.urgency)}
             </Text>
           </View>
@@ -120,9 +130,7 @@ const IssueDetailScreen: React.FC = () => {
       {currentIssue.description && (
         <Card style={styles.card}>
           <Text style={styles.sectionTitle}>Mo ta</Text>
-          <Text style={styles.descriptionText}>
-            {currentIssue.description}
-          </Text>
+          <Text style={styles.descriptionText}>{currentIssue.description}</Text>
         </Card>
       )}
 
@@ -221,7 +229,7 @@ interface TimelineItemProps {
   active?: boolean;
 }
 
-const TimelineItem: React.FC<TimelineItemProps> = ({label, date, active}) => (
+const TimelineItem: React.FC<TimelineItemProps> = ({ label, date, active }) => (
   <View style={timelineStyles.item}>
     <View style={timelineStyles.dotColumn}>
       <View

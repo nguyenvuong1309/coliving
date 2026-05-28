@@ -1,5 +1,6 @@
 import React from 'react';
-import { View, TouchableOpacity, StyleSheet, ViewStyle } from 'react-native';
+import { View, StyleSheet, ViewStyle } from 'react-native';
+import PressableOpacity from './PressableOpacity';
 
 interface CardProps {
   children: React.ReactNode;
@@ -10,12 +11,13 @@ interface CardProps {
 const Card: React.FC<CardProps> = ({ children, style, onPress }) => {
   if (onPress) {
     return (
-      <TouchableOpacity
+      <PressableOpacity
         style={[styles.card, style]}
         onPress={onPress}
-        activeOpacity={0.7}>
+        activeOpacity={0.7}
+      >
         {children}
-      </TouchableOpacity>
+      </PressableOpacity>
     );
   }
 
@@ -27,11 +29,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
     borderRadius: 12,
     padding: 16,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.08,
-    shadowRadius: 4,
-    elevation: 2,
+    boxShadow: '0 1px 4px rgba(0, 0, 0, 0.08)',
   },
 });
 

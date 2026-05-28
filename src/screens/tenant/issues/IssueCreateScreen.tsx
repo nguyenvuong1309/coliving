@@ -1,53 +1,50 @@
-import React, {useEffect, useState} from 'react';
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  Image,
-  StyleSheet,
-  Alert,
-} from 'react-native';
-import {useNavigation} from '@react-navigation/native';
-import {useForm, Controller} from 'react-hook-form';
-import {zodResolver} from '@hookform/resolvers/zod';
-import {launchImageLibrary} from 'react-native-image-picker';
-import {ScreenWrapper, Button, Input, LoadingOverlay} from '../../../components';
-import {useAuth} from '../../../hooks/useAuth';
-import {useApartment} from '../../../hooks/useApartment';
-import {useAppSelector, useAppDispatch} from '../../../store';
-import {createIssueRequest} from '../../../store/slices/issueSlice';
+import React, { useEffect, useState } from 'react';
+import { View, Text, Image, StyleSheet, Alert } from 'react-native';
+import PressableOpacity from '../../../components/PressableOpacity';
+import { useNavigation } from '@react-navigation/native';
+import { useForm, Controller } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { launchImageLibrary } from 'react-native-image-picker';
+import ScreenWrapper from '../../../components/ScreenWrapper';
+import Button from '../../../components/Button';
+import Input from '../../../components/Input';
+import LoadingOverlay from '../../../components/LoadingOverlay';
+import { useAuth } from '../../../hooks/useAuth';
+import { useApartment } from '../../../hooks/useApartment';
+import { useAppSelector, useAppDispatch } from '../../../store';
+import { createIssueRequest } from '../../../store/slices/issueSlice';
 import {
   issueCreateSchema,
   type IssueCreateFormData,
 } from '../../../schemas/issue';
 
 const CATEGORIES = [
-  {value: 'equipment' as const, label: 'Hong hoc'},
-  {value: 'noise' as const, label: 'Tieng on'},
-  {value: 'hygiene' as const, label: 'Ve sinh'},
-  {value: 'security' as const, label: 'An ninh'},
-  {value: 'other' as const, label: 'Khac'},
+  { value: 'equipment' as const, label: 'Hong hoc' },
+  { value: 'noise' as const, label: 'Tieng on' },
+  { value: 'hygiene' as const, label: 'Ve sinh' },
+  { value: 'security' as const, label: 'An ninh' },
+  { value: 'other' as const, label: 'Khac' },
 ];
 
 const LOCATIONS = [
-  {value: 'living_room', label: 'Phong khach'},
-  {value: 'kitchen', label: 'Bep'},
-  {value: 'bathroom', label: 'WC'},
-  {value: 'balcony', label: 'Ban cong'},
-  {value: 'private_room', label: 'Phong rieng'},
+  { value: 'living_room', label: 'Phong khach' },
+  { value: 'kitchen', label: 'Bep' },
+  { value: 'bathroom', label: 'WC' },
+  { value: 'balcony', label: 'Ban cong' },
+  { value: 'private_room', label: 'Phong rieng' },
 ];
 
 const URGENCY_OPTIONS = [
-  {value: 'normal' as const, label: 'Binh thuong'},
-  {value: 'urgent' as const, label: 'Khan cap'},
+  { value: 'normal' as const, label: 'Binh thuong' },
+  { value: 'urgent' as const, label: 'Khan cap' },
 ];
 
 const IssueCreateScreen: React.FC = () => {
   const navigation = useNavigation();
   const dispatch = useAppDispatch();
-  const {user} = useAuth();
-  const {apartment} = useApartment();
-  const {loading} = useAppSelector(state => state.issue);
+  const { user } = useAuth();
+  const { apartment } = useApartment();
+  const { loading } = useAppSelector(state => state.issue);
   const [images, setImages] = useState<string[]>([]);
 
   const {
@@ -55,7 +52,7 @@ const IssueCreateScreen: React.FC = () => {
     handleSubmit,
     setValue,
     watch,
-    formState: {errors},
+    formState: { errors },
   } = useForm<IssueCreateFormData>({
     resolver: zodResolver(issueCreateSchema),
     defaultValues: {
@@ -132,24 +129,26 @@ const IssueCreateScreen: React.FC = () => {
       <Text style={styles.label}>Danh muc</Text>
       <View style={styles.optionRow}>
         {CATEGORIES.map(cat => (
-          <TouchableOpacity
+          <PressableOpacity
             key={cat.value}
             style={[
               styles.optionChip,
               selectedCategory === cat.value && styles.optionChipActive,
             ]}
             onPress={() =>
-              setValue('category', cat.value, {shouldValidate: true})
+              setValue('category', cat.value, { shouldValidate: true })
             }
-            activeOpacity={0.7}>
+            activeOpacity={0.7}
+          >
             <Text
               style={[
                 styles.optionChipText,
                 selectedCategory === cat.value && styles.optionChipTextActive,
-              ]}>
+              ]}
+            >
               {cat.label}
             </Text>
-          </TouchableOpacity>
+          </PressableOpacity>
         ))}
       </View>
       {errors.category && (
@@ -160,24 +159,26 @@ const IssueCreateScreen: React.FC = () => {
       <Text style={styles.label}>Vi tri</Text>
       <View style={styles.optionRow}>
         {LOCATIONS.map(loc => (
-          <TouchableOpacity
+          <PressableOpacity
             key={loc.value}
             style={[
               styles.optionChip,
               selectedLocation === loc.value && styles.optionChipActive,
             ]}
             onPress={() =>
-              setValue('location', loc.value, {shouldValidate: true})
+              setValue('location', loc.value, { shouldValidate: true })
             }
-            activeOpacity={0.7}>
+            activeOpacity={0.7}
+          >
             <Text
               style={[
                 styles.optionChipText,
                 selectedLocation === loc.value && styles.optionChipTextActive,
-              ]}>
+              ]}
+            >
               {loc.label}
             </Text>
-          </TouchableOpacity>
+          </PressableOpacity>
         ))}
       </View>
       {errors.location && (
@@ -188,29 +189,29 @@ const IssueCreateScreen: React.FC = () => {
       <Text style={styles.label}>Muc do</Text>
       <View style={styles.urgencyRow}>
         {URGENCY_OPTIONS.map(opt => (
-          <TouchableOpacity
+          <PressableOpacity
             key={opt.value}
             style={[
               styles.urgencyBtn,
-              selectedUrgency === opt.value && (
-                opt.value === 'urgent'
+              selectedUrgency === opt.value &&
+                (opt.value === 'urgent'
                   ? styles.urgencyBtnUrgent
-                  : styles.urgencyBtnNormal
-              ),
+                  : styles.urgencyBtnNormal),
             ]}
             onPress={() =>
-              setValue('urgency', opt.value, {shouldValidate: true})
+              setValue('urgency', opt.value, { shouldValidate: true })
             }
-            activeOpacity={0.7}>
+            activeOpacity={0.7}
+          >
             <Text
               style={[
                 styles.urgencyBtnText,
-                selectedUrgency === opt.value &&
-                  styles.urgencyBtnTextActive,
-              ]}>
+                selectedUrgency === opt.value && styles.urgencyBtnTextActive,
+              ]}
+            >
               {opt.label}
             </Text>
-          </TouchableOpacity>
+          </PressableOpacity>
         ))}
       </View>
 
@@ -218,7 +219,7 @@ const IssueCreateScreen: React.FC = () => {
       <Controller
         control={control}
         name="title"
-        render={({field: {onChange, value}}) => (
+        render={({ field: { onChange, value } }) => (
           <Input
             label="Tieu de"
             placeholder="Mo ta ngan gon su co..."
@@ -233,7 +234,7 @@ const IssueCreateScreen: React.FC = () => {
       <Controller
         control={control}
         name="description"
-        render={({field: {onChange, value}}) => (
+        render={({ field: { onChange, value } }) => (
           <Input
             label="Mo ta chi tiet"
             placeholder="Mo ta chi tiet hon ve su co..."
@@ -251,22 +252,24 @@ const IssueCreateScreen: React.FC = () => {
       <View style={styles.imageRow}>
         {images.map((uri, index) => (
           <View key={uri} style={styles.imageWrapper}>
-            <Image source={{uri}} style={styles.imageThumbnail} />
-            <TouchableOpacity
+            <Image source={{ uri }} style={styles.imageThumbnail} />
+            <PressableOpacity
               style={styles.removeImageBtn}
-              onPress={() => handleRemoveImage(index)}>
+              onPress={() => handleRemoveImage(index)}
+            >
               <Text style={styles.removeImageText}>X</Text>
-            </TouchableOpacity>
+            </PressableOpacity>
           </View>
         ))}
         {images.length < 3 && (
-          <TouchableOpacity
+          <PressableOpacity
             style={styles.addImageBtn}
             onPress={handlePickImage}
-            activeOpacity={0.7}>
+            activeOpacity={0.7}
+          >
             <Text style={styles.addImageText}>+</Text>
             <Text style={styles.addImageLabel}>Them anh</Text>
-          </TouchableOpacity>
+          </PressableOpacity>
         )}
       </View>
 

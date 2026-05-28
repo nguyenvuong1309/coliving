@@ -1,18 +1,22 @@
-import React, {useEffect, useCallback} from 'react';
-import {View, Text, StyleSheet} from 'react-native';
-import {useNavigation, useRoute} from '@react-navigation/native';
-import type {NativeStackNavigationProp} from '@react-navigation/native-stack';
-import type {RouteProp} from '@react-navigation/native';
-import {ScreenWrapper, Card, Button, StatusBadge, LoadingOverlay} from '../../../components';
-import {useAuth} from '../../../hooks/useAuth';
-import {useApartment} from '../../../hooks/useApartment';
-import {useAppSelector, useAppDispatch} from '../../../store';
+import React, { useEffect, useCallback } from 'react';
+import { View, Text, StyleSheet } from 'react-native';
+import { useNavigation, useRoute } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import type { RouteProp } from '@react-navigation/native';
+import ScreenWrapper from '../../../components/ScreenWrapper';
+import Card from '../../../components/Card';
+import Button from '../../../components/Button';
+import StatusBadge from '../../../components/StatusBadge';
+import LoadingOverlay from '../../../components/LoadingOverlay';
+import { useAuth } from '../../../hooks/useAuth';
+import { useApartment } from '../../../hooks/useApartment';
+import { useAppSelector, useAppDispatch } from '../../../store';
 import {
   fetchBorrowDetailRequest,
   updateBorrowStatusRequest,
 } from '../../../store/slices/borrowSlice';
-import {formatDate, formatDateTime} from '../../../utils/formatters';
-import type {TenantStackParamList} from '../../../types/navigation';
+import { formatDate, formatDateTime } from '../../../utils/formatters';
+import type { TenantStackParamList } from '../../../types/navigation';
 
 type ScreenRouteProp = RouteProp<TenantStackParamList, 'BorrowDetail'>;
 type NavigationProp = NativeStackNavigationProp<TenantStackParamList>;
@@ -20,14 +24,14 @@ type NavigationProp = NativeStackNavigationProp<TenantStackParamList>;
 const BorrowDetailScreen: React.FC = () => {
   const navigation = useNavigation<NavigationProp>();
   const route = useRoute<ScreenRouteProp>();
-  const {id} = route.params;
+  const { id } = route.params;
   const dispatch = useAppDispatch();
-  const {user} = useAuth();
-  const {members} = useApartment();
-  const {currentRequest, loading} = useAppSelector(state => state.borrow);
+  const { user } = useAuth();
+  const { members } = useApartment();
+  const { currentRequest, loading } = useAppSelector(state => state.borrow);
 
   useEffect(() => {
-    dispatch(fetchBorrowDetailRequest({id}));
+    dispatch(fetchBorrowDetailRequest({ id }));
   }, [id, dispatch]);
 
   const getMemberName = useCallback(
@@ -48,7 +52,7 @@ const BorrowDetailScreen: React.FC = () => {
         | 'return_requested'
         | 'returned',
     ) => {
-      dispatch(updateBorrowStatusRequest({id, status}));
+      dispatch(updateBorrowStatusRequest({ id, status }));
     },
     [id, dispatch],
   );
@@ -64,7 +68,7 @@ const BorrowDetailScreen: React.FC = () => {
 
   const isLender = currentRequest.lender_id === user?.id;
   const isBorrower = currentRequest.borrower_id === user?.id;
-  const {status} = currentRequest;
+  const { status } = currentRequest;
 
   return (
     <ScreenWrapper>
@@ -110,21 +114,41 @@ const BorrowDetailScreen: React.FC = () => {
             status === 'in_use' ||
             status === 'return_requested' ||
             status === 'returned') && (
-            <TimelineItem label="Duoc chap nhan" date={currentRequest.updated_at} active />
+            <TimelineItem
+              label="Duoc chap nhan"
+              date={currentRequest.updated_at}
+              active
+            />
           )}
           {status === 'rejected' && (
-            <TimelineItem label="Tu choi" date={currentRequest.updated_at} active />
+            <TimelineItem
+              label="Tu choi"
+              date={currentRequest.updated_at}
+              active
+            />
           )}
           {(status === 'in_use' ||
             status === 'return_requested' ||
             status === 'returned') && (
-            <TimelineItem label="Dang muon" date={currentRequest.updated_at} active />
+            <TimelineItem
+              label="Dang muon"
+              date={currentRequest.updated_at}
+              active
+            />
           )}
           {(status === 'return_requested' || status === 'returned') && (
-            <TimelineItem label="Yeu cau tra" date={currentRequest.updated_at} active />
+            <TimelineItem
+              label="Yeu cau tra"
+              date={currentRequest.updated_at}
+              active
+            />
           )}
           {status === 'returned' && (
-            <TimelineItem label="Da tra" date={currentRequest.updated_at} active />
+            <TimelineItem
+              label="Da tra"
+              date={currentRequest.updated_at}
+              active
+            />
           )}
         </View>
       </Card>
@@ -138,7 +162,7 @@ const BorrowDetailScreen: React.FC = () => {
       )}
 
       {/* Duration */}
-      {currentRequest.borrow_duration && (
+      {currentRequest.borrow_duration ? (
         <Card style={styles.card}>
           <View style={styles.infoRow}>
             <Text style={styles.label}>Thoi gian muon:</Text>
@@ -153,7 +177,7 @@ const BorrowDetailScreen: React.FC = () => {
             </View>
           )}
         </Card>
-      )}
+      ) : null}
 
       {/* Action buttons */}
       <View style={styles.actionsContainer}>
@@ -202,7 +226,7 @@ interface TimelineItemProps {
   active?: boolean;
 }
 
-const TimelineItem: React.FC<TimelineItemProps> = ({label, date, active}) => (
+const TimelineItem: React.FC<TimelineItemProps> = ({ label, date, active }) => (
   <View style={timelineStyles.item}>
     <View style={timelineStyles.dotColumn}>
       <View

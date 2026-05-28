@@ -1,70 +1,103 @@
-import React, {useEffect, useState, useCallback} from 'react';
-import {
-  View,
-  Text,
-  Switch,
-  Alert,
-  Image,
-  TouchableOpacity,
-  StyleSheet,
-} from 'react-native';
-import {useNavigation, useRoute} from '@react-navigation/native';
-import type {NativeStackNavigationProp} from '@react-navigation/native-stack';
-import type {RouteProp} from '@react-navigation/native';
-import {launchImageLibrary} from 'react-native-image-picker';
-import {
-  ScreenWrapper,
-  Input,
-  Button,
-  Card,
-  LoadingOverlay,
-} from '../../../components';
-import {useApartment} from '../../../hooks/useApartment';
-import {useAuth} from '../../../hooks/useAuth';
-import {useAppDispatch, useAppSelector} from '../../../store';
+import React, { useCallback, useEffect, useReducer } from 'react';
+import { View, Text, Switch, Alert, Image, StyleSheet } from 'react-native';
+import PressableOpacity from '../../../components/PressableOpacity';
+import { useNavigation, useRoute } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import type { RouteProp } from '@react-navigation/native';
+import { launchImageLibrary } from 'react-native-image-picker';
+import ScreenWrapper from '../../../components/ScreenWrapper';
+import Input from '../../../components/Input';
+import Button from '../../../components/Button';
+import Card from '../../../components/Card';
+import LoadingOverlay from '../../../components/LoadingOverlay';
+import { useApartment } from '../../../hooks/useApartment';
+import { useAuth } from '../../../hooks/useAuth';
+import { useAppDispatch, useAppSelector } from '../../../store';
 import {
   createAssetRequest,
   updateAssetRequest,
   deleteAssetRequest,
 } from '../../../store/slices/assetSlice';
-import type {LandlordStackParamList} from '../../../types/navigation';
+import type { LandlordStackParamList } from '../../../types/navigation';
+import type { Asset } from '../../../types/database';
 
 type NavigationProp = NativeStackNavigationProp<LandlordStackParamList>;
 type EditRouteProp = RouteProp<LandlordStackParamList, 'AssetEdit'>;
 
 const CATEGORIES = ['Dien tu', 'Noi that', 'Bep', 'Ve sinh', 'Khac'];
 const LOCATIONS = ['Phong khach', 'Bep', 'Ban cong', 'Kho', 'San thuong'];
-const CONDITIONS: {label: string; value: 'good' | 'fair' | 'poor'}[] = [
-  {label: 'Tot', value: 'good'},
-  {label: 'Kha', value: 'fair'},
-  {label: 'Kem', value: 'poor'},
+const CONDITIONS: { label: string; value: 'good' | 'fair' | 'poor' }[] = [
+  { label: 'Tot', value: 'good' },
+  { label: 'Kha', value: 'fair' },
+  { label: 'Kem', value: 'poor' },
 ];
+
+type AssetFormState = {
+  name: string;
+  category: string;
+  location: string;
+  condition: 'good' | 'fair' | 'poor';
+  isBorrowable: boolean;
+  imageUri: string | null;
+};
+
+type AssetFormAction =
+  | { type: 'setName'; value: string }
+  | { type: 'setCategory'; value: string }
+  | { type: 'setLocation'; value: string }
+  | { type: 'setCondition'; value: 'good' | 'fair' | 'poor' }
+  | { type: 'setIsBorrowable'; value: boolean }
+  | { type: 'setImageUri'; value: string | null };
+
+function getInitialAssetFormState(existing: Asset | undefined): AssetFormState {
+  return {
+    name: existing?.name ?? '',
+    category: existing?.category ?? CATEGORIES[0],
+    location: existing?.location ?? LOCATIONS[0],
+    condition: existing?.condition ?? 'good',
+    isBorrowable: existing?.is_borrowable ?? true,
+    imageUri: existing?.image_url ?? null,
+  };
+}
+
+function assetFormReducer(
+  state: AssetFormState,
+  action: AssetFormAction,
+): AssetFormState {
+  switch (action.type) {
+    case 'setName':
+      return { ...state, name: action.value };
+    case 'setCategory':
+      return { ...state, category: action.value };
+    case 'setLocation':
+      return { ...state, location: action.value };
+    case 'setCondition':
+      return { ...state, condition: action.value };
+    case 'setIsBorrowable':
+      return { ...state, isBorrowable: action.value };
+    case 'setImageUri':
+      return { ...state, imageUri: action.value };
+  }
+}
 
 const AssetEditScreen: React.FC = () => {
   const navigation = useNavigation<NavigationProp>();
   const route = useRoute<EditRouteProp>();
   const dispatch = useAppDispatch();
-  const {apartment} = useApartment();
-  const {user} = useAuth();
-  const {assets, loading} = useAppSelector(state => state.asset);
+  const { apartment } = useApartment();
+  const { user } = useAuth();
+  const { assets, loading } = useAppSelector(state => state.asset);
 
   const editId = route.params?.id;
   const isEditMode = !!editId;
   const existing = isEditMode ? assets.find(a => a.id === editId) : undefined;
 
-  const [name, setName] = useState(existing?.name ?? '');
-  const [category, setCategory] = useState(existing?.category ?? CATEGORIES[0]);
-  const [location, setLocation] = useState(existing?.location ?? LOCATIONS[0]);
-  const [condition, setCondition] = useState<'good' | 'fair' | 'poor'>(
-    existing?.condition ?? 'good',
+  const [form, updateForm] = useReducer(
+    assetFormReducer,
+    existing,
+    getInitialAssetFormState,
   );
-  const [isBorrowable, setIsBorrowable] = useState(
-    existing?.is_borrowable ?? true,
-  );
-  const [imageUri, setImageUri] = useState<string | null>(
-    existing?.image_url ?? null,
-  );
-  const [newImagePicked, setNewImagePicked] = useState(false);
+  const newImagePickedRef = React.useRef(false);
 
   useEffect(() => {
     navigation.setOptions({
@@ -82,8 +115,8 @@ const AssetEditScreen: React.FC = () => {
       });
       if (result.assets && result.assets.length > 0) {
         const uri = result.assets[0].uri ?? null;
-        setImageUri(uri);
-        setNewImagePicked(true);
+        updateForm({ type: 'setImageUri', value: uri });
+        newImagePickedRef.current = true;
       }
     } catch {
       // User cancelled
@@ -99,7 +132,7 @@ const AssetEditScreen: React.FC = () => {
   }, [loading, navigation]);
 
   const handleSubmit = useCallback(() => {
-    if (!name.trim()) {
+    if (!form.name.trim()) {
       Alert.alert('Loi', 'Vui long nhap ten tai san');
       return;
     }
@@ -112,13 +145,16 @@ const AssetEditScreen: React.FC = () => {
         updateAssetRequest({
           id: editId,
           updates: {
-            name: name.trim(),
-            category,
-            location,
-            condition,
-            is_borrowable: isBorrowable,
+            name: form.name.trim(),
+            category: form.category,
+            location: form.location,
+            condition: form.condition,
+            is_borrowable: form.isBorrowable,
           },
-          imageUri: newImagePicked && imageUri ? imageUri : undefined,
+          imageUri:
+            newImagePickedRef.current && form.imageUri
+              ? form.imageUri
+              : undefined,
         }),
       );
     } else {
@@ -126,41 +162,28 @@ const AssetEditScreen: React.FC = () => {
         createAssetRequest({
           apartment_id: apartment.id,
           owner_id: user?.id ?? null,
-          name: name.trim(),
-          category,
-          location,
-          condition,
-          is_borrowable: isBorrowable,
-          imageUri: imageUri ?? undefined,
+          name: form.name.trim(),
+          category: form.category,
+          location: form.location,
+          condition: form.condition,
+          is_borrowable: form.isBorrowable,
+          imageUri: form.imageUri ?? undefined,
         }),
       );
     }
-  }, [
-    apartment?.id,
-    user?.id,
-    isEditMode,
-    editId,
-    name,
-    category,
-    location,
-    condition,
-    isBorrowable,
-    imageUri,
-    newImagePicked,
-    dispatch,
-  ]);
+  }, [apartment?.id, user?.id, isEditMode, editId, form, dispatch]);
 
   const handleDelete = useCallback(() => {
     if (!editId) {
       return;
     }
     Alert.alert('Xoa tai san', 'Ban co chac chan muon xoa tai san nay?', [
-      {text: 'Huy', style: 'cancel'},
+      { text: 'Huy', style: 'cancel' },
       {
         text: 'Xoa',
         style: 'destructive',
         onPress: () => {
-          dispatch(deleteAssetRequest({id: editId}));
+          dispatch(deleteAssetRequest({ id: editId }));
         },
       },
     ]);
@@ -171,47 +194,50 @@ const AssetEditScreen: React.FC = () => {
       <LoadingOverlay visible={loading} />
 
       {/* Image Picker */}
-      <TouchableOpacity
+      <PressableOpacity
         style={styles.imagePicker}
         onPress={handlePickImage}
-        activeOpacity={0.7}>
-        {imageUri ? (
-          <Image source={{uri: imageUri}} style={styles.imagePreview} />
+        activeOpacity={0.7}
+      >
+        {form.imageUri ? (
+          <Image source={{ uri: form.imageUri }} style={styles.imagePreview} />
         ) : (
           <View style={styles.imagePlaceholder}>
             <Text style={styles.imagePlaceholderIcon}>+</Text>
             <Text style={styles.imagePlaceholderText}>Chon hinh anh</Text>
           </View>
         )}
-      </TouchableOpacity>
+      </PressableOpacity>
 
       {/* Name */}
       <Input
         label="Ten tai san"
         placeholder="VD: May giat Samsung"
-        value={name}
-        onChangeText={setName}
+        value={form.name}
+        onChangeText={value => updateForm({ type: 'setName', value })}
       />
 
       {/* Category Picker */}
       <Text style={styles.label}>Danh muc</Text>
       <View style={styles.pickerRow}>
         {CATEGORIES.map(cat => (
-          <TouchableOpacity
+          <PressableOpacity
             key={cat}
             style={[
               styles.pickerChip,
-              category === cat && styles.pickerChipActive,
+              form.category === cat && styles.pickerChipActive,
             ]}
-            onPress={() => setCategory(cat)}>
+            onPress={() => updateForm({ type: 'setCategory', value: cat })}
+          >
             <Text
               style={[
                 styles.pickerChipText,
-                category === cat && styles.pickerChipTextActive,
-              ]}>
+                form.category === cat && styles.pickerChipTextActive,
+              ]}
+            >
               {cat}
             </Text>
-          </TouchableOpacity>
+          </PressableOpacity>
         ))}
       </View>
 
@@ -219,21 +245,23 @@ const AssetEditScreen: React.FC = () => {
       <Text style={styles.label}>Vi tri</Text>
       <View style={styles.pickerRow}>
         {LOCATIONS.map(loc => (
-          <TouchableOpacity
+          <PressableOpacity
             key={loc}
             style={[
               styles.pickerChip,
-              location === loc && styles.pickerChipActive,
+              form.location === loc && styles.pickerChipActive,
             ]}
-            onPress={() => setLocation(loc)}>
+            onPress={() => updateForm({ type: 'setLocation', value: loc })}
+          >
             <Text
               style={[
                 styles.pickerChipText,
-                location === loc && styles.pickerChipTextActive,
-              ]}>
+                form.location === loc && styles.pickerChipTextActive,
+              ]}
+            >
               {loc}
             </Text>
-          </TouchableOpacity>
+          </PressableOpacity>
         ))}
       </View>
 
@@ -241,21 +269,23 @@ const AssetEditScreen: React.FC = () => {
       <Text style={styles.label}>Tinh trang</Text>
       <View style={styles.pickerRow}>
         {CONDITIONS.map(c => (
-          <TouchableOpacity
+          <PressableOpacity
             key={c.value}
             style={[
               styles.pickerChip,
-              condition === c.value && styles.pickerChipActive,
+              form.condition === c.value && styles.pickerChipActive,
             ]}
-            onPress={() => setCondition(c.value)}>
+            onPress={() => updateForm({ type: 'setCondition', value: c.value })}
+          >
             <Text
               style={[
                 styles.pickerChipText,
-                condition === c.value && styles.pickerChipTextActive,
-              ]}>
+                form.condition === c.value && styles.pickerChipTextActive,
+              ]}
+            >
               {c.label}
             </Text>
-          </TouchableOpacity>
+          </PressableOpacity>
         ))}
       </View>
 
@@ -269,10 +299,12 @@ const AssetEditScreen: React.FC = () => {
             </Text>
           </View>
           <Switch
-            value={isBorrowable}
-            onValueChange={setIsBorrowable}
-            trackColor={{false: '#CBD5E1', true: '#93C5FD'}}
-            thumbColor={isBorrowable ? '#2563EB' : '#F1F5F9'}
+            value={form.isBorrowable}
+            onValueChange={value =>
+              updateForm({ type: 'setIsBorrowable', value })
+            }
+            trackColor={{ false: '#CBD5E1', true: '#93C5FD' }}
+            thumbColor={form.isBorrowable ? '#2563EB' : '#F1F5F9'}
           />
         </View>
       </Card>

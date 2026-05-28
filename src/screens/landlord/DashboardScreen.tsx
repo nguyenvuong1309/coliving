@@ -1,38 +1,38 @@
-import React, {useEffect, useMemo} from 'react';
+import React, { useEffect, useMemo } from 'react';
+import { View, Text, FlatList, StyleSheet, RefreshControl } from 'react-native';
+import PressableOpacity from '../../components/PressableOpacity';
+import { useNavigation } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import Card from '../../components/Card';
+import Button from '../../components/Button';
+import LoadingOverlay from '../../components/LoadingOverlay';
+import ScreenWrapper from '../../components/ScreenWrapper';
+import { useAuth } from '../../hooks/useAuth';
+import { useApartment } from '../../hooks/useApartment';
+import { useAppSelector, useAppDispatch } from '../../store';
+import { fetchIssuesRequest } from '../../store/slices/issueSlice';
 import {
-  View,
-  Text,
-  FlatList,
-  TouchableOpacity,
-  StyleSheet,
-  RefreshControl,
-} from 'react-native';
-import {useNavigation} from '@react-navigation/native';
-import type {NativeStackNavigationProp} from '@react-navigation/native-stack';
-import {Card, Button, LoadingOverlay, ScreenWrapper} from '../../components';
-import {useAuth} from '../../hooks/useAuth';
-import {useApartment} from '../../hooks/useApartment';
-import {useAppSelector, useAppDispatch} from '../../store';
-import {fetchIssuesRequest} from '../../store/slices/issueSlice';
-import {fetchBillingPeriodsRequest, fetchPaymentsRequest} from '../../store/slices/paymentSlice';
-import {fetchBorrowRequestsRequest} from '../../store/slices/borrowSlice';
-import {fetchNotificationsRequest} from '../../store/slices/notificationSlice';
-import {formatCurrency, formatRelativeTime} from '../../utils/formatters';
-import type {LandlordStackParamList} from '../../types/navigation';
-import type {Notification} from '../../types/database';
+  fetchBillingPeriodsRequest,
+  fetchPaymentsRequest,
+} from '../../store/slices/paymentSlice';
+import { fetchBorrowRequestsRequest } from '../../store/slices/borrowSlice';
+import { fetchNotificationsRequest } from '../../store/slices/notificationSlice';
+import { formatCurrency, formatRelativeTime } from '../../utils/formatters';
+import type { LandlordStackParamList } from '../../types/navigation';
+import type { Notification } from '../../types/database';
 
 type NavigationProp = NativeStackNavigationProp<LandlordStackParamList>;
 
 const DashboardScreen: React.FC = () => {
   const navigation = useNavigation<NavigationProp>();
   const dispatch = useAppDispatch();
-  const {user} = useAuth();
-  const {apartment, members, fetchApartment, fetchMembers} = useApartment();
+  const { user } = useAuth();
+  const { apartment, members, fetchApartment, fetchMembers } = useApartment();
 
-  const {issues} = useAppSelector(state => state.issue);
-  const {payments, billingPeriods} = useAppSelector(state => state.payment);
-  const {requests: borrowRequests} = useAppSelector(state => state.borrow);
-  const {notifications} = useAppSelector(state => state.notification);
+  const { issues } = useAppSelector(state => state.issue);
+  const { payments, billingPeriods } = useAppSelector(state => state.payment);
+  const { requests: borrowRequests } = useAppSelector(state => state.borrow);
+  const { notifications } = useAppSelector(state => state.notification);
   const apartmentLoading = useAppSelector(state => state.apartment.loading);
 
   const [refreshing, setRefreshing] = React.useState(false);
@@ -40,12 +40,12 @@ const DashboardScreen: React.FC = () => {
   const loadData = React.useCallback(() => {
     if (apartment?.id) {
       fetchMembers(apartment.id);
-      dispatch(fetchIssuesRequest({apartmentId: apartment.id}));
-      dispatch(fetchBillingPeriodsRequest({apartmentId: apartment.id}));
-      dispatch(fetchBorrowRequestsRequest({apartmentId: apartment.id}));
+      dispatch(fetchIssuesRequest({ apartmentId: apartment.id }));
+      dispatch(fetchBillingPeriodsRequest({ apartmentId: apartment.id }));
+      dispatch(fetchBorrowRequestsRequest({ apartmentId: apartment.id }));
     }
     if (user?.id) {
-      dispatch(fetchNotificationsRequest({userId: user.id}));
+      dispatch(fetchNotificationsRequest({ userId: user.id }));
     }
   }, [apartment?.id, user?.id, dispatch, fetchMembers]);
 
@@ -76,20 +76,21 @@ const DashboardScreen: React.FC = () => {
       return 0;
     }
     return payments
-      .filter(p => p.billing_period_id === currentPeriod.id && p.status === 'confirmed')
+      .filter(
+        p =>
+          p.billing_period_id === currentPeriod.id && p.status === 'confirmed',
+      )
       .reduce((sum, p) => sum + p.amount, 0);
   }, [payments, billingPeriods, currentMonth, currentYear]);
 
   const unpaidCount = useMemo(() => {
-    return payments.filter(
-      p => p.status === 'unpaid' || p.status === 'overdue',
-    ).length;
+    return payments.filter(p => p.status === 'unpaid' || p.status === 'overdue')
+      .length;
   }, [payments]);
 
   const openIssuesCount = useMemo(() => {
-    return issues.filter(
-      i => i.status === 'open' || i.status === 'reopened',
-    ).length;
+    return issues.filter(i => i.status === 'open' || i.status === 'reopened')
+      .length;
   }, [issues]);
 
   const pendingBorrowCount = useMemo(() => {
@@ -100,8 +101,8 @@ const DashboardScreen: React.FC = () => {
     return notifications.slice(0, 5);
   }, [notifications]);
 
-  const renderNotification = ({item}: {item: Notification}) => (
-    <TouchableOpacity style={styles.notificationItem}>
+  const renderNotification = ({ item }: { item: Notification }) => (
+    <PressableOpacity style={styles.notificationItem}>
       <View style={styles.notificationDot}>
         {!item.is_read && <View style={styles.unreadDot} />}
       </View>
@@ -118,7 +119,7 @@ const DashboardScreen: React.FC = () => {
           {formatRelativeTime(item.created_at)}
         </Text>
       </View>
-    </TouchableOpacity>
+    </PressableOpacity>
   );
 
   return (
@@ -139,13 +140,13 @@ const DashboardScreen: React.FC = () => {
       <View style={styles.summaryRow}>
         <Card style={styles.summaryCard}>
           <Text style={styles.summaryLabel}>Doanh thu thang</Text>
-          <Text style={[styles.summaryValue, {color: '#16A34A'}]}>
+          <Text style={[styles.summaryValue, { color: '#16A34A' }]}>
             {formatCurrency(monthlyRevenue)}
           </Text>
         </Card>
         <Card style={styles.summaryCard}>
           <Text style={styles.summaryLabel}>Chua thanh toan</Text>
-          <Text style={[styles.summaryValue, {color: '#F59E0B'}]}>
+          <Text style={[styles.summaryValue, { color: '#F59E0B' }]}>
             {unpaidCount}
           </Text>
         </Card>
@@ -154,7 +155,8 @@ const DashboardScreen: React.FC = () => {
       {/* Open Issues Card */}
       <Card
         style={styles.infoCard}
-        onPress={() => navigation.navigate('LandlordIssueList')}>
+        onPress={() => navigation.navigate('LandlordIssueList')}
+      >
         <View style={styles.infoCardRow}>
           <View>
             <Text style={styles.infoCardLabel}>Su co cho xu ly</Text>
@@ -168,9 +170,7 @@ const DashboardScreen: React.FC = () => {
       <Card style={styles.infoCard}>
         <View style={styles.infoCardRow}>
           <View>
-            <Text style={styles.infoCardLabel}>
-              Yeu cau muon do dang cho
-            </Text>
+            <Text style={styles.infoCardLabel}>Yeu cau muon do dang cho</Text>
             <Text style={styles.infoCardValue}>{pendingBorrowCount}</Text>
           </View>
         </View>

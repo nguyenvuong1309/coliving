@@ -1,4 +1,4 @@
-import React, { forwardRef, useState } from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -9,6 +9,7 @@ import {
 } from 'react-native';
 
 interface InputProps extends Omit<TextInputProps, 'style'> {
+  ref?: React.Ref<TextInput>;
   label?: string;
   placeholder?: string;
   error?: string;
@@ -21,73 +22,65 @@ interface InputProps extends Omit<TextInputProps, 'style'> {
   style?: ViewStyle;
 }
 
-const Input = forwardRef<TextInput, InputProps>(
-  (
-    {
-      label,
-      placeholder,
-      error,
-      secureTextEntry,
-      leftIcon,
-      value,
-      onChangeText,
-      multiline,
-      numberOfLines,
-      style,
-      ...rest
-    },
-    ref,
-  ) => {
-    const [isFocused, setIsFocused] = useState(false);
+const Input: React.FC<InputProps> = ({
+  ref,
+  label,
+  placeholder,
+  error,
+  secureTextEntry,
+  leftIcon,
+  value,
+  onChangeText,
+  multiline,
+  numberOfLines,
+  style,
+  ...rest
+}) => {
+  const [isFocused, setIsFocused] = useState(false);
 
-    const borderColor = error
-      ? '#DC2626'
-      : isFocused
-        ? '#2563EB'
-        : '#CBD5E1';
+  const borderColor = error ? '#DC2626' : isFocused ? '#2563EB' : '#CBD5E1';
 
-    return (
-      <View style={[styles.container, style]}>
-        {label && <Text style={styles.label}>{label}</Text>}
-        <View
+  return (
+    <View style={[styles.container, style]}>
+      {label && <Text style={styles.label}>{label}</Text>}
+      <View
+        style={[
+          styles.inputWrapper,
+          { borderColor },
+          multiline && { height: undefined, minHeight: 80 },
+        ]}
+      >
+        {leftIcon && <View style={styles.iconWrapper}>{leftIcon}</View>}
+        <TextInput
+          ref={ref}
           style={[
-            styles.inputWrapper,
-            { borderColor },
-            multiline && { height: undefined, minHeight: 80 },
-          ]}>
-          {leftIcon && <View style={styles.iconWrapper}>{leftIcon}</View>}
-          <TextInput
-            ref={ref}
-            style={[
-              styles.input,
-              leftIcon ? { paddingLeft: 0 } : undefined,
-              multiline && { textAlignVertical: 'top' },
-            ]}
-            placeholder={placeholder}
-            placeholderTextColor="#94A3B8"
-            secureTextEntry={secureTextEntry}
-            value={value}
-            onChangeText={onChangeText}
-            multiline={multiline}
-            numberOfLines={numberOfLines}
-            onFocus={() => setIsFocused(true)}
-            onBlur={() => setIsFocused(false)}
-            {...rest}
-          />
-        </View>
-        {error && (
+            styles.input,
+            leftIcon ? { paddingLeft: 0 } : undefined,
+            multiline && { textAlignVertical: 'top' },
+          ]}
+          placeholder={placeholder}
+          placeholderTextColor="#94A3B8"
+          secureTextEntry={secureTextEntry}
+          value={value}
+          onChangeText={onChangeText}
+          multiline={multiline}
+          numberOfLines={numberOfLines}
+          onFocus={() => setIsFocused(true)}
+          onBlur={() => setIsFocused(false)}
+          {...rest}
+        />
+      </View>
+      {error && (
         <Text
           testID={rest.testID ? `${rest.testID}-error` : undefined}
-          style={styles.error}>
+          style={styles.error}
+        >
           {error}
         </Text>
       )}
-      </View>
-    );
-  },
-);
-
-Input.displayName = 'Input';
+    </View>
+  );
+};
 
 const styles = StyleSheet.create({
   container: {

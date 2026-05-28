@@ -1,23 +1,25 @@
-import React, {useEffect, useMemo, useCallback} from 'react';
-import {View, Text, Image, Alert, StyleSheet} from 'react-native';
-import {useNavigation, useRoute} from '@react-navigation/native';
-import type {NativeStackNavigationProp} from '@react-navigation/native-stack';
-import type {RouteProp} from '@react-navigation/native';
-import {
-  ScreenWrapper,
-  Card,
-  Button,
-  StatusBadge,
-  LoadingOverlay,
-} from '../../../components';
-import {useApartment} from '../../../hooks/useApartment';
-import {useAppSelector, useAppDispatch} from '../../../store';
+import React, { useEffect, useMemo, useCallback } from 'react';
+import { View, Text, Image, Alert, StyleSheet } from 'react-native';
+import { useNavigation, useRoute } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import type { RouteProp } from '@react-navigation/native';
+import ScreenWrapper from '../../../components/ScreenWrapper';
+import Card from '../../../components/Card';
+import Button from '../../../components/Button';
+import StatusBadge from '../../../components/StatusBadge';
+import LoadingOverlay from '../../../components/LoadingOverlay';
+import { useApartment } from '../../../hooks/useApartment';
+import { useAppSelector, useAppDispatch } from '../../../store';
 import {
   confirmPaymentRequest,
   rejectPaymentRequest,
 } from '../../../store/slices/paymentSlice';
-import {formatCurrency, formatDate, getStatusLabel} from '../../../utils/formatters';
-import type {LandlordStackParamList} from '../../../types/navigation';
+import {
+  formatCurrency,
+  formatDate,
+  getStatusLabel,
+} from '../../../utils/formatters';
+import type { LandlordStackParamList } from '../../../types/navigation';
 
 type NavigationProp = NativeStackNavigationProp<LandlordStackParamList>;
 type ConfirmRouteProp = RouteProp<LandlordStackParamList, 'PaymentConfirm'>;
@@ -26,9 +28,9 @@ const PaymentConfirmScreen: React.FC = () => {
   const navigation = useNavigation<NavigationProp>();
   const route = useRoute<ConfirmRouteProp>();
   const dispatch = useAppDispatch();
-  const {id} = route.params;
-  const {members} = useApartment();
-  const {payments, loading} = useAppSelector(state => state.payment);
+  const { id } = route.params;
+  const { members } = useApartment();
+  const { payments, loading } = useAppSelector(state => state.payment);
 
   const payment = useMemo(
     () => payments.find(p => p.id === id),
@@ -44,13 +46,15 @@ const PaymentConfirmScreen: React.FC = () => {
   const handleConfirm = useCallback(() => {
     Alert.alert(
       'Xac nhan thanh toan',
-      `Xac nhan da nhan ${payment ? formatCurrency(payment.amount) : ''} tu ${tenantName}?`,
+      `Xac nhan da nhan ${
+        payment ? formatCurrency(payment.amount) : ''
+      } tu ${tenantName}?`,
       [
-        {text: 'Huy', style: 'cancel'},
+        { text: 'Huy', style: 'cancel' },
         {
           text: 'Xac nhan',
           onPress: () => {
-            dispatch(confirmPaymentRequest({paymentId: id}));
+            dispatch(confirmPaymentRequest({ paymentId: id }));
             navigation.goBack();
           },
         },
@@ -63,12 +67,12 @@ const PaymentConfirmScreen: React.FC = () => {
       'Tu choi thanh toan',
       `Ban xac nhan chua nhan duoc thanh toan tu ${tenantName}?`,
       [
-        {text: 'Huy', style: 'cancel'},
+        { text: 'Huy', style: 'cancel' },
         {
           text: 'Chua nhan duoc',
           style: 'destructive',
           onPress: () => {
-            dispatch(rejectPaymentRequest({paymentId: id}));
+            dispatch(rejectPaymentRequest({ paymentId: id }));
             navigation.goBack();
           },
         },
@@ -109,8 +113,8 @@ const PaymentConfirmScreen: React.FC = () => {
             {payment.payment_method === 'bank_transfer'
               ? 'Chuyen khoan'
               : payment.payment_method === 'cash'
-                ? 'Tien mat'
-                : 'Chua ro'}
+              ? 'Tien mat'
+              : 'Chua ro'}
           </Text>
         </View>
         <View style={styles.infoRow}>
@@ -120,9 +124,7 @@ const PaymentConfirmScreen: React.FC = () => {
         {payment.paid_at && (
           <View style={styles.infoRow}>
             <Text style={styles.infoLabel}>Ngay bao</Text>
-            <Text style={styles.infoValue}>
-              {formatDate(payment.paid_at)}
-            </Text>
+            <Text style={styles.infoValue}>{formatDate(payment.paid_at)}</Text>
           </View>
         )}
         {payment.note && (
@@ -138,7 +140,7 @@ const PaymentConfirmScreen: React.FC = () => {
         <View style={styles.receiptSection}>
           <Text style={styles.sectionTitle}>Hinh anh xac nhan</Text>
           <Image
-            source={{uri: payment.receipt_image_url}}
+            source={{ uri: payment.receipt_image_url }}
             style={styles.receiptImage}
             resizeMode="contain"
           />

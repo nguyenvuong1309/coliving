@@ -6,7 +6,10 @@ interface LoadingOverlayProps {
   message?: string;
 }
 
-const LoadingOverlay: React.FC<LoadingOverlayProps> = ({ visible, message }) => {
+const LoadingOverlay: React.FC<LoadingOverlayProps> = ({
+  visible,
+  message,
+}) => {
   return (
     <Modal transparent animationType="fade" visible={visible}>
       <View style={styles.overlay}>
@@ -32,11 +35,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 32,
     paddingVertical: 24,
     alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.15,
-    shadowRadius: 8,
-    elevation: 4,
+    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.15)',
   },
   message: {
     marginTop: 12,

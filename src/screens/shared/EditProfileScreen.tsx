@@ -1,29 +1,33 @@
-import React, {useCallback, useEffect, useState} from 'react';
-import {Alert, View, StyleSheet, Text, TouchableOpacity, Image} from 'react-native';
-import {useNavigation} from '@react-navigation/native';
-import {launchImageLibrary} from 'react-native-image-picker';
-import {ScreenWrapper, Input, Button, LoadingOverlay} from '../../components';
-import {useAuth} from '../../hooks/useAuth';
-import {useAppDispatch, useAppSelector} from '../../store';
-import {updateProfileRequest} from '../../store/slices/authSlice';
-import {uploadImage, getImageUrl} from '../../services/storage';
+import React, { useCallback, useEffect, useState } from 'react';
+import { Alert, View, StyleSheet, Text, Image } from 'react-native';
+import PressableOpacity from '../../components/PressableOpacity';
+import { useNavigation } from '@react-navigation/native';
+import { launchImageLibrary } from 'react-native-image-picker';
+import ScreenWrapper from '../../components/ScreenWrapper';
+import Input from '../../components/Input';
+import Button from '../../components/Button';
+import LoadingOverlay from '../../components/LoadingOverlay';
+import { useAuth } from '../../hooks/useAuth';
+import { useAppDispatch, useAppSelector } from '../../store';
+import { updateProfileRequest } from '../../store/slices/authSlice';
+import { uploadImage, getImageUrl } from '../../services/storage';
 
 const EditProfileScreen: React.FC = () => {
   const navigation = useNavigation();
   const dispatch = useAppDispatch();
-  const {user} = useAuth();
-  const {loading} = useAppSelector(state => state.auth);
+  const { user } = useAuth();
+  const { loading } = useAppSelector(state => state.auth);
 
   const [fullName, setFullName] = useState(user?.full_name ?? '');
   const [phone, setPhone] = useState(user?.phone ?? '');
   const [avatarUri, setAvatarUri] = useState<string | null>(
     user?.avatar_url ?? null,
   );
-  const [avatarChanged, setAvatarChanged] = useState(false);
+  const avatarChangedRef = React.useRef(false);
   const [uploading, setUploading] = useState(false);
 
   useEffect(() => {
-    navigation.setOptions({title: 'Chỉnh sửa thông tin'});
+    navigation.setOptions({ title: 'Chỉnh sửa thông tin' });
   }, [navigation]);
 
   const prevLoadingRef = React.useRef(loading);
@@ -44,7 +48,7 @@ const EditProfileScreen: React.FC = () => {
       });
       if (result.assets && result.assets[0]?.uri) {
         setAvatarUri(result.assets[0].uri);
-        setAvatarChanged(true);
+        avatarChangedRef.current = true;
       }
     } catch {
       // user cancelled
@@ -57,7 +61,7 @@ const EditProfileScreen: React.FC = () => {
       return;
     }
     let avatar_url: string | null | undefined;
-    if (avatarChanged && avatarUri && user?.id) {
+    if (avatarChangedRef.current && avatarUri && user?.id) {
       try {
         setUploading(true);
         const ext = avatarUri.split('.').pop()?.toLowerCase() || 'jpg';
@@ -82,29 +86,30 @@ const EditProfileScreen: React.FC = () => {
         updates: {
           full_name: fullName.trim(),
           phone: phone.trim() || null,
-          ...(avatar_url !== undefined ? {avatar_url} : {}),
+          ...(avatar_url !== undefined ? { avatar_url } : {}),
         },
       }),
     );
-  }, [fullName, phone, avatarUri, avatarChanged, user?.id, dispatch]);
+  }, [fullName, phone, avatarUri, user?.id, dispatch]);
 
   return (
     <ScreenWrapper scroll>
       <LoadingOverlay visible={loading || uploading} />
 
-      <TouchableOpacity
+      <PressableOpacity
         style={styles.avatarWrapper}
         onPress={handlePickAvatar}
-        activeOpacity={0.7}>
+        activeOpacity={0.7}
+      >
         {avatarUri ? (
-          <Image source={{uri: avatarUri}} style={styles.avatar} />
+          <Image source={{ uri: avatarUri }} style={styles.avatar} />
         ) : (
           <View style={styles.avatarPlaceholder}>
             <Text style={styles.avatarPlaceholderText}>+</Text>
           </View>
         )}
         <Text style={styles.avatarLabel}>Đổi ảnh đại diện</Text>
-      </TouchableOpacity>
+      </PressableOpacity>
 
       <Input
         label="Họ và tên"

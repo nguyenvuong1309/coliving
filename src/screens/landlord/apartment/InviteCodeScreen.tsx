@@ -1,17 +1,19 @@
 import React from 'react';
-import {View, Text, Share, StyleSheet, Alert} from 'react-native';
+import { View, Text, Share, StyleSheet, Alert } from 'react-native';
 import Clipboard from '@react-native-clipboard/clipboard';
-import {useRoute} from '@react-navigation/native';
-import type {RouteProp} from '@react-navigation/native';
-import {ScreenWrapper, Button, Card} from '../../../components';
-import {useAppSelector} from '../../../store';
-import type {LandlordStackParamList} from '../../../types/navigation';
+import { useRoute } from '@react-navigation/native';
+import type { RouteProp } from '@react-navigation/native';
+import ScreenWrapper from '../../../components/ScreenWrapper';
+import Button from '../../../components/Button';
+import Card from '../../../components/Card';
+import { useAppSelector } from '../../../store';
+import type { LandlordStackParamList } from '../../../types/navigation';
 
 type InviteCodeRouteProp = RouteProp<LandlordStackParamList, 'InviteCode'>;
 
 const InviteCodeScreen: React.FC = () => {
   const route = useRoute<InviteCodeRouteProp>();
-  const {apartmentId} = route.params;
+  const { apartmentId } = route.params;
 
   const apartment = useAppSelector(state => state.apartment.apartment);
 

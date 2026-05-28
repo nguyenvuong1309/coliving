@@ -1,28 +1,28 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
   StyleSheet,
-  TouchableOpacity,
   KeyboardAvoidingView,
   Platform,
 } from 'react-native';
-import {useNavigation} from '@react-navigation/native';
-import type {NativeStackNavigationProp} from '@react-navigation/native-stack';
-import {useAppDispatch} from '../../store';
-import {setLoading} from '../../store/slices/authSlice';
-import {setUserRole} from '../../utils/mmkv';
-import {Button} from '../../components';
-import type {AuthStackParamList} from '../../types/navigation';
+import PressableOpacity from '../../components/PressableOpacity';
+import { useNavigation } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { useAppDispatch } from '../../store';
+import { setLoading } from '../../store/slices/authSlice';
+import { setUserRole } from '../../utils/mmkv';
+import Button from '../../components/Button';
+import type { AuthStackParamList } from '../../types/navigation';
 
 type Nav = NativeStackNavigationProp<AuthStackParamList, 'RoleSelection'>;
 
 export default function RoleSelectionScreen() {
   const navigation = useNavigation<Nav>();
   const dispatch = useAppDispatch();
-  const [selectedRole, setSelectedRole] = useState<'tenant' | 'landlord' | null>(
-    null,
-  );
+  const [selectedRole, setSelectedRole] = useState<
+    'tenant' | 'landlord' | null
+  >(null);
 
   const handleContinue = () => {
     if (!selectedRole) {
@@ -37,37 +37,36 @@ export default function RoleSelectionScreen() {
   return (
     <KeyboardAvoidingView
       style={styles.container}
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+    >
       <View style={styles.content}>
         <Text style={styles.title}>Bạn là ai? 👤</Text>
         <Text style={styles.subtitle}>Chọn để tiếp tục</Text>
 
         <View style={styles.roleContainer}>
-          <TouchableOpacity
+          <PressableOpacity
             style={[
               styles.roleCard,
               selectedRole === 'tenant' && styles.roleCardActive,
             ]}
-            onPress={() => setSelectedRole('tenant')}>
+            onPress={() => setSelectedRole('tenant')}
+          >
             <Text style={styles.roleEmoji}>🏠</Text>
             <Text style={styles.roleTitle}>Người thuê</Text>
-            <Text style={styles.roleDescription}>
-              Tôi đang tìm kiếm chỗ ở
-            </Text>
-          </TouchableOpacity>
+            <Text style={styles.roleDescription}>Tôi đang tìm kiếm chỗ ở</Text>
+          </PressableOpacity>
 
-          <TouchableOpacity
+          <PressableOpacity
             style={[
               styles.roleCard,
               selectedRole === 'landlord' && styles.roleCardActive,
             ]}
-            onPress={() => setSelectedRole('landlord')}>
+            onPress={() => setSelectedRole('landlord')}
+          >
             <Text style={styles.roleEmoji}>🏢</Text>
             <Text style={styles.roleTitle}>Chủ nhà</Text>
-            <Text style={styles.roleDescription}>
-              Tôi quản lý căn hộ
-            </Text>
-          </TouchableOpacity>
+            <Text style={styles.roleDescription}>Tôi quản lý căn hộ</Text>
+          </PressableOpacity>
         </View>
 
         <Button
@@ -77,11 +76,12 @@ export default function RoleSelectionScreen() {
           style={styles.button}
         />
 
-        <TouchableOpacity
+        <PressableOpacity
           onPress={() => navigation.navigate('SignIn')}
-          style={styles.backLink}>
+          style={styles.backLink}
+        >
           <Text style={styles.backText}>← Quay lại</Text>
-        </TouchableOpacity>
+        </PressableOpacity>
       </View>
     </KeyboardAvoidingView>
   );

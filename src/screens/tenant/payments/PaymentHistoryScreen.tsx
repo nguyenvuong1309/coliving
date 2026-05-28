@@ -1,14 +1,17 @@
-import React, {useEffect, useMemo} from 'react';
-import {View, Text, SectionList, StyleSheet} from 'react-native';
-import {useNavigation} from '@react-navigation/native';
-import type {NativeStackNavigationProp} from '@react-navigation/native-stack';
-import {Card, StatusBadge, EmptyState, LoadingOverlay} from '../../../components';
-import {useAuth} from '../../../hooks/useAuth';
-import {useAppSelector, useAppDispatch} from '../../../store';
-import {fetchMyPaymentsRequest} from '../../../store/slices/paymentSlice';
-import {formatCurrency, formatDate} from '../../../utils/formatters';
-import type {TenantStackParamList} from '../../../types/navigation';
-import type {Payment} from '../../../types/database';
+import React, { useEffect, useMemo } from 'react';
+import { View, Text, SectionList, StyleSheet } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import Card from '../../../components/Card';
+import StatusBadge from '../../../components/StatusBadge';
+import EmptyState from '../../../components/EmptyState';
+import LoadingOverlay from '../../../components/LoadingOverlay';
+import { useAuth } from '../../../hooks/useAuth';
+import { useAppSelector, useAppDispatch } from '../../../store';
+import { fetchMyPaymentsRequest } from '../../../store/slices/paymentSlice';
+import { formatCurrency, formatDate } from '../../../utils/formatters';
+import type { TenantStackParamList } from '../../../types/navigation';
+import type { Payment } from '../../../types/database';
 
 type NavigationProp = NativeStackNavigationProp<TenantStackParamList>;
 
@@ -36,12 +39,12 @@ const MONTH_NAMES = [
 const PaymentHistoryScreen: React.FC = () => {
   const navigation = useNavigation<NavigationProp>();
   const dispatch = useAppDispatch();
-  const {user} = useAuth();
-  const {myPayments, loading} = useAppSelector(state => state.payment);
+  const { user } = useAuth();
+  const { myPayments, loading } = useAppSelector(state => state.payment);
 
   useEffect(() => {
     if (user?.id) {
-      dispatch(fetchMyPaymentsRequest({userId: user.id}));
+      dispatch(fetchMyPaymentsRequest({ userId: user.id }));
     }
   }, [user?.id, dispatch]);
 
@@ -89,10 +92,11 @@ const PaymentHistoryScreen: React.FC = () => {
     return result;
   }, [myPayments]);
 
-  const renderItem = ({item}: {item: Payment}) => (
+  const renderItem = ({ item }: { item: Payment }) => (
     <Card
       style={styles.itemCard}
-      onPress={() => navigation.navigate('PaymentDetail', {id: item.id})}>
+      onPress={() => navigation.navigate('PaymentDetail', { id: item.id })}
+    >
       <View style={styles.itemRow}>
         <View style={styles.itemLeft}>
           <Text style={styles.amountText}>{formatCurrency(item.amount)}</Text>
@@ -107,21 +111,19 @@ const PaymentHistoryScreen: React.FC = () => {
     </Card>
   );
 
-  const renderSectionHeader = ({
-    section,
-  }: {
-    section: SectionData;
-  }) => (
+  const renderSectionHeader = ({ section }: { section: SectionData }) => (
     <View
       style={[
         styles.sectionHeader,
         section.isCurrent && styles.sectionHeaderCurrent,
-      ]}>
+      ]}
+    >
       <Text
         style={[
           styles.sectionTitle,
           section.isCurrent && styles.sectionTitleCurrent,
-        ]}>
+        ]}
+      >
         {section.title}
       </Text>
       {section.isCurrent && (

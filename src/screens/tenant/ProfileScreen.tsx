@@ -1,24 +1,28 @@
-import React, {useCallback} from 'react';
-import {View, Text, StyleSheet, Alert, TouchableOpacity} from 'react-native';
-import {useNavigation} from '@react-navigation/native';
-import type {NativeStackNavigationProp} from '@react-navigation/native-stack';
-import {ScreenWrapper, Avatar, Card, Button} from '../../components';
-import {useAuth} from '../../hooks/useAuth';
-import {useApartment} from '../../hooks/useApartment';
-import type {TenantStackParamList} from '../../types/navigation';
+import React, { useCallback } from 'react';
+import { View, Text, StyleSheet, Alert } from 'react-native';
+import PressableOpacity from '../../components/PressableOpacity';
+import { useNavigation } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import ScreenWrapper from '../../components/ScreenWrapper';
+import Avatar from '../../components/Avatar';
+import Card from '../../components/Card';
+import Button from '../../components/Button';
+import { useAuth } from '../../hooks/useAuth';
+import { useApartment } from '../../hooks/useApartment';
+import type { TenantStackParamList } from '../../types/navigation';
 
 type NavigationProp = NativeStackNavigationProp<TenantStackParamList>;
 
 const ProfileScreen: React.FC = () => {
   const navigation = useNavigation<NavigationProp>();
-  const {user, signOut, loading} = useAuth();
-  const {apartment, members} = useApartment();
+  const { user, signOut, loading } = useAuth();
+  const { apartment, members } = useApartment();
 
   const currentMember = members.find(m => m.user_id === user?.id);
 
   const handleSignOut = useCallback(() => {
     Alert.alert('Dang xuat', 'Ban co chac chan muon dang xuat?', [
-      {text: 'Huy', style: 'cancel'},
+      { text: 'Huy', style: 'cancel' },
       {
         text: 'Dang xuat',
         style: 'destructive',
@@ -51,9 +55,7 @@ const ProfileScreen: React.FC = () => {
 
         <View style={styles.infoRow}>
           <Text style={styles.infoLabel}>So dien thoai</Text>
-          <Text style={styles.infoValue}>
-            {user?.phone ?? 'Chua cap nhat'}
-          </Text>
+          <Text style={styles.infoValue}>{user?.phone ?? 'Chua cap nhat'}</Text>
         </View>
 
         {currentMember?.room_name && (
@@ -92,19 +94,21 @@ const ProfileScreen: React.FC = () => {
       <Card style={styles.card}>
         <Text style={styles.sectionTitle}>Tai khoan</Text>
 
-        <TouchableOpacity
+        <PressableOpacity
           style={styles.settingRow}
-          onPress={() => navigation.navigate('EditProfile')}>
+          onPress={() => navigation.navigate('EditProfile')}
+        >
           <Text style={styles.settingLabel}>Chinh sua thong tin</Text>
           <Text style={styles.settingChevron}>›</Text>
-        </TouchableOpacity>
+        </PressableOpacity>
 
-        <TouchableOpacity
+        <PressableOpacity
           style={styles.settingRow}
-          onPress={() => navigation.navigate('ChangePassword')}>
+          onPress={() => navigation.navigate('ChangePassword')}
+        >
           <Text style={styles.settingLabel}>Doi mat khau</Text>
           <Text style={styles.settingChevron}>›</Text>
-        </TouchableOpacity>
+        </PressableOpacity>
 
         <View style={styles.settingRow}>
           <Text style={styles.settingLabel}>Phien ban</Text>

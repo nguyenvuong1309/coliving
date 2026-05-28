@@ -1,30 +1,28 @@
-import React, {useCallback, useEffect, useMemo, useState} from 'react';
-import {
-  View,
-  Text,
-  FlatList,
-  TouchableOpacity,
-  StyleSheet,
-} from 'react-native';
-import {useNavigation} from '@react-navigation/native';
-import type {NativeStackNavigationProp} from '@react-navigation/native-stack';
-import {Card, StatusBadge, EmptyState, LoadingOverlay} from '../../../components';
-import {useApartment} from '../../../hooks/useApartment';
-import {useAppSelector, useAppDispatch} from '../../../store';
-import {fetchIssuesRequest} from '../../../store/slices/issueSlice';
-import {formatDate, getStatusLabel} from '../../../utils/formatters';
-import type {TenantStackParamList} from '../../../types/navigation';
-import type {Issue} from '../../../types/database';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { View, Text, FlatList, StyleSheet } from 'react-native';
+import PressableOpacity from '../../../components/PressableOpacity';
+import { useNavigation } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import Card from '../../../components/Card';
+import StatusBadge from '../../../components/StatusBadge';
+import EmptyState from '../../../components/EmptyState';
+import LoadingOverlay from '../../../components/LoadingOverlay';
+import { useApartment } from '../../../hooks/useApartment';
+import { useAppSelector, useAppDispatch } from '../../../store';
+import { fetchIssuesRequest } from '../../../store/slices/issueSlice';
+import { formatDate, getStatusLabel } from '../../../utils/formatters';
+import type { TenantStackParamList } from '../../../types/navigation';
+import type { Issue } from '../../../types/database';
 
 type NavigationProp = NativeStackNavigationProp<TenantStackParamList>;
 
 type FilterTab = 'all' | 'open' | 'in_progress' | 'resolved';
 
-const FILTER_TABS: {key: FilterTab; label: string}[] = [
-  {key: 'all', label: 'Tat ca'},
-  {key: 'open', label: 'Mo'},
-  {key: 'in_progress', label: 'Dang xu ly'},
-  {key: 'resolved', label: 'Da xong'},
+const FILTER_TABS: { key: FilterTab; label: string }[] = [
+  { key: 'all', label: 'Tat ca' },
+  { key: 'open', label: 'Mo' },
+  { key: 'in_progress', label: 'Dang xu ly' },
+  { key: 'resolved', label: 'Da xong' },
 ];
 
 const CATEGORY_LABELS: Record<string, string> = {
@@ -46,13 +44,13 @@ const CATEGORY_COLORS: Record<string, string> = {
 const IssueListScreen: React.FC = () => {
   const navigation = useNavigation<NavigationProp>();
   const dispatch = useAppDispatch();
-  const {apartment} = useApartment();
-  const {issues, loading} = useAppSelector(state => state.issue);
+  const { apartment } = useApartment();
+  const { issues, loading } = useAppSelector(state => state.issue);
   const [activeTab, setActiveTab] = useState<FilterTab>('all');
 
   const loadData = useCallback(() => {
     if (apartment?.id) {
-      dispatch(fetchIssuesRequest({apartmentId: apartment.id}));
+      dispatch(fetchIssuesRequest({ apartmentId: apartment.id }));
     }
   }, [apartment?.id, dispatch]);
 
@@ -70,17 +68,16 @@ const IssueListScreen: React.FC = () => {
       );
     }
     if (activeTab === 'open') {
-      return issues.filter(
-        i => i.status === 'open' || i.status === 'reopened',
-      );
+      return issues.filter(i => i.status === 'open' || i.status === 'reopened');
     }
     return issues.filter(i => i.status === activeTab);
   }, [issues, activeTab]);
 
-  const renderItem = ({item}: {item: Issue}) => (
+  const renderItem = ({ item }: { item: Issue }) => (
     <Card
       style={styles.itemCard}
-      onPress={() => navigation.navigate('IssueDetail', {id: item.id})}>
+      onPress={() => navigation.navigate('IssueDetail', { id: item.id })}
+    >
       <View style={styles.itemHeader}>
         <Text style={styles.issueTitle} numberOfLines={1}>
           {item.title}
@@ -97,12 +94,14 @@ const IssueListScreen: React.FC = () => {
               backgroundColor:
                 (CATEGORY_COLORS[item.category] ?? '#64748B') + '18',
             },
-          ]}>
+          ]}
+        >
           <Text
             style={[
               styles.categoryBadgeText,
-              {color: CATEGORY_COLORS[item.category] ?? '#64748B'},
-            ]}>
+              { color: CATEGORY_COLORS[item.category] ?? '#64748B' },
+            ]}
+          >
             {CATEGORY_LABELS[item.category] ?? item.category}
           </Text>
         </View>
@@ -111,17 +110,15 @@ const IssueListScreen: React.FC = () => {
         <View
           style={[
             styles.urgencyBadge,
-            item.urgency === 'urgent'
-              ? styles.urgentBadge
-              : styles.normalBadge,
-          ]}>
+            item.urgency === 'urgent' ? styles.urgentBadge : styles.normalBadge,
+          ]}
+        >
           <Text
             style={[
               styles.urgencyBadgeText,
-              item.urgency === 'urgent'
-                ? styles.urgentText
-                : styles.normalText,
-            ]}>
+              item.urgency === 'urgent' ? styles.urgentText : styles.normalText,
+            ]}
+          >
             {getStatusLabel(item.urgency)}
           </Text>
         </View>
@@ -138,19 +135,21 @@ const IssueListScreen: React.FC = () => {
       {/* Filter tabs */}
       <View style={styles.tabContainer}>
         {FILTER_TABS.map(tab => (
-          <TouchableOpacity
+          <PressableOpacity
             key={tab.key}
             style={[styles.tab, activeTab === tab.key && styles.activeTab]}
             onPress={() => setActiveTab(tab.key)}
-            activeOpacity={0.7}>
+            activeOpacity={0.7}
+          >
             <Text
               style={[
                 styles.tabText,
                 activeTab === tab.key && styles.activeTabText,
-              ]}>
+              ]}
+            >
               {tab.label}
             </Text>
-          </TouchableOpacity>
+          </PressableOpacity>
         ))}
       </View>
 
@@ -174,12 +173,13 @@ const IssueListScreen: React.FC = () => {
       />
 
       {/* FAB */}
-      <TouchableOpacity
+      <PressableOpacity
         style={styles.fab}
         onPress={() => navigation.navigate('IssueCreate')}
-        activeOpacity={0.8}>
+        activeOpacity={0.8}
+      >
         <Text style={styles.fabText}>+</Text>
-      </TouchableOpacity>
+      </PressableOpacity>
     </View>
   );
 };
@@ -285,11 +285,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#2563EB',
     alignItems: 'center',
     justifyContent: 'center',
-    shadowColor: '#2563EB',
-    shadowOffset: {width: 0, height: 4},
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 6,
+    boxShadow: '0 4px 8px rgba(37, 99, 235, 0.3)',
   },
   fabText: {
     fontSize: 28,

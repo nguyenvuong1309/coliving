@@ -1,12 +1,15 @@
-import React, {useEffect} from 'react';
-import {View, Text, FlatList, StyleSheet} from 'react-native';
-import {ScreenWrapper, Avatar, EmptyState, LoadingOverlay} from '../../components';
-import {useAuth} from '../../hooks/useAuth';
-import {useApartment} from '../../hooks/useApartment';
+import React, { useEffect } from 'react';
+import { View, Text, FlatList, StyleSheet } from 'react-native';
+import ScreenWrapper from '../../components/ScreenWrapper';
+import Avatar from '../../components/Avatar';
+import EmptyState from '../../components/EmptyState';
+import LoadingOverlay from '../../components/LoadingOverlay';
+import { useAuth } from '../../hooks/useAuth';
+import { useApartment } from '../../hooks/useApartment';
 
 const RoommateListScreen: React.FC = () => {
-  const {user} = useAuth();
-  const {apartment, members, loading, fetchMembers} = useApartment();
+  const { user } = useAuth();
+  const { apartment, members, loading, fetchMembers } = useApartment();
 
   useEffect(() => {
     if (apartment?.id) {
@@ -16,7 +19,7 @@ const RoommateListScreen: React.FC = () => {
 
   const roommates = members.filter(m => m.user_id !== user?.id);
 
-  const renderItem = ({item}: {item: (typeof members)[0]}) => (
+  const renderItem = ({ item }: { item: (typeof members)[0] }) => (
     <View style={styles.memberCard}>
       <Avatar
         uri={item.profile?.avatar_url}
@@ -69,11 +72,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     padding: 16,
     marginBottom: 10,
-    shadowColor: '#000',
-    shadowOffset: {width: 0, height: 1},
-    shadowOpacity: 0.08,
-    shadowRadius: 4,
-    elevation: 2,
+    boxShadow: '0 1px 4px rgba(0, 0, 0, 0.08)',
   },
   memberInfo: {
     marginLeft: 14,

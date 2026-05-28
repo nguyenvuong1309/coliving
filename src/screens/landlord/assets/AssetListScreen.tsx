@@ -1,45 +1,41 @@
-import React, {useEffect, useMemo} from 'react';
-import {
-  View,
-  Text,
-  FlatList,
-  Image,
-  TouchableOpacity,
-  StyleSheet,
-  RefreshControl,
-} from 'react-native';
-import {useNavigation} from '@react-navigation/native';
-import type {NativeStackNavigationProp} from '@react-navigation/native-stack';
-import {Card, StatusBadge, EmptyState, LoadingOverlay} from '../../../components';
-import {useApartment} from '../../../hooks/useApartment';
-import {useAppSelector, useAppDispatch} from '../../../store';
-import {fetchAssetsRequest} from '../../../store/slices/assetSlice';
-import type {LandlordStackParamList} from '../../../types/navigation';
-import type {Asset} from '../../../types/database';
+import React, { useEffect, useMemo } from 'react';
+import { View, Text, FlatList, Image, StyleSheet } from 'react-native';
+import PressableOpacity from '../../../components/PressableOpacity';
+import { useNavigation } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import Card from '../../../components/Card';
+import StatusBadge from '../../../components/StatusBadge';
+import EmptyState from '../../../components/EmptyState';
+import LoadingOverlay from '../../../components/LoadingOverlay';
+import { useApartment } from '../../../hooks/useApartment';
+import { useAppSelector, useAppDispatch } from '../../../store';
+import { fetchAssetsRequest } from '../../../store/slices/assetSlice';
+import type { LandlordStackParamList } from '../../../types/navigation';
+import type { Asset } from '../../../types/database';
 
 type NavigationProp = NativeStackNavigationProp<LandlordStackParamList>;
 
 const AssetListScreen: React.FC = () => {
   const navigation = useNavigation<NavigationProp>();
   const dispatch = useAppDispatch();
-  const {apartment} = useApartment();
-  const {requests: borrowRequests} = useAppSelector(state => state.borrow);
-  const {assets, loading} = useAppSelector(state => state.asset);
+  const { apartment } = useApartment();
+  const { requests: borrowRequests } = useAppSelector(state => state.borrow);
+  const { assets, loading } = useAppSelector(state => state.asset);
   const [refreshing, setRefreshing] = React.useState(false);
 
   const borrowedAssetMap = useMemo(() => {
     const map: Record<string, string> = {};
-    borrowRequests
-      .filter(r => r.status === 'in_use' || r.status === 'approved')
-      .forEach(r => {
+    for (const r of borrowRequests) {
+      if (r.status === 'in_use' || r.status === 'approved') {
         map[r.asset_id] = r.borrower_id;
-      });
+      }
+    }
     return map;
   }, [borrowRequests]);
 
   useEffect(() => {
     if (apartment?.id) {
-      dispatch(fetchAssetsRequest({apartmentId: apartment.id}));
+      dispatch(fetchAssetsRequest({ apartmentId: apartment.id }));
     }
   }, [apartment?.id, dispatch]);
 
@@ -48,20 +44,26 @@ const AssetListScreen: React.FC = () => {
       return;
     }
     setRefreshing(true);
-    dispatch(fetchAssetsRequest({apartmentId: apartment.id}));
+    dispatch(fetchAssetsRequest({ apartmentId: apartment.id }));
     setTimeout(() => setRefreshing(false), 600);
   }, [apartment?.id, dispatch]);
 
-  const renderItem = ({item}: {item: Asset}) => {
+  const renderSeparator = React.useCallback(
+    () => <View style={styles.gap} />,
+    [],
+  );
+
+  const renderItem = ({ item }: { item: Asset }) => {
     const borrowerId = borrowedAssetMap[item.id];
 
     return (
       <Card
         style={styles.assetCard}
-        onPress={() => navigation.navigate('AssetEdit', {id: item.id})}>
+        onPress={() => navigation.navigate('AssetEdit', { id: item.id })}
+      >
         <View style={styles.assetRow}>
           {item.image_url ? (
-            <Image source={{uri: item.image_url}} style={styles.thumbnail} />
+            <Image source={{ uri: item.image_url }} style={styles.thumbnail} />
           ) : (
             <View style={styles.thumbnailPlaceholder}>
               <Text style={styles.thumbnailText}>IMG</Text>
@@ -94,12 +96,13 @@ const AssetListScreen: React.FC = () => {
           actionLabel="Them tai san"
           onAction={() => navigation.navigate('AssetEdit', {})}
         />
-        <TouchableOpacity
+        <PressableOpacity
           style={styles.fab}
           onPress={() => navigation.navigate('AssetEdit', {})}
-          activeOpacity={0.8}>
+          activeOpacity={0.8}
+        >
           <Text style={styles.fabText}>+</Text>
-        </TouchableOpacity>
+        </PressableOpacity>
       </View>
     );
   }
@@ -112,17 +115,17 @@ const AssetListScreen: React.FC = () => {
         keyExtractor={item => item.id}
         renderItem={renderItem}
         contentContainerStyle={styles.list}
-        refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-        }
-        ItemSeparatorComponent={() => <View style={styles.gap} />}
+        refreshing={refreshing}
+        onRefresh={onRefresh}
+        ItemSeparatorComponent={renderSeparator}
       />
-      <TouchableOpacity
+      <PressableOpacity
         style={styles.fab}
         onPress={() => navigation.navigate('AssetEdit', {})}
-        activeOpacity={0.8}>
+        activeOpacity={0.8}
+      >
         <Text style={styles.fabText}>+</Text>
-      </TouchableOpacity>
+      </PressableOpacity>
     </View>
   );
 };
@@ -196,11 +199,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#2563EB',
     alignItems: 'center',
     justifyContent: 'center',
-    shadowColor: '#2563EB',
-    shadowOffset: {width: 0, height: 4},
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 6,
+    boxShadow: '0 4px 8px rgba(37, 99, 235, 0.3)',
   },
   fabText: {
     fontSize: 28,

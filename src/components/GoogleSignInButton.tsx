@@ -1,11 +1,6 @@
-import React, {useEffect, useState} from 'react';
-import {
-  TouchableOpacity,
-  Text,
-  StyleSheet,
-  ActivityIndicator,
-  View,
-} from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { Text, StyleSheet, ActivityIndicator, View } from 'react-native';
+import PressableOpacity from './PressableOpacity';
 import {
   GoogleSignin,
   statusCodes,
@@ -68,10 +63,11 @@ export function GoogleSignInButton({
   };
 
   return (
-    <TouchableOpacity
+    <PressableOpacity
       style={[styles.button, (loading || isLoading) && styles.buttonDisabled]}
       onPress={handleGoogleSignIn}
-      disabled={loading || isLoading}>
+      disabled={loading || isLoading}
+    >
       <View style={styles.content}>
         <Text style={styles.icon}>🔵</Text>
         {isLoading || loading ? (
@@ -80,7 +76,7 @@ export function GoogleSignInButton({
           <Text style={styles.text}>Đăng nhập với Google</Text>
         )}
       </View>
-    </TouchableOpacity>
+    </PressableOpacity>
   );
 }
 

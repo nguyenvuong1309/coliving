@@ -1,44 +1,42 @@
-import React, {useCallback, useEffect, useMemo, useState} from 'react';
-import {
-  View,
-  Text,
-  FlatList,
-  TouchableOpacity,
-  StyleSheet,
-} from 'react-native';
-import {useNavigation} from '@react-navigation/native';
-import type {NativeStackNavigationProp} from '@react-navigation/native-stack';
-import {Card, StatusBadge, EmptyState, LoadingOverlay} from '../../../components';
-import {useAuth} from '../../../hooks/useAuth';
-import {useApartment} from '../../../hooks/useApartment';
-import {useAppSelector, useAppDispatch} from '../../../store';
-import {fetchBorrowRequestsRequest} from '../../../store/slices/borrowSlice';
-import {formatDate} from '../../../utils/formatters';
-import type {TenantStackParamList} from '../../../types/navigation';
-import type {BorrowRequest} from '../../../types/database';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { View, Text, FlatList, StyleSheet } from 'react-native';
+import PressableOpacity from '../../../components/PressableOpacity';
+import { useNavigation } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import Card from '../../../components/Card';
+import StatusBadge from '../../../components/StatusBadge';
+import EmptyState from '../../../components/EmptyState';
+import LoadingOverlay from '../../../components/LoadingOverlay';
+import { useAuth } from '../../../hooks/useAuth';
+import { useApartment } from '../../../hooks/useApartment';
+import { useAppSelector, useAppDispatch } from '../../../store';
+import { fetchBorrowRequestsRequest } from '../../../store/slices/borrowSlice';
+import { formatDate } from '../../../utils/formatters';
+import type { TenantStackParamList } from '../../../types/navigation';
+import type { BorrowRequest } from '../../../types/database';
 
 type NavigationProp = NativeStackNavigationProp<TenantStackParamList>;
 
 type FilterTab = 'all' | 'pending' | 'in_use' | 'returned';
 
-const FILTER_TABS: {key: FilterTab; label: string}[] = [
-  {key: 'all', label: 'Tat ca'},
-  {key: 'pending', label: 'Dang cho'},
-  {key: 'in_use', label: 'Dang muon'},
-  {key: 'returned', label: 'Da tra'},
+const FILTER_TABS: { key: FilterTab; label: string }[] = [
+  { key: 'all', label: 'Tat ca' },
+  { key: 'pending', label: 'Dang cho' },
+  { key: 'in_use', label: 'Dang muon' },
+  { key: 'returned', label: 'Da tra' },
 ];
 
 const BorrowListScreen: React.FC = () => {
   const navigation = useNavigation<NavigationProp>();
   const dispatch = useAppDispatch();
-  const {user} = useAuth();
-  const {apartment, members} = useApartment();
-  const {requests, loading} = useAppSelector(state => state.borrow);
+  const { user } = useAuth();
+  const { apartment, members } = useApartment();
+  const { requests, loading } = useAppSelector(state => state.borrow);
   const [activeTab, setActiveTab] = useState<FilterTab>('all');
 
   const loadData = useCallback(() => {
     if (apartment?.id) {
-      dispatch(fetchBorrowRequestsRequest({apartmentId: apartment.id}));
+      dispatch(fetchBorrowRequestsRequest({ apartmentId: apartment.id }));
     }
   }, [apartment?.id, dispatch]);
 
@@ -74,12 +72,13 @@ const BorrowListScreen: React.FC = () => {
     [members],
   );
 
-  const renderItem = ({item}: {item: BorrowRequest}) => {
+  const renderItem = ({ item }: { item: BorrowRequest }) => {
     const isBorrower = item.borrower_id === user?.id;
     return (
       <Card
         style={styles.itemCard}
-        onPress={() => navigation.navigate('BorrowDetail', {id: item.id})}>
+        onPress={() => navigation.navigate('BorrowDetail', { id: item.id })}
+      >
         <View style={styles.itemHeader}>
           <Text style={styles.assetName} numberOfLines={1}>
             {item.asset_id}
@@ -106,22 +105,21 @@ const BorrowListScreen: React.FC = () => {
       {/* Filter tabs */}
       <View style={styles.tabContainer}>
         {FILTER_TABS.map(tab => (
-          <TouchableOpacity
+          <PressableOpacity
             key={tab.key}
-            style={[
-              styles.tab,
-              activeTab === tab.key && styles.activeTab,
-            ]}
+            style={[styles.tab, activeTab === tab.key && styles.activeTab]}
             onPress={() => setActiveTab(tab.key)}
-            activeOpacity={0.7}>
+            activeOpacity={0.7}
+          >
             <Text
               style={[
                 styles.tabText,
                 activeTab === tab.key && styles.activeTabText,
-              ]}>
+              ]}
+            >
               {tab.label}
             </Text>
-          </TouchableOpacity>
+          </PressableOpacity>
         ))}
       </View>
 
@@ -145,12 +143,13 @@ const BorrowListScreen: React.FC = () => {
       />
 
       {/* FAB */}
-      <TouchableOpacity
+      <PressableOpacity
         style={styles.fab}
         onPress={() => navigation.navigate('BorrowCreate')}
-        activeOpacity={0.8}>
+        activeOpacity={0.8}
+      >
         <Text style={styles.fabText}>+</Text>
-      </TouchableOpacity>
+      </PressableOpacity>
     </View>
   );
 };
@@ -230,11 +229,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#2563EB',
     alignItems: 'center',
     justifyContent: 'center',
-    shadowColor: '#2563EB',
-    shadowOffset: {width: 0, height: 4},
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 6,
+    boxShadow: '0 4px 8px rgba(37, 99, 235, 0.3)',
   },
   fabText: {
     fontSize: 28,

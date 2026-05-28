@@ -1,60 +1,57 @@
-import React, {useEffect, useMemo, useState} from 'react';
-import {
-  View,
-  Text,
-  FlatList,
-  TouchableOpacity,
-  StyleSheet,
-  RefreshControl,
-} from 'react-native';
-import {useNavigation} from '@react-navigation/native';
-import type {NativeStackNavigationProp} from '@react-navigation/native-stack';
-import {
-  Card,
-  StatusBadge,
-  EmptyState,
-  LoadingOverlay,
-} from '../../../components';
-import {useApartment} from '../../../hooks/useApartment';
-import {useAppSelector, useAppDispatch} from '../../../store';
-import {fetchIssuesRequest} from '../../../store/slices/issueSlice';
-import {formatRelativeTime, getStatusLabel} from '../../../utils/formatters';
-import type {LandlordStackParamList} from '../../../types/navigation';
-import type {Issue} from '../../../types/database';
+import React, { useEffect, useMemo, useState } from 'react';
+import { View, Text, FlatList, StyleSheet } from 'react-native';
+import PressableOpacity from '../../../components/PressableOpacity';
+import { useNavigation } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import Card from '../../../components/Card';
+import StatusBadge from '../../../components/StatusBadge';
+import EmptyState from '../../../components/EmptyState';
+import LoadingOverlay from '../../../components/LoadingOverlay';
+import { useApartment } from '../../../hooks/useApartment';
+import { useAppSelector, useAppDispatch } from '../../../store';
+import { fetchIssuesRequest } from '../../../store/slices/issueSlice';
+import { formatRelativeTime, getStatusLabel } from '../../../utils/formatters';
+import type { LandlordStackParamList } from '../../../types/navigation';
+import type { Issue } from '../../../types/database';
 
 type NavigationProp = NativeStackNavigationProp<LandlordStackParamList>;
 
 type FilterTab = 'all' | 'open' | 'in_progress' | 'resolved';
 
-const FILTER_TABS: {key: FilterTab; label: string}[] = [
-  {key: 'all', label: 'Tat ca'},
-  {key: 'open', label: 'Mo'},
-  {key: 'in_progress', label: 'Dang xu ly'},
-  {key: 'resolved', label: 'Da xong'},
+const FILTER_TABS: { key: FilterTab; label: string }[] = [
+  { key: 'all', label: 'Tat ca' },
+  { key: 'open', label: 'Mo' },
+  { key: 'in_progress', label: 'Dang xu ly' },
+  { key: 'resolved', label: 'Da xong' },
 ];
 
 const IssueListScreen: React.FC = () => {
   const navigation = useNavigation<NavigationProp>();
   const dispatch = useAppDispatch();
-  const {apartment, members} = useApartment();
-  const {issues, loading} = useAppSelector(state => state.issue);
+  const { apartment, members } = useApartment();
+  const { issues, loading } = useAppSelector(state => state.issue);
 
   const [activeFilter, setActiveFilter] = useState<FilterTab>('all');
   const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
     if (apartment?.id) {
-      dispatch(fetchIssuesRequest({apartmentId: apartment.id}));
+      dispatch(fetchIssuesRequest({ apartmentId: apartment.id }));
     }
   }, [apartment?.id, dispatch]);
 
   const onRefresh = React.useCallback(() => {
     if (apartment?.id) {
       setRefreshing(true);
-      dispatch(fetchIssuesRequest({apartmentId: apartment.id}));
+      dispatch(fetchIssuesRequest({ apartmentId: apartment.id }));
       setTimeout(() => setRefreshing(false), 1000);
     }
   }, [apartment?.id, dispatch]);
+
+  const renderSeparator = React.useCallback(
+    () => <View style={styles.gap} />,
+    [],
+  );
 
   const memberNameMap = useMemo(() => {
     const map: Record<string, string> = {};
@@ -104,12 +101,13 @@ const IssueListScreen: React.FC = () => {
     return labels[category] ?? category;
   };
 
-  const renderItem = ({item}: {item: Issue}) => (
+  const renderItem = ({ item }: { item: Issue }) => (
     <Card
       style={styles.issueCard}
       onPress={() =>
-        navigation.navigate('LandlordIssueDetail', {id: item.id})
-      }>
+        navigation.navigate('LandlordIssueDetail', { id: item.id })
+      }
+    >
       <View style={styles.issueHeader}>
         <Text style={styles.issueTitle} numberOfLines={1}>
           {item.title}
@@ -145,21 +143,23 @@ const IssueListScreen: React.FC = () => {
       {/* Filter Tabs */}
       <View style={styles.filterRow}>
         {FILTER_TABS.map(tab => (
-          <TouchableOpacity
+          <PressableOpacity
             key={tab.key}
             style={[
               styles.filterTab,
               activeFilter === tab.key && styles.filterTabActive,
             ]}
-            onPress={() => setActiveFilter(tab.key)}>
+            onPress={() => setActiveFilter(tab.key)}
+          >
             <Text
               style={[
                 styles.filterTabText,
                 activeFilter === tab.key && styles.filterTabTextActive,
-              ]}>
+              ]}
+            >
               {tab.label}
             </Text>
-          </TouchableOpacity>
+          </PressableOpacity>
         ))}
       </View>
 
@@ -174,10 +174,9 @@ const IssueListScreen: React.FC = () => {
           keyExtractor={item => item.id}
           renderItem={renderItem}
           contentContainerStyle={styles.list}
-          refreshControl={
-            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-          }
-          ItemSeparatorComponent={() => <View style={styles.gap} />}
+          refreshing={refreshing}
+          onRefresh={onRefresh}
+          ItemSeparatorComponent={renderSeparator}
         />
       )}
     </View>

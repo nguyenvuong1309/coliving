@@ -1,6 +1,6 @@
 import React from 'react';
-import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
-import {createNativeStackNavigator} from '@react-navigation/native-stack';
+import { createNativeBottomTabNavigator } from '@react-navigation/bottom-tabs/unstable';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import type {
   TenantTabParamList,
   TenantStackParamList,
@@ -21,7 +21,7 @@ import TenantProfileScreen from '../screens/tenant/ProfileScreen';
 import EditProfileScreen from '../screens/shared/EditProfileScreen';
 import ChangePasswordScreen from '../screens/shared/ChangePasswordScreen';
 
-const Tab = createBottomTabNavigator<TenantTabParamList>();
+const Tab = createNativeBottomTabNavigator<TenantTabParamList>();
 const Stack = createNativeStackNavigator<TenantStackParamList>();
 
 function TenantTabNavigator() {
@@ -31,31 +31,32 @@ function TenantTabNavigator() {
         tabBarActiveTintColor: '#2563EB',
         tabBarInactiveTintColor: '#64748B',
         headerShown: false,
-      }}>
+      }}
+    >
       <Tab.Screen
         name="TenantHome"
         component={TenantHomeScreen}
-        options={{tabBarLabel: 'Trang chủ'}}
+        options={{ tabBarLabel: 'Trang chủ' }}
       />
       <Tab.Screen
         name="BorrowList"
         component={BorrowListScreen}
-        options={{tabBarLabel: 'Mượn đồ'}}
+        options={{ tabBarLabel: 'Mượn đồ' }}
       />
       <Tab.Screen
         name="IssueList"
         component={IssueListScreen}
-        options={{tabBarLabel: 'Sự cố'}}
+        options={{ tabBarLabel: 'Sự cố' }}
       />
       <Tab.Screen
         name="PaymentHistory"
         component={PaymentHistoryScreen}
-        options={{tabBarLabel: 'Thanh toán'}}
+        options={{ tabBarLabel: 'Thanh toán' }}
       />
       <Tab.Screen
         name="TenantProfile"
         component={TenantProfileScreen}
-        options={{tabBarLabel: 'Cá nhân'}}
+        options={{ tabBarLabel: 'Cá nhân' }}
       />
     </Tab.Navigator>
   );
@@ -67,52 +68,52 @@ export default function TenantStack() {
       <Stack.Screen
         name="TenantHome"
         component={TenantTabNavigator}
-        options={{headerShown: false}}
+        options={{ headerShown: false }}
       />
       <Stack.Screen
         name="BorrowCreate"
         component={BorrowCreateScreen}
-        options={{title: 'Yêu cầu mượn đồ'}}
+        options={{ title: 'Yêu cầu mượn đồ' }}
       />
       <Stack.Screen
         name="BorrowDetail"
         component={BorrowDetailScreen}
-        options={{title: 'Chi tiết mượn đồ'}}
+        options={{ title: 'Chi tiết mượn đồ' }}
       />
       <Stack.Screen
         name="IssueCreate"
         component={IssueCreateScreen}
-        options={{title: 'Tạo báo cáo'}}
+        options={{ title: 'Tạo báo cáo' }}
       />
       <Stack.Screen
         name="IssueDetail"
         component={IssueDetailScreen}
-        options={{title: 'Chi tiết sự cố'}}
+        options={{ title: 'Chi tiết sự cố' }}
       />
       <Stack.Screen
         name="PaymentDetail"
         component={PaymentDetailScreen}
-        options={{title: 'Chi tiết thanh toán'}}
+        options={{ title: 'Chi tiết thanh toán' }}
       />
       <Stack.Screen
         name="RoommateList"
         component={RoommateListScreen}
-        options={{title: 'Bạn cùng phòng'}}
+        options={{ title: 'Bạn cùng phòng' }}
       />
       <Stack.Screen
         name="Notifications"
         component={NotificationsScreen}
-        options={{title: 'Thông báo'}}
+        options={{ title: 'Thông báo' }}
       />
       <Stack.Screen
         name="EditProfile"
         component={EditProfileScreen}
-        options={{title: 'Chỉnh sửa thông tin'}}
+        options={{ title: 'Chỉnh sửa thông tin' }}
       />
       <Stack.Screen
         name="ChangePassword"
         component={ChangePasswordScreen}
-        options={{title: 'Đổi mật khẩu'}}
+        options={{ title: 'Đổi mật khẩu' }}
       />
     </Stack.Navigator>
   );

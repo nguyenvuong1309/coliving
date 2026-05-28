@@ -1,54 +1,48 @@
-import React, {useEffect, useMemo} from 'react';
-import {
-  View,
-  Text,
-  FlatList,
-  StyleSheet,
-  RefreshControl,
-} from 'react-native';
-import {useNavigation, useRoute} from '@react-navigation/native';
-import type {NativeStackNavigationProp} from '@react-navigation/native-stack';
-import type {RouteProp} from '@react-navigation/native';
-import {
-  Card,
-  StatusBadge,
-  EmptyState,
-  LoadingOverlay,
-} from '../../../components';
-import {useApartment} from '../../../hooks/useApartment';
-import {useAppSelector, useAppDispatch} from '../../../store';
-import {fetchPaymentsRequest} from '../../../store/slices/paymentSlice';
-import {formatCurrency} from '../../../utils/formatters';
-import type {LandlordStackParamList} from '../../../types/navigation';
-import type {Payment} from '../../../types/database';
+import React, { useEffect, useMemo } from 'react';
+import { View, Text, FlatList, StyleSheet } from 'react-native';
+import { useNavigation, useRoute } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import type { RouteProp } from '@react-navigation/native';
+import Card from '../../../components/Card';
+import StatusBadge from '../../../components/StatusBadge';
+import EmptyState from '../../../components/EmptyState';
+import LoadingOverlay from '../../../components/LoadingOverlay';
+import { useApartment } from '../../../hooks/useApartment';
+import { useAppSelector, useAppDispatch } from '../../../store';
+import { fetchPaymentsRequest } from '../../../store/slices/paymentSlice';
+import { formatCurrency } from '../../../utils/formatters';
+import type { LandlordStackParamList } from '../../../types/navigation';
+import type { Payment } from '../../../types/database';
 
 type NavigationProp = NativeStackNavigationProp<LandlordStackParamList>;
-type OverviewRouteProp = RouteProp<
-  LandlordStackParamList,
-  'PaymentOverview'
->;
+type OverviewRouteProp = RouteProp<LandlordStackParamList, 'PaymentOverview'>;
 
 const PaymentOverviewScreen: React.FC = () => {
   const navigation = useNavigation<NavigationProp>();
   const route = useRoute<OverviewRouteProp>();
   const dispatch = useAppDispatch();
-  const {billingId} = route.params;
-  const {members} = useApartment();
-  const {payments, billingPeriods, loading} = useAppSelector(
+  const { billingId } = route.params;
+  const { members } = useApartment();
+  const { payments, billingPeriods, loading } = useAppSelector(
     state => state.payment,
   );
 
   const [refreshing, setRefreshing] = React.useState(false);
 
   useEffect(() => {
-    dispatch(fetchPaymentsRequest({billingPeriodId: billingId}));
+    dispatch(fetchPaymentsRequest({ billingPeriodId: billingId }));
   }, [billingId, dispatch]);
 
   const onRefresh = React.useCallback(() => {
     setRefreshing(true);
-    dispatch(fetchPaymentsRequest({billingPeriodId: billingId}));
+    dispatch(fetchPaymentsRequest({ billingPeriodId: billingId }));
     setTimeout(() => setRefreshing(false), 1000);
   }, [billingId, dispatch]);
+
+  const renderSeparator = React.useCallback(
+    () => <View style={styles.gap} />,
+    [],
+  );
 
   const period = useMemo(
     () => billingPeriods.find(bp => bp.id === billingId),
@@ -89,7 +83,7 @@ const PaymentOverviewScreen: React.FC = () => {
     return map;
   }, [members]);
 
-  const renderItem = ({item}: {item: Payment}) => {
+  const renderItem = ({ item }: { item: Payment }) => {
     const tenantName = memberNameMap[item.tenant_id] ?? 'Nguoi thue';
     const canConfirm = item.status === 'tenant_reported';
 
@@ -98,9 +92,10 @@ const PaymentOverviewScreen: React.FC = () => {
         style={styles.paymentCard}
         onPress={
           canConfirm
-            ? () => navigation.navigate('PaymentConfirm', {id: item.id})
+            ? () => navigation.navigate('PaymentConfirm', { id: item.id })
             : undefined
-        }>
+        }
+      >
         <View style={styles.paymentRow}>
           <View style={styles.paymentInfo}>
             <Text style={styles.paymentName}>{tenantName}</Text>
@@ -134,13 +129,13 @@ const PaymentOverviewScreen: React.FC = () => {
           </View>
           <View style={styles.summaryItem}>
             <Text style={styles.summaryLabel}>Da thu</Text>
-            <Text style={[styles.summaryValue, {color: '#16A34A'}]}>
+            <Text style={[styles.summaryValue, { color: '#16A34A' }]}>
               {formatCurrency(totalConfirmed)}
             </Text>
           </View>
           <View style={styles.summaryItem}>
             <Text style={styles.summaryLabel}>Cho duyet</Text>
-            <Text style={[styles.summaryValue, {color: '#F59E0B'}]}>
+            <Text style={[styles.summaryValue, { color: '#F59E0B' }]}>
               {formatCurrency(totalPending)}
             </Text>
           </View>
@@ -158,10 +153,9 @@ const PaymentOverviewScreen: React.FC = () => {
           keyExtractor={item => item.id}
           renderItem={renderItem}
           contentContainerStyle={styles.list}
-          refreshControl={
-            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-          }
-          ItemSeparatorComponent={() => <View style={styles.gap} />}
+          refreshing={refreshing}
+          onRefresh={onRefresh}
+          ItemSeparatorComponent={renderSeparator}
         />
       )}
     </View>

@@ -1,46 +1,44 @@
-import React, {useState, useMemo, useCallback} from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
 import {
   View,
   Text,
   FlatList,
   TextInput,
-  TouchableOpacity,
   Alert,
   Platform,
   StyleSheet,
 } from 'react-native';
+import PressableOpacity from '../../../components/PressableOpacity';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import {useNavigation} from '@react-navigation/native';
-import type {NativeStackNavigationProp} from '@react-navigation/native-stack';
-import {useForm, Controller} from 'react-hook-form';
-import {zodResolver} from '@hookform/resolvers/zod';
-import {
-  ScreenWrapper,
-  Card,
-  Button,
-  LoadingOverlay,
-} from '../../../components';
-import {useApartment} from '../../../hooks/useApartment';
-import {useAppDispatch, useAppSelector} from '../../../store';
-import {createBillingRequest} from '../../../store/slices/paymentSlice';
+import { useNavigation } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { useForm, Controller } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import ScreenWrapper from '../../../components/ScreenWrapper';
+import Card from '../../../components/Card';
+import Button from '../../../components/Button';
+import LoadingOverlay from '../../../components/LoadingOverlay';
+import { useApartment } from '../../../hooks/useApartment';
+import { useAppDispatch, useAppSelector } from '../../../store';
+import { createBillingRequest } from '../../../store/slices/paymentSlice';
 import {
   createBillingSchema,
   type CreateBillingFormData,
 } from '../../../schemas/payment';
-import {formatCurrency, formatDate} from '../../../utils/formatters';
-import type {LandlordStackParamList} from '../../../types/navigation';
+import { formatCurrency, formatDate } from '../../../utils/formatters';
+import type { LandlordStackParamList } from '../../../types/navigation';
 
 type NavigationProp = NativeStackNavigationProp<LandlordStackParamList>;
 
-const MONTHS = Array.from({length: 12}, (_, i) => i + 1);
+const MONTHS = Array.from({ length: 12 }, (_, i) => i + 1);
 
 const CreateBillingScreen: React.FC = () => {
   const navigation = useNavigation<NavigationProp>();
   const dispatch = useAppDispatch();
-  const {apartment, members} = useApartment();
-  const {loading} = useAppSelector(state => state.payment);
+  const { apartment, members } = useApartment();
+  const { loading } = useAppSelector(state => state.payment);
 
-  const currentDate = new Date();
+  const currentDate = useMemo(() => new Date(), []);
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [dueDate, setDueDate] = useState(
     new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0),
@@ -54,7 +52,7 @@ const CreateBillingScreen: React.FC = () => {
     control,
     handleSubmit,
     watch,
-    formState: {errors},
+    formState: { errors },
   } = useForm<CreateBillingFormData>({
     resolver: zodResolver(createBillingSchema),
     defaultValues: {
@@ -81,34 +79,32 @@ const CreateBillingScreen: React.FC = () => {
     return tenantList.reduce((sum, t) => sum + t.amount, 0);
   }, [tenantList]);
 
-  const handleAmountChange = useCallback(
-    (userId: string, text: string) => {
-      const num = parseInt(text.replace(/\D/g, ''), 10);
-      setAdjustedAmounts(prev => ({
-        ...prev,
-        [userId]: isNaN(num) ? 0 : num,
-      }));
-    },
-    [],
-  );
+  const handleAmountChange = useCallback((userId: string, text: string) => {
+    const num = parseInt(text.replace(/\D/g, ''), 10);
+    setAdjustedAmounts(prev => ({
+      ...prev,
+      [userId]: isNaN(num) ? 0 : num,
+    }));
+  }, []);
 
-  const onDateChange = useCallback(
-    (_: any, selectedDate?: Date) => {
-      setShowDatePicker(Platform.OS === 'ios');
-      if (selectedDate) {
-        setDueDate(selectedDate);
-      }
-    },
-    [],
-  );
+  const onDateChange = useCallback((_: any, selectedDate?: Date) => {
+    setShowDatePicker(Platform.OS === 'ios');
+    if (selectedDate) {
+      setDueDate(selectedDate);
+    }
+  }, []);
 
   const onSubmit = useCallback(
     (data: CreateBillingFormData) => {
       Alert.alert(
         'Xac nhan tao ky thu tien',
-        `Thang ${data.month}/${data.year}\nHan: ${formatDate(dueDate.toISOString())}\nTong: ${formatCurrency(totalAmount)}\nSo nguoi thue: ${tenantList.length}`,
+        `Thang ${data.month}/${data.year}\nHan: ${formatDate(
+          dueDate.toISOString(),
+        )}\nTong: ${formatCurrency(totalAmount)}\nSo nguoi thue: ${
+          tenantList.length
+        }`,
         [
-          {text: 'Huy', style: 'cancel'},
+          { text: 'Huy', style: 'cancel' },
           {
             text: 'Tao',
             onPress: () => {
@@ -128,14 +124,17 @@ const CreateBillingScreen: React.FC = () => {
         ],
       );
     },
-    [apartment?.id, totalAmount, tenantList.length, dueDate, dispatch, navigation],
+    [
+      apartment?.id,
+      totalAmount,
+      tenantList.length,
+      dueDate,
+      dispatch,
+      navigation,
+    ],
   );
 
-  const renderTenantItem = ({
-    item,
-  }: {
-    item: (typeof tenantList)[0];
-  }) => (
+  const renderTenantItem = ({ item }: { item: (typeof tenantList)[0] }) => (
     <View style={styles.tenantItem}>
       <View style={styles.tenantInfo}>
         <Text style={styles.tenantName}>{item.name}</Text>
@@ -162,24 +161,26 @@ const CreateBillingScreen: React.FC = () => {
       <Controller
         control={control}
         name="month"
-        render={({field: {onChange, value}}) => (
+        render={({ field: { onChange, value } }) => (
           <View style={styles.monthRow}>
             {MONTHS.map(m => (
-              <TouchableOpacity
+              <PressableOpacity
                 key={m}
                 style={[
                   styles.monthChip,
                   value === m && styles.monthChipActive,
                 ]}
-                onPress={() => onChange(m)}>
+                onPress={() => onChange(m)}
+              >
                 <Text
                   style={[
                     styles.monthChipText,
                     value === m && styles.monthChipTextActive,
-                  ]}>
+                  ]}
+                >
                   {m}
                 </Text>
-              </TouchableOpacity>
+              </PressableOpacity>
             ))}
           </View>
         )}
@@ -192,28 +193,27 @@ const CreateBillingScreen: React.FC = () => {
       <Controller
         control={control}
         name="year"
-        render={({field: {onChange, value}}) => (
+        render={({ field: { onChange, value } }) => (
           <View style={styles.yearRow}>
             {[
               currentDate.getFullYear() - 1,
               currentDate.getFullYear(),
               currentDate.getFullYear() + 1,
             ].map(y => (
-              <TouchableOpacity
+              <PressableOpacity
                 key={y}
-                style={[
-                  styles.yearChip,
-                  value === y && styles.yearChipActive,
-                ]}
-                onPress={() => onChange(y)}>
+                style={[styles.yearChip, value === y && styles.yearChipActive]}
+                onPress={() => onChange(y)}
+              >
                 <Text
                   style={[
                     styles.yearChipText,
                     value === y && styles.yearChipTextActive,
-                  ]}>
+                  ]}
+                >
                   {y}
                 </Text>
-              </TouchableOpacity>
+              </PressableOpacity>
             ))}
           </View>
         )}
@@ -224,18 +224,21 @@ const CreateBillingScreen: React.FC = () => {
 
       {/* Due Date */}
       <Text style={styles.label}>Han thanh toan</Text>
-      <TouchableOpacity
+      <PressableOpacity
         style={styles.datePickerBtn}
-        onPress={() => setShowDatePicker(true)}>
-        <Text style={styles.datePickerText}>{formatDate(dueDate.toISOString())}</Text>
-      </TouchableOpacity>
+        onPress={() => setShowDatePicker(true)}
+      >
+        <Text style={styles.datePickerText}>
+          {formatDate(dueDate.toISOString())}
+        </Text>
+      </PressableOpacity>
       {showDatePicker && (
         <DateTimePicker
           value={dueDate}
           mode="date"
           display="default"
           onChange={onDateChange}
-          minimumDate={new Date()}
+          minimumDate={currentDate}
         />
       )}
 

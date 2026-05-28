@@ -1,7 +1,7 @@
-import {createSlice, PayloadAction} from '@reduxjs/toolkit';
-import {all, call, fork, put, select, takeLatest} from 'redux-saga/effects';
-import {createMMKV} from 'react-native-mmkv';
-import type {RootState} from '../index';
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { all, call, fork, put, select, takeLatest } from 'redux-saga/effects';
+import { createMMKV } from 'react-native-mmkv';
+import type { RootState } from '../index';
 import {
   signUp,
   signIn,
@@ -13,7 +13,7 @@ import {
   updateProfile,
   changePassword,
 } from '../../services/auth';
-import type {Profile, ProfileUpdate} from '../../types/database';
+import type { Profile, ProfileUpdate } from '../../types/database';
 
 const storage = createMMKV();
 
@@ -37,14 +37,19 @@ const authSlice = createSlice({
   reducers: {
     signUpRequest(
       state,
-      _action: PayloadAction<{email: string; password: string; fullName: string; role: 'tenant' | 'landlord'}>,
+      _action: PayloadAction<{
+        email: string;
+        password: string;
+        fullName: string;
+        role: 'tenant' | 'landlord';
+      }>,
     ) {
       state.loading = true;
       state.error = null;
     },
     signInRequest(
       state,
-      _action: PayloadAction<{email: string; password: string}>,
+      _action: PayloadAction<{ email: string; password: string }>,
     ) {
       state.loading = true;
       state.error = null;
@@ -53,34 +58,34 @@ const authSlice = createSlice({
       state.loading = true;
       state.error = null;
     },
-    resetPasswordRequest(state, _action: PayloadAction<{email: string}>) {
+    resetPasswordRequest(state, _action: PayloadAction<{ email: string }>) {
       state.loading = true;
       state.error = null;
     },
     signInWithGoogleRequest(
       state,
-      _action: PayloadAction<{idToken: string; accessToken: string}>,
+      _action: PayloadAction<{ idToken: string; accessToken: string }>,
     ) {
       state.loading = true;
       state.error = null;
     },
     signInWithAppleRequest(
       state,
-      _action: PayloadAction<{idToken: string; fullName?: any}>,
+      _action: PayloadAction<{ idToken: string; fullName?: any }>,
     ) {
       state.loading = true;
       state.error = null;
     },
     updateProfileRequest(
       state,
-      _action: PayloadAction<{updates: ProfileUpdate}>,
+      _action: PayloadAction<{ updates: ProfileUpdate }>,
     ) {
       state.loading = true;
       state.error = null;
     },
     changePasswordRequest(
       state,
-      _action: PayloadAction<{newPassword: string}>,
+      _action: PayloadAction<{ newPassword: string }>,
     ) {
       state.loading = true;
       state.error = null;
@@ -126,8 +131,14 @@ function* handleSignUp(
   action: ReturnType<typeof signUpRequest>,
 ): Generator<any, void, any> {
   try {
-    const {email, password, fullName, role} = action.payload;
-    const {session, user} = yield call(signUp, email, password, fullName, role);
+    const { email, password, fullName, role } = action.payload;
+    const { session, user } = yield call(
+      signUp,
+      email,
+      password,
+      fullName,
+      role,
+    );
     if (session?.access_token) {
       storage.set('token', session.access_token);
     }
@@ -146,8 +157,8 @@ function* handleSignIn(
   action: ReturnType<typeof signInRequest>,
 ): Generator<any, void, any> {
   try {
-    const {email, password} = action.payload;
-    const {session, user} = yield call(signIn, email, password);
+    const { email, password } = action.payload;
+    const { session, user } = yield call(signIn, email, password);
     if (session?.access_token) {
       storage.set('token', session.access_token);
     }
@@ -189,7 +200,7 @@ function* handleSignInWithGoogle(
   action: ReturnType<typeof signInWithGoogleRequest>,
 ): Generator<any, void, any> {
   try {
-    const {session, user} = yield call(
+    const { session, user } = yield call(
       signInWithGoogle,
       action.payload.idToken,
       action.payload.accessToken,
@@ -216,7 +227,7 @@ function* handleSignInWithApple(
   action: ReturnType<typeof signInWithAppleRequest>,
 ): Generator<any, void, any> {
   try {
-    const {session, user} = yield call(
+    const { session, user } = yield call(
       signInWithApple,
       action.payload.idToken,
       action.payload.fullName,
@@ -239,27 +250,27 @@ function* handleSignInWithApple(
   }
 }
 
-export function* watchSignUp() {
+function* watchSignUp() {
   yield takeLatest(signUpRequest.type, handleSignUp);
 }
 
-export function* watchSignIn() {
+function* watchSignIn() {
   yield takeLatest(signInRequest.type, handleSignIn);
 }
 
-export function* watchSignOut() {
+function* watchSignOut() {
   yield takeLatest(signOutRequest.type, handleSignOut);
 }
 
-export function* watchResetPassword() {
+function* watchResetPassword() {
   yield takeLatest(resetPasswordRequest.type, handleResetPassword);
 }
 
-export function* watchSignInWithGoogle() {
+function* watchSignInWithGoogle() {
   yield takeLatest(signInWithGoogleRequest.type, handleSignInWithGoogle);
 }
 
-export function* watchSignInWithApple() {
+function* watchSignInWithApple() {
   yield takeLatest(signInWithAppleRequest.type, handleSignInWithApple);
 }
 
@@ -290,11 +301,11 @@ function* handleChangePassword(
   }
 }
 
-export function* watchUpdateProfile() {
+function* watchUpdateProfile() {
   yield takeLatest(updateProfileRequest.type, handleUpdateProfile);
 }
 
-export function* watchChangePassword() {
+function* watchChangePassword() {
   yield takeLatest(changePasswordRequest.type, handleChangePassword);
 }
 

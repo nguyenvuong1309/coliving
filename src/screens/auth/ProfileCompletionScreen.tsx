@@ -1,31 +1,29 @@
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
   StyleSheet,
-  TouchableOpacity,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
   Alert,
 } from 'react-native';
-import {useForm, Controller} from 'react-hook-form';
-import {zodResolver} from '@hookform/resolvers/zod';
-import {useNavigation} from '@react-navigation/native';
-import type {NativeStackNavigationProp} from '@react-navigation/native-stack';
-import {z} from 'zod';
-import {useAuth} from '../../hooks/useAuth';
-import {useAppDispatch, useAppSelector} from '../../store';
-import {setLoading, setError} from '../../store/slices/authSlice';
-import {Input, Button} from '../../components';
-import {supabase} from '../../config/supabase';
-import {getUserRole, setAuthToken} from '../../utils/mmkv';
-import type {AuthStackParamList} from '../../types/navigation';
+import PressableOpacity from '../../components/PressableOpacity';
+import { useForm, Controller } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useNavigation } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { z } from 'zod';
+import { useAuth } from '../../hooks/useAuth';
+import { useAppDispatch, useAppSelector } from '../../store';
+import { setLoading, setError } from '../../store/slices/authSlice';
+import Input from '../../components/Input';
+import Button from '../../components/Button';
+import { supabase } from '../../config/supabase';
+import { getUserRole, setAuthToken } from '../../utils/mmkv';
+import type { AuthStackParamList } from '../../types/navigation';
 
-type Nav = NativeStackNavigationProp<
-  AuthStackParamList,
-  'ProfileCompletion'
->;
+type Nav = NativeStackNavigationProp<AuthStackParamList, 'ProfileCompletion'>;
 
 const profileSchema = z.object({
   full_name: z
@@ -39,17 +37,17 @@ type ProfileData = z.infer<typeof profileSchema>;
 export default function ProfileCompletionScreen() {
   const navigation = useNavigation<Nav>();
   const dispatch = useAppDispatch();
-  const {session, loading, error} = useAppSelector(state => state.auth);
+  const { session, loading, error } = useAppSelector(state => state.auth);
   const [isSaving, setIsSaving] = useState(false);
 
   const {
     control,
     handleSubmit,
-    formState: {errors},
+    formState: { errors },
     setValue,
   } = useForm<ProfileData>({
     resolver: zodResolver(profileSchema),
-    defaultValues: {full_name: ''},
+    defaultValues: { full_name: '' },
   });
 
   // Get user metadata on mount
@@ -74,7 +72,7 @@ export default function ProfileCompletionScreen() {
       }
 
       // Update profile with selected role
-      const {error: updateError} = await supabase
+      const { error: updateError } = await supabase
         .from('profiles')
         .update({
           full_name: data.full_name,
@@ -106,10 +104,12 @@ export default function ProfileCompletionScreen() {
   return (
     <KeyboardAvoidingView
       style={styles.container}
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+    >
       <ScrollView
         contentContainerStyle={styles.scroll}
-        keyboardShouldPersistTaps="handled">
+        keyboardShouldPersistTaps="handled"
+      >
         <Text style={styles.title}>Hoàn thiện hồ sơ ✏️</Text>
         <Text style={styles.subtitle}>Cập nhật thông tin cá nhân của bạn</Text>
 
@@ -125,7 +125,7 @@ export default function ProfileCompletionScreen() {
         <Controller
           control={control}
           name="full_name"
-          render={({field: {onChange, onBlur, value}}) => (
+          render={({ field: { onChange, onBlur, value } }) => (
             <Input
               label="Họ và tên"
               placeholder="Nguyễn Văn A"
@@ -147,12 +147,13 @@ export default function ProfileCompletionScreen() {
           style={styles.submitBtn}
         />
 
-        <TouchableOpacity
+        <PressableOpacity
           onPress={() => navigation.navigate('RoleSelection')}
           disabled={isSaving}
-          style={styles.backLink}>
+          style={styles.backLink}
+        >
           <Text style={styles.backText}>← Quay lại</Text>
-        </TouchableOpacity>
+        </PressableOpacity>
       </ScrollView>
     </KeyboardAvoidingView>
   );

@@ -1,11 +1,11 @@
 import React from 'react';
-import {StatusBar, StyleSheet} from 'react-native';
-import {SafeAreaProvider} from 'react-native-safe-area-context';
-import {GestureHandlerRootView} from 'react-native-gesture-handler';
-import {Provider} from 'react-redux';
-import {store} from './src/store';
+import { StatusBar, StyleSheet } from 'react-native';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { Provider } from 'react-redux';
+import { store } from './src/store';
 import RootNavigator from './src/navigation/RootNavigator';
-import {ErrorToast} from './src/components';
+import ErrorToast from './src/components/ErrorToast';
 
 export default function App() {
   return (

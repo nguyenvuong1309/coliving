@@ -1,26 +1,8 @@
-import {createMMKV} from 'react-native-mmkv';
+import { createMMKV } from 'react-native-mmkv';
 
-export const storage = createMMKV({
+const storage = createMMKV({
   id: 'coliving-storage',
 });
-
-// ── Generic helpers ──────────────────────────────────────────────────
-
-export function setItem(key: string, value: string | number | boolean): void {
-  storage.set(key, value);
-}
-
-export function getItem(key: string): string | undefined {
-  return storage.getString(key);
-}
-
-export function removeItem(key: string): void {
-  storage.remove(key);
-}
-
-export function clearAll(): void {
-  storage.clearAll();
-}
 
 // ── Auth-specific helpers ────────────────────────────────────────────
 
@@ -46,14 +28,6 @@ export function getUserRole(): 'tenant' | 'landlord' | undefined {
     return role;
   }
   return undefined;
-}
-
-export function setApartmentId(id: string): void {
-  storage.set(APARTMENT_ID_KEY, id);
-}
-
-export function getApartmentId(): string | undefined {
-  return storage.getString(APARTMENT_ID_KEY);
 }
 
 export function clearAuth(): void {

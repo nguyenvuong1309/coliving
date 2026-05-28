@@ -1,12 +1,12 @@
 import React from 'react';
 import {
-  TouchableOpacity,
   Text,
   ActivityIndicator,
   StyleSheet,
   ViewStyle,
   TextStyle,
 } from 'react-native';
+import PressableOpacity from './PressableOpacity';
 
 type ButtonVariant = 'primary' | 'secondary' | 'outline' | 'danger';
 
@@ -34,7 +34,7 @@ const Button: React.FC<ButtonProps> = ({
   const isDisabled = disabled || loading;
 
   return (
-    <TouchableOpacity
+    <PressableOpacity
       testID={testID}
       style={[
         styles.base,
@@ -44,7 +44,8 @@ const Button: React.FC<ButtonProps> = ({
       ]}
       onPress={onPress}
       disabled={isDisabled}
-      activeOpacity={0.7}>
+      activeOpacity={0.7}
+    >
       {loading ? (
         <ActivityIndicator
           size="small"
@@ -56,11 +57,12 @@ const Button: React.FC<ButtonProps> = ({
             styles.textBase,
             styles[`${variant}Text` as keyof typeof styles] as TextStyle,
             textStyle,
-          ]}>
+          ]}
+        >
           {title}
         </Text>
       )}
-    </TouchableOpacity>
+    </PressableOpacity>
   );
 };
 

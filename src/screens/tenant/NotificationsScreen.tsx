@@ -1,22 +1,19 @@
-import React, {useEffect, useCallback} from 'react';
-import {
-  View,
-  Text,
-  FlatList,
-  TouchableOpacity,
-  StyleSheet,
-} from 'react-native';
-import {useNavigation} from '@react-navigation/native';
-import {ScreenWrapper, EmptyState, LoadingOverlay} from '../../components';
-import {useAuth} from '../../hooks/useAuth';
-import {useAppSelector, useAppDispatch} from '../../store';
+import React, { useEffect, useCallback } from 'react';
+import { View, Text, FlatList, StyleSheet } from 'react-native';
+import PressableOpacity from '../../components/PressableOpacity';
+import { useNavigation } from '@react-navigation/native';
+import ScreenWrapper from '../../components/ScreenWrapper';
+import EmptyState from '../../components/EmptyState';
+import LoadingOverlay from '../../components/LoadingOverlay';
+import { useAuth } from '../../hooks/useAuth';
+import { useAppSelector, useAppDispatch } from '../../store';
 import {
   fetchNotificationsRequest,
   markAsReadRequest,
   markAllAsReadRequest,
 } from '../../store/slices/notificationSlice';
-import {formatRelativeTime} from '../../utils/formatters';
-import type {Notification} from '../../types/database';
+import { formatRelativeTime } from '../../utils/formatters';
+import type { Notification } from '../../types/database';
 
 const TYPE_ICONS: Record<string, string> = {
   payment: '💰',
@@ -28,21 +25,21 @@ const TYPE_ICONS: Record<string, string> = {
 const NotificationsScreen: React.FC = () => {
   const navigation = useNavigation();
   const dispatch = useAppDispatch();
-  const {user} = useAuth();
-  const {notifications, loading} = useAppSelector(
+  const { user } = useAuth();
+  const { notifications, loading } = useAppSelector(
     state => state.notification,
   );
 
   useEffect(() => {
     if (user?.id) {
-      dispatch(fetchNotificationsRequest({userId: user.id}));
+      dispatch(fetchNotificationsRequest({ userId: user.id }));
     }
   }, [user?.id, dispatch]);
 
   const handleMarkAsRead = useCallback(
     (notif: Notification) => {
       if (!notif.is_read) {
-        dispatch(markAsReadRequest({id: notif.id}));
+        dispatch(markAsReadRequest({ id: notif.id }));
       }
     },
     [dispatch],
@@ -50,7 +47,7 @@ const NotificationsScreen: React.FC = () => {
 
   const handleMarkAllAsRead = useCallback(() => {
     if (user?.id) {
-      dispatch(markAllAsReadRequest({userId: user.id}));
+      dispatch(markAllAsReadRequest({ userId: user.id }));
     }
   }, [user?.id, dispatch]);
 
@@ -58,21 +55,22 @@ const NotificationsScreen: React.FC = () => {
   useEffect(() => {
     navigation.setOptions({
       headerRight: () => (
-        <TouchableOpacity onPress={handleMarkAllAsRead} activeOpacity={0.7}>
+        <PressableOpacity onPress={handleMarkAllAsRead} activeOpacity={0.7}>
           <Text style={styles.headerBtn}>Danh dau tat ca da doc</Text>
-        </TouchableOpacity>
+        </PressableOpacity>
       ),
     });
   }, [navigation, handleMarkAllAsRead]);
 
-  const renderItem = ({item}: {item: Notification}) => {
+  const renderItem = ({ item }: { item: Notification }) => {
     const icon = TYPE_ICONS[item.type] ?? TYPE_ICONS.general;
 
     return (
-      <TouchableOpacity
+      <PressableOpacity
         style={[styles.notifItem, !item.is_read && styles.notifItemUnread]}
         onPress={() => handleMarkAsRead(item)}
-        activeOpacity={0.7}>
+        activeOpacity={0.7}
+      >
         <View style={styles.iconContainer}>
           <Text style={styles.iconText}>{icon}</Text>
         </View>
@@ -84,7 +82,8 @@ const NotificationsScreen: React.FC = () => {
                 styles.notifTitle,
                 !item.is_read && styles.notifTitleUnread,
               ]}
-              numberOfLines={1}>
+              numberOfLines={1}
+            >
               {item.title}
             </Text>
             {!item.is_read && <View style={styles.unreadDot} />}
@@ -100,7 +99,7 @@ const NotificationsScreen: React.FC = () => {
             {formatRelativeTime(item.created_at)}
           </Text>
         </View>
-      </TouchableOpacity>
+      </PressableOpacity>
     );
   };
 

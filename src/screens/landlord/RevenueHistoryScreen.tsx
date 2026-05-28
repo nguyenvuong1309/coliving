@@ -1,9 +1,11 @@
-import React, {useMemo} from 'react';
-import {View, Text, FlatList, StyleSheet} from 'react-native';
-import {Card, EmptyState, ScreenWrapper} from '../../components';
-import {useAppSelector} from '../../store';
-import {formatCurrency} from '../../utils/formatters';
-import type {BillingPeriod} from '../../types/database';
+import React, { useMemo } from 'react';
+import { View, Text, FlatList, StyleSheet } from 'react-native';
+import Card from '../../components/Card';
+import EmptyState from '../../components/EmptyState';
+import ScreenWrapper from '../../components/ScreenWrapper';
+import { useAppSelector } from '../../store';
+import { formatCurrency } from '../../utils/formatters';
+import type { BillingPeriod } from '../../types/database';
 
 interface MonthRevenue {
   periodId: string;
@@ -15,7 +17,7 @@ interface MonthRevenue {
 }
 
 const RevenueHistoryScreen: React.FC = () => {
-  const {billingPeriods, payments} = useAppSelector(state => state.payment);
+  const { billingPeriods, payments } = useAppSelector(state => state.payment);
 
   const revenueData = useMemo(() => {
     const data: MonthRevenue[] = billingPeriods
@@ -50,7 +52,7 @@ const RevenueHistoryScreen: React.FC = () => {
     [revenueData],
   );
 
-  const renderItem = ({item}: {item: MonthRevenue}) => (
+  const renderItem = ({ item }: { item: MonthRevenue }) => (
     <Card style={styles.revenueCard}>
       <View style={styles.revenueRow}>
         <View>

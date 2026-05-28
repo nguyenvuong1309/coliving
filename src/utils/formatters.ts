@@ -71,44 +71,6 @@ export function formatRelativeTime(date: string): string {
 }
 
 /**
- * Return a hex color for a given status string.
- */
-export function getStatusColor(status: string): string {
-  const colors: Record<string, string> = {
-    // Borrow request statuses
-    pending: '#F59E0B',
-    approved: '#10B981',
-    rejected: '#EF4444',
-    in_use: '#3B82F6',
-    return_requested: '#8B5CF6',
-    returned: '#6B7280',
-
-    // Issue statuses
-    open: '#F59E0B',
-    in_progress: '#3B82F6',
-    resolved: '#10B981',
-    closed: '#6B7280',
-    reopened: '#EF4444',
-
-    // Payment statuses
-    unpaid: '#EF4444',
-    tenant_reported: '#F59E0B',
-    confirmed: '#10B981',
-    overdue: '#DC2626',
-
-    // Asset condition
-    good: '#10B981',
-    fair: '#F59E0B',
-    poor: '#EF4444',
-
-    // Urgency
-    normal: '#3B82F6',
-    urgent: '#EF4444',
-  };
-  return colors[status] ?? '#6B7280';
-}
-
-/**
  * Return a Vietnamese label for a given status string.
  */
 export function getStatusLabel(status: string): string {

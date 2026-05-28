@@ -1,4 +1,4 @@
-import React, {useEffect, useState, useCallback, useMemo} from 'react';
+import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import {
   View,
   Text,
@@ -8,17 +8,15 @@ import {
   StyleSheet,
   Alert,
 } from 'react-native';
-import {useRoute} from '@react-navigation/native';
-import type {RouteProp} from '@react-navigation/native';
-import {
-  ScreenWrapper,
-  Card,
-  StatusBadge,
-  Button,
-  LoadingOverlay,
-} from '../../../components';
-import {useApartment} from '../../../hooks/useApartment';
-import {useAppSelector, useAppDispatch} from '../../../store';
+import { useRoute } from '@react-navigation/native';
+import type { RouteProp } from '@react-navigation/native';
+import ScreenWrapper from '../../../components/ScreenWrapper';
+import Card from '../../../components/Card';
+import StatusBadge from '../../../components/StatusBadge';
+import Button from '../../../components/Button';
+import LoadingOverlay from '../../../components/LoadingOverlay';
+import { useApartment } from '../../../hooks/useApartment';
+import { useAppSelector, useAppDispatch } from '../../../store';
 import {
   fetchIssueDetailRequest,
   updateIssueStatusRequest,
@@ -28,7 +26,7 @@ import {
   formatRelativeTime,
   getStatusLabel,
 } from '../../../utils/formatters';
-import type {LandlordStackParamList} from '../../../types/navigation';
+import type { LandlordStackParamList } from '../../../types/navigation';
 
 type DetailRouteProp = RouteProp<LandlordStackParamList, 'LandlordIssueDetail'>;
 
@@ -53,7 +51,7 @@ const STATUS_FLOW: {
   next: IssueStatusValue;
   nextLabel: string;
 }[] = [
-  {status: 'open', label: 'Mo', next: 'in_progress', nextLabel: 'Tiep nhan'},
+  { status: 'open', label: 'Mo', next: 'in_progress', nextLabel: 'Tiep nhan' },
   {
     status: 'in_progress',
     label: 'Dang xu ly',
@@ -70,15 +68,15 @@ const STATUS_FLOW: {
 
 const IssueDetailScreen: React.FC = () => {
   const route = useRoute<DetailRouteProp>();
-  const {id} = route.params;
+  const { id } = route.params;
   const dispatch = useAppDispatch();
-  const {members} = useApartment();
-  const {currentIssue: issue, loading} = useAppSelector(state => state.issue);
+  const { members } = useApartment();
+  const { currentIssue: issue, loading } = useAppSelector(state => state.issue);
 
   const [note, setNote] = useState('');
 
   useEffect(() => {
-    dispatch(fetchIssueDetailRequest({id}));
+    dispatch(fetchIssueDetailRequest({ id }));
   }, [id, dispatch]);
 
   const reporterName = useMemo(() => {
@@ -97,22 +95,26 @@ const IssueDetailScreen: React.FC = () => {
       newStatus: 'open' | 'in_progress' | 'resolved' | 'closed' | 'reopened',
     ) => {
       if (!issue) return;
-      Alert.alert('Xac nhan', `Ban muon chuyen trang thai sang "${getStatusLabel(newStatus)}"?`, [
-        {text: 'Huy', style: 'cancel'},
-        {
-          text: 'Dong y',
-          onPress: () => {
-            dispatch(
-              updateIssueStatusRequest({
-                id: issue.id,
-                status: newStatus,
-                note: note || undefined,
-              }),
-            );
-            setNote('');
+      Alert.alert(
+        'Xac nhan',
+        `Ban muon chuyen trang thai sang "${getStatusLabel(newStatus)}"?`,
+        [
+          { text: 'Huy', style: 'cancel' },
+          {
+            text: 'Dong y',
+            onPress: () => {
+              dispatch(
+                updateIssueStatusRequest({
+                  id: issue.id,
+                  status: newStatus,
+                  note: note || undefined,
+                }),
+              );
+              setNote('');
+            },
           },
-        },
-      ]);
+        ],
+      );
     },
     [issue, note, dispatch],
   );
@@ -197,7 +199,9 @@ const IssueDetailScreen: React.FC = () => {
           </View>
           {issue.status !== 'open' && (
             <View style={styles.timelineItem}>
-              <View style={[styles.timelineDot, {backgroundColor: '#2563EB'}]} />
+              <View
+                style={[styles.timelineDot, { backgroundColor: '#2563EB' }]}
+              />
               <View style={styles.timelineContent}>
                 <Text style={styles.timelineStatus}>Tiep nhan xu ly</Text>
                 {issue.landlord_note && (
@@ -209,7 +213,7 @@ const IssueDetailScreen: React.FC = () => {
           {(issue.status === 'resolved' || issue.status === 'closed') && (
             <View style={styles.timelineItem}>
               <View
-                style={[styles.timelineDot, {backgroundColor: '#16A34A'}]}
+                style={[styles.timelineDot, { backgroundColor: '#16A34A' }]}
               />
               <View style={styles.timelineContent}>
                 <Text style={styles.timelineStatus}>Da giai quyet</Text>

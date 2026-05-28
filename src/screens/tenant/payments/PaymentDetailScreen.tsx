@@ -1,31 +1,36 @@
-import React, {useEffect, useState, useCallback} from 'react';
-import {View, Text, TouchableOpacity, Image, StyleSheet, Alert} from 'react-native';
-import {useRoute} from '@react-navigation/native';
-import type {RouteProp} from '@react-navigation/native';
-import {launchImageLibrary} from 'react-native-image-picker';
-import {ScreenWrapper, Card, Button, StatusBadge, LoadingOverlay} from '../../../components';
-import {useAppSelector, useAppDispatch} from '../../../store';
+import React, { useEffect, useState, useCallback } from 'react';
+import { View, Text, Image, StyleSheet, Alert } from 'react-native';
+import PressableOpacity from '../../../components/PressableOpacity';
+import { useRoute } from '@react-navigation/native';
+import type { RouteProp } from '@react-navigation/native';
+import { launchImageLibrary } from 'react-native-image-picker';
+import ScreenWrapper from '../../../components/ScreenWrapper';
+import Card from '../../../components/Card';
+import Button from '../../../components/Button';
+import StatusBadge from '../../../components/StatusBadge';
+import LoadingOverlay from '../../../components/LoadingOverlay';
+import { useAppSelector, useAppDispatch } from '../../../store';
 import {
   fetchMyPaymentsRequest,
   reportPaymentRequest,
 } from '../../../store/slices/paymentSlice';
-import {useAuth} from '../../../hooks/useAuth';
-import {formatCurrency, formatDate} from '../../../utils/formatters';
-import type {TenantStackParamList} from '../../../types/navigation';
+import { useAuth } from '../../../hooks/useAuth';
+import { formatCurrency, formatDate } from '../../../utils/formatters';
+import type { TenantStackParamList } from '../../../types/navigation';
 
 type ScreenRouteProp = RouteProp<TenantStackParamList, 'PaymentDetail'>;
 
 const PAYMENT_METHODS = [
-  {value: 'bank_transfer' as const, label: 'Chuyen khoan'},
-  {value: 'cash' as const, label: 'Tien mat'},
+  { value: 'bank_transfer' as const, label: 'Chuyen khoan' },
+  { value: 'cash' as const, label: 'Tien mat' },
 ];
 
 const PaymentDetailScreen: React.FC = () => {
   const route = useRoute<ScreenRouteProp>();
-  const {id} = route.params;
+  const { id } = route.params;
   const dispatch = useAppDispatch();
-  const {user} = useAuth();
-  const {myPayments, loading} = useAppSelector(state => state.payment);
+  const { user } = useAuth();
+  const { myPayments, loading } = useAppSelector(state => state.payment);
 
   const [selectedMethod, setSelectedMethod] = useState<
     'bank_transfer' | 'cash' | null
@@ -37,7 +42,7 @@ const PaymentDetailScreen: React.FC = () => {
 
   useEffect(() => {
     if (user?.id && !payment) {
-      dispatch(fetchMyPaymentsRequest({userId: user.id}));
+      dispatch(fetchMyPaymentsRequest({ userId: user.id }));
     }
   }, [user?.id, payment, dispatch]);
 
@@ -95,7 +100,8 @@ const PaymentDetailScreen: React.FC = () => {
           style={[
             styles.amountValue,
             isConfirmed ? styles.amountConfirmed : styles.amountUnpaid,
-          ]}>
+          ]}
+        >
           {formatCurrency(payment.amount)}
         </Text>
         <StatusBadge status={payment.status} />
@@ -112,17 +118,13 @@ const PaymentDetailScreen: React.FC = () => {
 
         <View style={styles.infoRow}>
           <Text style={styles.infoLabel}>Ngay tao:</Text>
-          <Text style={styles.infoValue}>
-            {formatDate(payment.created_at)}
-          </Text>
+          <Text style={styles.infoValue}>{formatDate(payment.created_at)}</Text>
         </View>
 
         {payment.paid_at && (
           <View style={styles.infoRow}>
             <Text style={styles.infoLabel}>Ngay thanh toan:</Text>
-            <Text style={styles.infoValue}>
-              {formatDate(payment.paid_at)}
-            </Text>
+            <Text style={styles.infoValue}>{formatDate(payment.paid_at)}</Text>
           </View>
         )}
 
@@ -156,23 +158,25 @@ const PaymentDetailScreen: React.FC = () => {
           <Text style={styles.fieldLabel}>Phuong thuc thanh toan</Text>
           <View style={styles.methodRow}>
             {PAYMENT_METHODS.map(method => (
-              <TouchableOpacity
+              <PressableOpacity
                 key={method.value}
                 style={[
                   styles.methodBtn,
                   selectedMethod === method.value && styles.methodBtnActive,
                 ]}
                 onPress={() => setSelectedMethod(method.value)}
-                activeOpacity={0.7}>
+                activeOpacity={0.7}
+              >
                 <Text
                   style={[
                     styles.methodBtnText,
                     selectedMethod === method.value &&
                       styles.methodBtnTextActive,
-                  ]}>
+                  ]}
+                >
                   {method.label}
                 </Text>
-              </TouchableOpacity>
+              </PressableOpacity>
             ))}
           </View>
 
@@ -182,20 +186,25 @@ const PaymentDetailScreen: React.FC = () => {
           </Text>
           {receiptImage ? (
             <View style={styles.receiptWrapper}>
-              <Image source={{uri: receiptImage}} style={styles.receiptImage} />
-              <TouchableOpacity
+              <Image
+                source={{ uri: receiptImage }}
+                style={styles.receiptImage}
+              />
+              <PressableOpacity
                 style={styles.removeReceiptBtn}
-                onPress={() => setReceiptImage(null)}>
+                onPress={() => setReceiptImage(null)}
+              >
                 <Text style={styles.removeReceiptText}>X</Text>
-              </TouchableOpacity>
+              </PressableOpacity>
             </View>
           ) : (
-            <TouchableOpacity
+            <PressableOpacity
               style={styles.addReceiptBtn}
               onPress={handlePickReceipt}
-              activeOpacity={0.7}>
+              activeOpacity={0.7}
+            >
               <Text style={styles.addReceiptText}>+ Chon hinh anh</Text>
-            </TouchableOpacity>
+            </PressableOpacity>
           )}
 
           <View style={styles.submitContainer}>
@@ -211,9 +220,7 @@ const PaymentDetailScreen: React.FC = () => {
       {/* Tenant reported: show waiting message */}
       {isTenantReported && (
         <Card style={styles.waitingCard}>
-          <Text style={styles.waitingText}>
-            Dang cho xac nhan tu chu nha
-          </Text>
+          <Text style={styles.waitingText}>Dang cho xac nhan tu chu nha</Text>
           <Text style={styles.waitingSubtext}>
             Ban da bao thanh toan. Vui long doi chu nha xac nhan.
           </Text>

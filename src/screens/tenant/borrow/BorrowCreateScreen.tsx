@@ -1,31 +1,36 @@
-import React, {useEffect} from 'react';
-import {View, Text, FlatList, TouchableOpacity, StyleSheet} from 'react-native';
-import {useNavigation} from '@react-navigation/native';
-import {useForm, Controller} from 'react-hook-form';
-import {zodResolver} from '@hookform/resolvers/zod';
-import {ScreenWrapper, Button, Input, Card, LoadingOverlay} from '../../../components';
-import {useAuth} from '../../../hooks/useAuth';
-import {useApartment} from '../../../hooks/useApartment';
-import {useAppSelector, useAppDispatch} from '../../../store';
-import {createBorrowRequestRequest} from '../../../store/slices/borrowSlice';
-import {fetchAssetsRequest} from '../../../store/slices/assetSlice';
+import React, { useEffect, useMemo } from 'react';
+import { View, Text, FlatList, StyleSheet } from 'react-native';
+import PressableOpacity from '../../../components/PressableOpacity';
+import { useNavigation } from '@react-navigation/native';
+import { useForm, Controller } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import ScreenWrapper from '../../../components/ScreenWrapper';
+import Button from '../../../components/Button';
+import Input from '../../../components/Input';
+import Card from '../../../components/Card';
+import LoadingOverlay from '../../../components/LoadingOverlay';
+import { useAuth } from '../../../hooks/useAuth';
+import { useApartment } from '../../../hooks/useApartment';
+import { useAppSelector, useAppDispatch } from '../../../store';
+import { createBorrowRequestRequest } from '../../../store/slices/borrowSlice';
+import { fetchAssetsRequest } from '../../../store/slices/assetSlice';
 import {
   borrowRequestSchema,
   type BorrowRequestFormData,
 } from '../../../schemas/borrow';
-import type {Asset} from '../../../types/database';
+import type { Asset } from '../../../types/database';
 
 const BorrowCreateScreen: React.FC = () => {
   const navigation = useNavigation();
   const dispatch = useAppDispatch();
-  const {user} = useAuth();
-  const {apartment} = useApartment();
-  const {loading} = useAppSelector(state => state.borrow);
+  const { user } = useAuth();
+  const { apartment } = useApartment();
+  const { loading } = useAppSelector(state => state.borrow);
   const assets = useAppSelector(state => state.asset.assets) as Asset[];
 
   useEffect(() => {
     if (apartment?.id) {
-      dispatch(fetchAssetsRequest({apartmentId: apartment.id}));
+      dispatch(fetchAssetsRequest({ apartmentId: apartment.id }));
     }
   }, [apartment?.id, dispatch]);
 
@@ -34,7 +39,7 @@ const BorrowCreateScreen: React.FC = () => {
     handleSubmit,
     setValue,
     watch,
-    formState: {errors},
+    formState: { errors },
   } = useForm<BorrowRequestFormData>({
     resolver: zodResolver(borrowRequestSchema),
     defaultValues: {
@@ -46,6 +51,10 @@ const BorrowCreateScreen: React.FC = () => {
   });
 
   const selectedAssetId = watch('asset_id');
+  const borrowableAssets = useMemo(
+    () => assets.filter(asset => asset.is_borrowable),
+    [assets],
+  );
 
   const onSubmit = (data: BorrowRequestFormData) => {
     if (!user?.id || !apartment?.id) {
@@ -72,29 +81,28 @@ const BorrowCreateScreen: React.FC = () => {
     prevLoading.current = loading;
   }, [loading, navigation]);
 
-  const renderAssetItem = ({item}: {item: Asset}) => {
+  const renderAssetItem = ({ item }: { item: Asset }) => {
     const isSelected = selectedAssetId === item.id;
     return (
-      <TouchableOpacity
+      <PressableOpacity
         style={[styles.assetItem, isSelected && styles.assetItemSelected]}
         onPress={() => {
-          setValue('asset_id', item.id, {shouldValidate: true});
+          setValue('asset_id', item.id, { shouldValidate: true });
           if (item.owner_id) {
-            setValue('lender_id', item.owner_id, {shouldValidate: true});
+            setValue('lender_id', item.owner_id, { shouldValidate: true });
           }
         }}
-        activeOpacity={0.7}>
+        activeOpacity={0.7}
+      >
         <Text
-          style={[
-            styles.assetName,
-            isSelected && styles.assetNameSelected,
-          ]}>
+          style={[styles.assetName, isSelected && styles.assetNameSelected]}
+        >
           {item.name}
         </Text>
         {item.category && (
           <Text style={styles.assetCategory}>{item.category}</Text>
         )}
-      </TouchableOpacity>
+      </PressableOpacity>
     );
   };
 
@@ -106,9 +114,9 @@ const BorrowCreateScreen: React.FC = () => {
 
       {/* Asset selection */}
       <Text style={styles.label}>Chon do muon</Text>
-      {assets.length > 0 ? (
+      {borrowableAssets.length > 0 ? (
         <FlatList
-          data={assets.filter(a => a.is_borrowable)}
+          data={borrowableAssets}
           keyExtractor={item => item.id}
           renderItem={renderAssetItem}
           horizontal
@@ -131,7 +139,7 @@ const BorrowCreateScreen: React.FC = () => {
       <Controller
         control={control}
         name="note"
-        render={({field: {onChange, value}}) => (
+        render={({ field: { onChange, value } }) => (
           <Input
             label="Ghi chu"
             placeholder="Ly do muon, thoi gian du kien..."
@@ -148,7 +156,7 @@ const BorrowCreateScreen: React.FC = () => {
       <Controller
         control={control}
         name="borrow_duration"
-        render={({field: {onChange, value}}) => (
+        render={({ field: { onChange, value } }) => (
           <Input
             label="Thoi gian muon"
             placeholder="VD: 2 ngay, 1 tuan..."

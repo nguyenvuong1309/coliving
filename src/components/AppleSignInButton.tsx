@@ -1,6 +1,5 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import {
-  TouchableOpacity,
   Text,
   StyleSheet,
   ActivityIndicator,
@@ -8,6 +7,7 @@ import {
   Platform,
   Alert,
 } from 'react-native';
+import PressableOpacity from './PressableOpacity';
 import appleAuth, {
   AppleRequestScope,
   AppleError,
@@ -37,10 +37,7 @@ export function AppleSignInButton({
 
       const appleAuthRequestResponse = await appleAuth.performRequest({
         requestedOperation: appleAuth.Operation.LOGIN,
-        requestedScopes: [
-          AppleRequestScope.FULL_NAME,
-          AppleRequestScope.EMAIL,
-        ],
+        requestedScopes: [AppleRequestScope.FULL_NAME, AppleRequestScope.EMAIL],
       });
 
       const credentialState = await appleAuth.getCredentialStateForUser(
@@ -71,10 +68,11 @@ export function AppleSignInButton({
   };
 
   return (
-    <TouchableOpacity
+    <PressableOpacity
       style={[styles.button, (loading || isLoading) && styles.buttonDisabled]}
       onPress={handleAppleSignIn}
-      disabled={loading || isLoading}>
+      disabled={loading || isLoading}
+    >
       <View style={styles.content}>
         <Text style={styles.icon}>🍎</Text>
         {isLoading || loading ? (
@@ -83,7 +81,7 @@ export function AppleSignInButton({
           <Text style={styles.text}>Đăng nhập với Apple</Text>
         )}
       </View>
-    </TouchableOpacity>
+    </PressableOpacity>
   );
 }
 

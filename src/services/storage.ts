@@ -1,14 +1,14 @@
-import {supabase} from '../config/supabase';
+import { supabase } from '../config/supabase';
 
 export async function uploadImage(
   bucket: string,
   path: string,
-  file: {uri: string; type: string; name: string},
+  file: { uri: string; type: string; name: string },
 ) {
   const formData = new FormData();
   formData.append('file', file as any);
 
-  const {data, error} = await supabase.storage
+  const { data, error } = await supabase.storage
     .from(bucket)
     .upload(path, formData, {
       contentType: file.type,
@@ -23,14 +23,6 @@ export async function uploadImage(
 }
 
 export function getImageUrl(bucket: string, path: string): string {
-  const {data} = supabase.storage.from(bucket).getPublicUrl(path);
+  const { data } = supabase.storage.from(bucket).getPublicUrl(path);
   return data.publicUrl;
-}
-
-export async function deleteImage(bucket: string, path: string) {
-  const {error} = await supabase.storage.from(bucket).remove([path]);
-
-  if (error) {
-    throw error;
-  }
 }

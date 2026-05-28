@@ -1,31 +1,35 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
   StyleSheet,
-  TouchableOpacity,
   Alert,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
 } from 'react-native';
-import {useForm, Controller} from 'react-hook-form';
-import {zodResolver} from '@hookform/resolvers/zod';
-import {useNavigation} from '@react-navigation/native';
-import type {NativeStackNavigationProp} from '@react-navigation/native-stack';
-import {useAuth} from '../../hooks/useAuth';
-import {signUpSchema, type SignUpData} from '../../schemas/auth';
-import {Input, Button, GoogleSignInButton, AppleSignInButton} from '../../components';
-import {useAppDispatch} from '../../store';
-import {setError as setAuthError} from '../../store/slices/authSlice';
-import type {AuthStackParamList} from '../../types/navigation';
+import PressableOpacity from '../../components/PressableOpacity';
+import { useForm, Controller } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useNavigation } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { useAuth } from '../../hooks/useAuth';
+import { signUpSchema, type SignUpData } from '../../schemas/auth';
+import Input from '../../components/Input';
+import Button from '../../components/Button';
+import { GoogleSignInButton } from '../../components/GoogleSignInButton';
+import { AppleSignInButton } from '../../components/AppleSignInButton';
+import { useAppDispatch } from '../../store';
+import { setError as setAuthError } from '../../store/slices/authSlice';
+import type { AuthStackParamList } from '../../types/navigation';
 
 type Nav = NativeStackNavigationProp<AuthStackParamList, 'SignUp'>;
 
 export default function SignUpScreen() {
   const navigation = useNavigation<Nav>();
   const dispatch = useAppDispatch();
-  const {signUp, signInWithGoogle, signInWithApple, loading, error} = useAuth();
+  const { signUp, signInWithGoogle, signInWithApple, loading, error } =
+    useAuth();
   const [selectedRole, setSelectedRole] = useState<'tenant' | 'landlord'>(
     'tenant',
   );
@@ -33,7 +37,7 @@ export default function SignUpScreen() {
   const {
     control,
     handleSubmit,
-    formState: {errors},
+    formState: { errors },
   } = useForm<SignUpData>({
     resolver: zodResolver(signUpSchema),
     defaultValues: {
@@ -59,7 +63,9 @@ export default function SignUpScreen() {
 
   const handleOAuthError = (err: unknown) => {
     const message =
-      err instanceof Error ? err.message : 'Đăng nhập với nhà cung cấp thất bại';
+      err instanceof Error
+        ? err.message
+        : 'Đăng nhập với nhà cung cấp thất bại';
     dispatch(setAuthError(message));
   };
 
@@ -67,10 +73,12 @@ export default function SignUpScreen() {
     <KeyboardAvoidingView
       testID="signup-screen"
       style={styles.container}
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+    >
       <ScrollView
         contentContainerStyle={styles.scroll}
-        keyboardShouldPersistTaps="handled">
+        keyboardShouldPersistTaps="handled"
+      >
         <Text style={styles.title}>Tạo tài khoản</Text>
 
         <View style={styles.oauthSection}>
@@ -93,42 +101,46 @@ export default function SignUpScreen() {
         </View>
 
         <View style={styles.roleSelector}>
-          <TouchableOpacity
+          <PressableOpacity
             testID="signup-role-tenant-btn"
             style={[
               styles.roleBtn,
               selectedRole === 'tenant' && styles.roleBtnActive,
             ]}
-            onPress={() => setSelectedRole('tenant')}>
+            onPress={() => setSelectedRole('tenant')}
+          >
             <Text
               style={[
                 styles.roleText,
                 selectedRole === 'tenant' && styles.roleTextActive,
-              ]}>
+              ]}
+            >
               Người thuê
             </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
+          </PressableOpacity>
+          <PressableOpacity
             testID="signup-role-landlord-btn"
             style={[
               styles.roleBtn,
               selectedRole === 'landlord' && styles.roleBtnActive,
             ]}
-            onPress={() => setSelectedRole('landlord')}>
+            onPress={() => setSelectedRole('landlord')}
+          >
             <Text
               style={[
                 styles.roleText,
                 selectedRole === 'landlord' && styles.roleTextActive,
-              ]}>
+              ]}
+            >
               Chủ nhà
             </Text>
-          </TouchableOpacity>
+          </PressableOpacity>
         </View>
 
         <Controller
           control={control}
           name="full_name"
-          render={({field: {onChange, onBlur, value}}) => (
+          render={({ field: { onChange, onBlur, value } }) => (
             <Input
               testID="signup-fullname-input"
               label="Họ và tên"
@@ -144,7 +156,7 @@ export default function SignUpScreen() {
         <Controller
           control={control}
           name="email"
-          render={({field: {onChange, onBlur, value}}) => (
+          render={({ field: { onChange, onBlur, value } }) => (
             <Input
               testID="signup-email-input"
               label="Email"
@@ -162,7 +174,7 @@ export default function SignUpScreen() {
         <Controller
           control={control}
           name="password"
-          render={({field: {onChange, onBlur, value}}) => (
+          render={({ field: { onChange, onBlur, value } }) => (
             <Input
               testID="signup-password-input"
               label="Mật khẩu"
@@ -179,7 +191,7 @@ export default function SignUpScreen() {
         <Controller
           control={control}
           name="confirmPassword"
-          render={({field: {onChange, onBlur, value}}) => (
+          render={({ field: { onChange, onBlur, value } }) => (
             <Input
               testID="signup-confirm-password-input"
               label="Xác nhận mật khẩu"
@@ -207,12 +219,13 @@ export default function SignUpScreen() {
           style={styles.submitBtn}
         />
 
-        <TouchableOpacity
+        <PressableOpacity
           testID="signup-goto-signin-btn"
           onPress={() => navigation.navigate('SignIn')}
-          style={styles.linkBtn}>
+          style={styles.linkBtn}
+        >
           <Text style={styles.linkText}>Đã có tài khoản? Đăng nhập</Text>
-        </TouchableOpacity>
+        </PressableOpacity>
       </ScrollView>
     </KeyboardAvoidingView>
   );

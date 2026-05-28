@@ -1,7 +1,22 @@
 import type { Options } from '@wdio/types';
+import type AppiumService from '@wdio/appium-service';
+import type LocalRunner from '@wdio/local-runner';
+import type MochaFramework from '@wdio/mocha-framework';
+import type SpecReporter from '@wdio/spec-reporter';
+import type UiAutomator2Driver from 'appium-uiautomator2-driver';
+import type XCUITestDriver from 'appium-xcuitest-driver';
 import path from 'path';
 
 const ROOT = path.join(__dirname, '../..');
+
+export type WdioRuntimeDependencies = [
+  AppiumService,
+  LocalRunner,
+  typeof MochaFramework,
+  SpecReporter,
+  UiAutomator2Driver,
+  XCUITestDriver,
+];
 
 export const config: Partial<Options.Testrunner> = {
   runner: 'local',

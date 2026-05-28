@@ -1,8 +1,9 @@
 import React from 'react';
-import {View, Text, StyleSheet, TouchableOpacity} from 'react-native';
-import {useNavigation} from '@react-navigation/native';
-import type {NativeStackNavigationProp} from '@react-navigation/native-stack';
-import type {AuthStackParamList} from '../../types/navigation';
+import { View, Text, StyleSheet } from 'react-native';
+import PressableOpacity from '../../components/PressableOpacity';
+import { useNavigation } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import type { AuthStackParamList } from '../../types/navigation';
 
 type Nav = NativeStackNavigationProp<AuthStackParamList, 'Welcome'>;
 
@@ -34,25 +35,27 @@ export default function WelcomeScreen() {
       </View>
 
       <View style={styles.actions}>
-        <TouchableOpacity
+        <PressableOpacity
           testID="welcome-signup-btn"
           style={styles.primaryBtn}
-          onPress={() => navigation.navigate('SignUp')}>
+          onPress={() => navigation.navigate('SignUp')}
+        >
           <Text style={styles.primaryText}>Đăng ký</Text>
-        </TouchableOpacity>
+        </PressableOpacity>
 
-        <TouchableOpacity
+        <PressableOpacity
           testID="welcome-signin-btn"
           style={styles.secondaryBtn}
-          onPress={() => navigation.navigate('SignIn')}>
+          onPress={() => navigation.navigate('SignIn')}
+        >
           <Text style={styles.secondaryText}>Đã có tài khoản? Đăng nhập</Text>
-        </TouchableOpacity>
+        </PressableOpacity>
       </View>
     </View>
   );
 }
 
-function FeatureItem({title, desc}: {title: string; desc: string}) {
+function FeatureItem({ title, desc }: { title: string; desc: string }) {
   return (
     <View style={styles.featureItem}>
       <Text style={styles.featureTitle}>{title}</Text>
@@ -91,11 +94,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
     padding: 16,
     borderRadius: 12,
-    shadowColor: '#000',
-    shadowOpacity: 0.05,
-    shadowRadius: 8,
-    shadowOffset: {width: 0, height: 2},
-    elevation: 2,
+    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.05)',
   },
   featureTitle: {
     fontSize: 16,

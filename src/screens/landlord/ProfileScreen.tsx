@@ -1,22 +1,26 @@
-import React, {useCallback} from 'react';
-import {View, Text, TouchableOpacity, Alert, StyleSheet} from 'react-native';
-import {useNavigation} from '@react-navigation/native';
-import type {NativeStackNavigationProp} from '@react-navigation/native-stack';
-import {ScreenWrapper, Card, Avatar, Button} from '../../components';
-import {useAuth} from '../../hooks/useAuth';
-import {useApartment} from '../../hooks/useApartment';
-import type {LandlordStackParamList} from '../../types/navigation';
+import React, { useCallback } from 'react';
+import { View, Text, Alert, StyleSheet } from 'react-native';
+import PressableOpacity from '../../components/PressableOpacity';
+import { useNavigation } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import ScreenWrapper from '../../components/ScreenWrapper';
+import Card from '../../components/Card';
+import Avatar from '../../components/Avatar';
+import Button from '../../components/Button';
+import { useAuth } from '../../hooks/useAuth';
+import { useApartment } from '../../hooks/useApartment';
+import type { LandlordStackParamList } from '../../types/navigation';
 
 type NavigationProp = NativeStackNavigationProp<LandlordStackParamList>;
 
 const ProfileScreen: React.FC = () => {
   const navigation = useNavigation<NavigationProp>();
-  const {user, signOut} = useAuth();
-  const {apartment} = useApartment();
+  const { user, signOut } = useAuth();
+  const { apartment } = useApartment();
 
   const handleSignOut = useCallback(() => {
     Alert.alert('Dang xuat', 'Ban co chac chan muon dang xuat?', [
-      {text: 'Huy', style: 'cancel'},
+      { text: 'Huy', style: 'cancel' },
       {
         text: 'Dang xuat',
         style: 'destructive',
@@ -47,8 +51,9 @@ const ProfileScreen: React.FC = () => {
           <Card
             style={styles.apartmentCard}
             onPress={() =>
-              navigation.navigate('ApartmentSetup', {id: apartment.id})
-            }>
+              navigation.navigate('ApartmentSetup', { id: apartment.id })
+            }
+          >
             <Text style={styles.apartmentName}>{apartment.name}</Text>
             <Text style={styles.apartmentAddress}>{apartment.address}</Text>
             <View style={styles.inviteRow}>
@@ -75,28 +80,31 @@ const ProfileScreen: React.FC = () => {
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Tai khoan</Text>
         <Card>
-          <TouchableOpacity
+          <PressableOpacity
             style={styles.settingItem}
-            onPress={() => navigation.navigate('EditProfile')}>
+            onPress={() => navigation.navigate('EditProfile')}
+          >
             <Text style={styles.settingText}>Chinh sua thong tin</Text>
             <Text style={styles.settingChevron}>{'>'}</Text>
-          </TouchableOpacity>
+          </PressableOpacity>
           <View style={styles.settingSeparator} />
-          <TouchableOpacity
+          <PressableOpacity
             style={styles.settingItem}
-            onPress={() => navigation.navigate('ChangePassword')}>
+            onPress={() => navigation.navigate('ChangePassword')}
+          >
             <Text style={styles.settingText}>Doi mat khau</Text>
             <Text style={styles.settingChevron}>{'>'}</Text>
-          </TouchableOpacity>
+          </PressableOpacity>
           <View style={styles.settingSeparator} />
-          <TouchableOpacity
+          <PressableOpacity
             style={styles.settingItem}
-            onPress={() => navigation.navigate('RevenueHistory')}>
+            onPress={() => navigation.navigate('RevenueHistory')}
+          >
             <Text style={styles.settingText}>Lich su doanh thu</Text>
             <Text style={styles.settingChevron}>{'>'}</Text>
-          </TouchableOpacity>
+          </PressableOpacity>
           <View style={styles.settingSeparator} />
-          <TouchableOpacity
+          <PressableOpacity
             style={styles.settingItem}
             onPress={() => {
               if (apartment?.id) {
@@ -104,10 +112,11 @@ const ProfileScreen: React.FC = () => {
                   apartmentId: apartment.id,
                 });
               }
-            }}>
+            }}
+          >
             <Text style={styles.settingText}>Ma moi can ho</Text>
             <Text style={styles.settingChevron}>{'>'}</Text>
-          </TouchableOpacity>
+          </PressableOpacity>
         </Card>
       </View>
 

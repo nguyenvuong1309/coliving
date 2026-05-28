@@ -1,21 +1,25 @@
 import React from 'react';
-import {View, Text, StyleSheet, Alert} from 'react-native';
-import {useForm, Controller} from 'react-hook-form';
-import {zodResolver} from '@hookform/resolvers/zod';
-import {useApartment} from '../../hooks/useApartment';
-import {joinApartmentSchema, type JoinApartmentData} from '../../schemas/auth';
-import {Input, Button} from '../../components';
+import { View, Text, StyleSheet, Alert } from 'react-native';
+import { useForm, Controller } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useApartment } from '../../hooks/useApartment';
+import {
+  joinApartmentSchema,
+  type JoinApartmentData,
+} from '../../schemas/auth';
+import Input from '../../components/Input';
+import Button from '../../components/Button';
 
 export default function JoinApartmentScreen() {
-  const {joinApartment, loading, error} = useApartment();
+  const { joinApartment, loading, error } = useApartment();
 
   const {
     control,
     handleSubmit,
-    formState: {errors},
+    formState: { errors },
   } = useForm<JoinApartmentData>({
     resolver: zodResolver(joinApartmentSchema),
-    defaultValues: {invite_code: ''},
+    defaultValues: { invite_code: '' },
   });
 
   const onSubmit = (data: JoinApartmentData) => {
@@ -32,7 +36,7 @@ export default function JoinApartmentScreen() {
       <Controller
         control={control}
         name="invite_code"
-        render={({field: {onChange, onBlur, value}}) => (
+        render={({ field: { onChange, onBlur, value } }) => (
           <Input
             label="Mã mời"
             placeholder="Nhập mã 8 ký tự"
