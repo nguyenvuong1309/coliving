@@ -56,7 +56,7 @@
 		<true/>
 	</dict>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string></string>
+	<string>Cần truy cập vị trí khi bạn cho phép đính kèm thông tin vị trí vào ảnh hoặc sự cố.</string>
 	<key>RCTNewArchEnabled</key>
 	<true/>
 	<key>UILaunchStoryboardName</key>

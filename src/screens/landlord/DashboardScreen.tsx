@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo } from 'react';
-import { View, Text, FlatList, StyleSheet, RefreshControl } from 'react-native';
+import { View, Text, FlatList, StyleSheet } from 'react-native';
 import PressableOpacity from '../../components/PressableOpacity';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -13,10 +13,12 @@ import { useAppSelector, useAppDispatch } from '../../store';
 import { fetchIssuesRequest } from '../../store/slices/issueSlice';
 import {
   fetchBillingPeriodsRequest,
-  fetchPaymentsRequest,
 } from '../../store/slices/paymentSlice';
 import { fetchBorrowRequestsRequest } from '../../store/slices/borrowSlice';
-import { fetchNotificationsRequest } from '../../store/slices/notificationSlice';
+import {
+  fetchNotificationsRequest,
+  markAsReadRequest,
+} from '../../store/slices/notificationSlice';
 import { formatCurrency, formatRelativeTime } from '../../utils/formatters';
 import type { LandlordStackParamList } from '../../types/navigation';
 import type { Notification } from '../../types/database';
@@ -27,15 +29,13 @@ const DashboardScreen: React.FC = () => {
   const navigation = useNavigation<NavigationProp>();
   const dispatch = useAppDispatch();
   const { user } = useAuth();
-  const { apartment, members, fetchApartment, fetchMembers } = useApartment();
+  const { apartment, fetchMembers } = useApartment();
 
   const { issues } = useAppSelector(state => state.issue);
   const { payments, billingPeriods } = useAppSelector(state => state.payment);
   const { requests: borrowRequests } = useAppSelector(state => state.borrow);
   const { notifications } = useAppSelector(state => state.notification);
   const apartmentLoading = useAppSelector(state => state.apartment.loading);
-
-  const [refreshing, setRefreshing] = React.useState(false);
 
   const loadData = React.useCallback(() => {
     if (apartment?.id) {
@@ -50,19 +50,7 @@ const DashboardScreen: React.FC = () => {
   }, [apartment?.id, user?.id, dispatch, fetchMembers]);
 
   useEffect(() => {
-    if (user?.id && !apartment) {
-      // Landlord's apartment should be fetched from their profile
-    }
-  }, [user?.id, apartment, fetchApartment]);
-
-  useEffect(() => {
     loadData();
-  }, [loadData]);
-
-  const onRefresh = React.useCallback(async () => {
-    setRefreshing(true);
-    loadData();
-    setTimeout(() => setRefreshing(false), 1000);
   }, [loadData]);
 
   const currentMonth = new Date().getMonth() + 1;
@@ -101,8 +89,24 @@ const DashboardScreen: React.FC = () => {
     return notifications.slice(0, 5);
   }, [notifications]);
 
+  const handleNotificationPress = React.useCallback(
+    (notification: Notification) => {
+      if (!notification.is_read) {
+        dispatch(markAsReadRequest({ id: notification.id }));
+      }
+      const routeName = notification.data?.route;
+      if (typeof routeName === 'string') {
+        (navigation as any).navigate(routeName, notification.data?.params);
+      }
+    },
+    [dispatch, navigation],
+  );
+
   const renderNotification = ({ item }: { item: Notification }) => (
-    <PressableOpacity style={styles.notificationItem}>
+    <PressableOpacity
+      style={styles.notificationItem}
+      onPress={() => handleNotificationPress(item)}
+    >
       <View style={styles.notificationDot}>
         {!item.is_read && <View style={styles.unreadDot} />}
       </View>
@@ -124,7 +128,7 @@ const DashboardScreen: React.FC = () => {
 
   return (
     <ScreenWrapper scroll>
-      <LoadingOverlay visible={apartmentLoading && !refreshing} />
+      <LoadingOverlay visible={apartmentLoading} />
 
       {/* Header */}
       <View style={styles.header}>
@@ -167,12 +171,16 @@ const DashboardScreen: React.FC = () => {
       </Card>
 
       {/* Pending Borrows Card */}
-      <Card style={styles.infoCard}>
+      <Card
+        style={styles.infoCard}
+        onPress={() => navigation.navigate('LandlordBorrowList')}
+      >
         <View style={styles.infoCardRow}>
           <View>
             <Text style={styles.infoCardLabel}>Yeu cau muon do dang cho</Text>
             <Text style={styles.infoCardValue}>{pendingBorrowCount}</Text>
           </View>
+          <Text style={styles.chevron}>{'>'}</Text>
         </View>
       </Card>
 

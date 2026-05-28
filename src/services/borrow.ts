@@ -21,7 +21,7 @@ export async function getBorrowRequests(apartmentId: string) {
   const { data, error } = await supabase
     .from('borrow_requests')
     .select(
-      '*, assets:asset_id(*), borrower:borrower_id(id, full_name, avatar_url), lender:lender_id(id, full_name, avatar_url)',
+      '*, assets:asset_id(*), borrower:borrower_id(id, full_name, avatar_url, role), lender:lender_id(id, full_name, avatar_url, role)',
     )
     .eq('apartment_id', apartmentId)
     .order('created_at', { ascending: false });
@@ -37,7 +37,7 @@ export async function getBorrowRequest(id: string) {
   const { data, error } = await supabase
     .from('borrow_requests')
     .select(
-      '*, assets:asset_id(*), borrower:borrower_id(id, full_name, avatar_url), lender:lender_id(id, full_name, avatar_url)',
+      '*, assets:asset_id(*), borrower:borrower_id(id, full_name, avatar_url, role), lender:lender_id(id, full_name, avatar_url, role)',
     )
     .eq('id', id)
     .single();

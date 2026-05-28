@@ -1,5 +1,6 @@
 import React from 'react';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
+import {useAppSelector} from '../store';
 import type {AuthStackParamList} from '../types/navigation';
 
 import SplashScreen from '../screens/auth/SplashScreen';
@@ -14,9 +15,12 @@ import ProfileCompletionScreen from '../screens/auth/ProfileCompletionScreen';
 const Stack = createNativeStackNavigator<AuthStackParamList>();
 
 export default function AuthStack() {
+  const {session, user} = useAppSelector(state => state.auth);
+  const initialRouteName = session && !user ? 'RoleSelection' : 'Splash';
+
   return (
     <Stack.Navigator
-      initialRouteName="Splash"
+      initialRouteName={initialRouteName}
       screenOptions={{headerShown: false}}>
       <Stack.Screen name="Splash" component={SplashScreen} />
       <Stack.Screen name="Welcome" component={WelcomeScreen} />

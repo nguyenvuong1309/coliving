@@ -10,7 +10,7 @@ import LoadingOverlay from '../../../components/LoadingOverlay';
 import { useApartment } from '../../../hooks/useApartment';
 import { useAppSelector, useAppDispatch } from '../../../store';
 import { fetchIssuesRequest } from '../../../store/slices/issueSlice';
-import { formatRelativeTime, getStatusLabel } from '../../../utils/formatters';
+import { formatRelativeTime } from '../../../utils/formatters';
 import type { LandlordStackParamList } from '../../../types/navigation';
 import type { Issue } from '../../../types/database';
 

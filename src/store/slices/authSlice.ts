@@ -1,7 +1,7 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { all, call, fork, put, select, takeLatest } from 'redux-saga/effects';
-import { createMMKV } from 'react-native-mmkv';
 import type { RootState } from '../index';
+import {clearAuth, setAuthToken} from '../../utils/mmkv';
 import {
   signUp,
   signIn,
@@ -14,8 +14,6 @@ import {
   changePassword,
 } from '../../services/auth';
 import type { Profile, ProfileUpdate } from '../../types/database';
-
-const storage = createMMKV();
 
 interface AuthState {
   user: Profile | null;
@@ -140,12 +138,18 @@ function* handleSignUp(
       role,
     );
     if (session?.access_token) {
-      storage.set('token', session.access_token);
+      setAuthToken(session.access_token);
     }
     yield put(setSession(session));
-    if (user?.id) {
-      const profile = yield call(getProfile, user.id);
-      yield put(setUser(profile));
+    if (session && user?.id) {
+      try {
+        const profile = yield call(getProfile, user.id);
+        yield put(setUser(profile));
+      } catch {
+        yield put(setUser(null));
+      }
+    } else {
+      yield put(setUser(null));
     }
     yield put(setLoading(false));
   } catch (error: any) {
@@ -160,12 +164,16 @@ function* handleSignIn(
     const { email, password } = action.payload;
     const { session, user } = yield call(signIn, email, password);
     if (session?.access_token) {
-      storage.set('token', session.access_token);
+      setAuthToken(session.access_token);
     }
     yield put(setSession(session));
     if (user?.id) {
-      const profile = yield call(getProfile, user.id);
-      yield put(setUser(profile));
+      try {
+        const profile = yield call(getProfile, user.id);
+        yield put(setUser(profile));
+      } catch {
+        yield put(setUser(null));
+      }
     }
     yield put(setLoading(false));
   } catch (error: any) {
@@ -176,7 +184,7 @@ function* handleSignIn(
 function* handleSignOut(): Generator<any, void, any> {
   try {
     yield call(signOut);
-    storage.remove('token');
+    clearAuth();
     yield put(setSession(null));
     yield put(setUser(null));
     yield put(setLoading(false));
@@ -206,7 +214,7 @@ function* handleSignInWithGoogle(
       action.payload.accessToken,
     );
     if (session?.access_token) {
-      storage.set('token', session.access_token);
+      setAuthToken(session.access_token);
     }
     yield put(setSession(session));
     if (user?.id) {
@@ -233,7 +241,7 @@ function* handleSignInWithApple(
       action.payload.fullName,
     );
     if (session?.access_token) {
-      storage.set('token', session.access_token);
+      setAuthToken(session.access_token);
     }
     yield put(setSession(session));
     if (user?.id) {

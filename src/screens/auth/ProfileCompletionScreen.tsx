@@ -14,9 +14,8 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { z } from 'zod';
-import { useAuth } from '../../hooks/useAuth';
 import { useAppDispatch, useAppSelector } from '../../store';
-import { setLoading, setError } from '../../store/slices/authSlice';
+import { setLoading, setError, setUser } from '../../store/slices/authSlice';
 import Input from '../../components/Input';
 import Button from '../../components/Button';
 import { supabase } from '../../config/supabase';
@@ -71,18 +70,23 @@ export default function ProfileCompletionScreen() {
         throw new Error('Role not selected');
       }
 
-      // Update profile with selected role
-      const { error: updateError } = await supabase
+      const { data: profile, error: updateError } = await supabase
         .from('profiles')
-        .update({
+        .upsert({
+          id: session.user.id,
           full_name: data.full_name,
           role,
           updated_at: new Date().toISOString(),
         })
-        .eq('id', session.user.id);
+        .select()
+        .single();
 
       if (updateError) {
         throw updateError;
+      }
+
+      if (profile) {
+        dispatch(setUser(profile));
       }
 
       // Save token

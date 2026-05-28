@@ -1,6 +1,7 @@
 import React from 'react';
 import { createNativeBottomTabNavigator } from '@react-navigation/bottom-tabs/unstable';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { useAppSelector } from '../store';
 import type {
   LandlordTabParamList,
   LandlordStackParamList,
@@ -9,10 +10,13 @@ import type {
 import DashboardScreen from '../screens/landlord/DashboardScreen';
 import TenantListScreen from '../screens/landlord/tenants/TenantListScreen';
 import TenantDetailScreen from '../screens/landlord/tenants/TenantDetailScreen';
+import TenantEditScreen from '../screens/landlord/tenants/TenantEditScreen';
 import AssetListScreen from '../screens/landlord/assets/AssetListScreen';
 import AssetEditScreen from '../screens/landlord/assets/AssetEditScreen';
 import LandlordIssueListScreen from '../screens/landlord/issues/IssueListScreen';
 import LandlordIssueDetailScreen from '../screens/landlord/issues/IssueDetailScreen';
+import LandlordBorrowListScreen from '../screens/landlord/borrow/BorrowListScreen';
+import LandlordBorrowDetailScreen from '../screens/landlord/borrow/BorrowDetailScreen';
 import LandlordPaymentsScreen from '../screens/landlord/payments/PaymentsScreen';
 import CreateBillingScreen from '../screens/landlord/payments/CreateBillingScreen';
 import PaymentOverviewScreen from '../screens/landlord/payments/PaymentOverviewScreen';
@@ -71,6 +75,30 @@ function LandlordTabNavigator() {
 }
 
 export default function LandlordStack() {
+  const apartment = useAppSelector(state => state.apartment.apartment);
+
+  if (!apartment) {
+    return (
+      <Stack.Navigator>
+        <Stack.Screen
+          name="ApartmentSetup"
+          component={ApartmentSetupScreen}
+          options={{ title: 'Thiết lập căn hộ' }}
+        />
+        <Stack.Screen
+          name="InviteCode"
+          component={InviteCodeScreen}
+          options={{ title: 'Mã mời' }}
+        />
+        <Stack.Screen
+          name="ChangePassword"
+          component={ChangePasswordScreen}
+          options={{ title: 'Đổi mật khẩu' }}
+        />
+      </Stack.Navigator>
+    );
+  }
+
   return (
     <Stack.Navigator>
       <Stack.Screen
@@ -94,6 +122,11 @@ export default function LandlordStack() {
         options={{ title: 'Chi tiết người thuê' }}
       />
       <Stack.Screen
+        name="TenantEdit"
+        component={TenantEditScreen}
+        options={{ title: 'Cập nhật người thuê' }}
+      />
+      <Stack.Screen
         name="AssetEdit"
         component={AssetEditScreen}
         options={{ title: 'Chỉnh sửa tài sản' }}
@@ -102,6 +135,16 @@ export default function LandlordStack() {
         name="LandlordIssueDetail"
         component={LandlordIssueDetailScreen}
         options={{ title: 'Xử lý sự cố' }}
+      />
+      <Stack.Screen
+        name="LandlordBorrowList"
+        component={LandlordBorrowListScreen}
+        options={{ title: 'Yêu cầu mượn đồ' }}
+      />
+      <Stack.Screen
+        name="LandlordBorrowDetail"
+        component={LandlordBorrowDetailScreen}
+        options={{ title: 'Xử lý mượn đồ' }}
       />
       <Stack.Screen
         name="CreateBilling"

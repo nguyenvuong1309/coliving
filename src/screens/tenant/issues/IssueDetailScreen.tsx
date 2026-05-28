@@ -1,5 +1,5 @@
-import React, { useEffect, useCallback } from 'react';
-import { View, Text, Image, ScrollView, StyleSheet } from 'react-native';
+import React, { useEffect, useCallback, useState } from 'react';
+import { View, Text, Image, StyleSheet } from 'react-native';
 import { useRoute } from '@react-navigation/native';
 import type { RouteProp } from '@react-navigation/native';
 import ScreenWrapper from '../../../components/ScreenWrapper';
@@ -17,6 +17,7 @@ import {
   formatDateTime,
   getStatusLabel,
 } from '../../../utils/formatters';
+import { getSignedImageUrl } from '../../../services/storage';
 import type { TenantStackParamList } from '../../../types/navigation';
 
 type ScreenRouteProp = RouteProp<TenantStackParamList, 'IssueDetail'>;
@@ -42,10 +43,30 @@ const IssueDetailScreen: React.FC = () => {
   const { id } = route.params;
   const dispatch = useAppDispatch();
   const { currentIssue, loading } = useAppSelector(state => state.issue);
+  const [imageUrls, setImageUrls] = useState<string[]>([]);
 
   useEffect(() => {
     dispatch(fetchIssueDetailRequest({ id }));
   }, [id, dispatch]);
+
+  useEffect(() => {
+    let cancelled = false;
+    const loadImages = async () => {
+      const rows = ((currentIssue as any)?.issue_images ?? []) as Array<{
+        image_url: string;
+      }>;
+      const urls = await Promise.all(
+        rows.map(row => getSignedImageUrl('issue-images', row.image_url)),
+      );
+      if (!cancelled) {
+        setImageUrls(urls);
+      }
+    };
+    loadImages();
+    return () => {
+      cancelled = true;
+    };
+  }, [currentIssue]);
 
   const handleUpdateStatus = useCallback(
     (status: 'open' | 'in_progress' | 'resolved' | 'closed' | 'reopened') => {
@@ -131,6 +152,17 @@ const IssueDetailScreen: React.FC = () => {
         <Card style={styles.card}>
           <Text style={styles.sectionTitle}>Mo ta</Text>
           <Text style={styles.descriptionText}>{currentIssue.description}</Text>
+        </Card>
+      )}
+
+      {imageUrls.length > 0 && (
+        <Card style={styles.card}>
+          <Text style={styles.sectionTitle}>Hinh anh</Text>
+          <View style={styles.imageGrid}>
+            {imageUrls.map(url => (
+              <Image key={url} source={{ uri: url }} style={styles.issueImage} />
+            ))}
+          </View>
         </Card>
       )}
 
@@ -368,6 +400,17 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#92400E',
     lineHeight: 20,
+  },
+  imageGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+  },
+  issueImage: {
+    width: 96,
+    height: 96,
+    borderRadius: 8,
+    backgroundColor: '#E2E8F0',
   },
   actionsContainer: {
     flexDirection: 'row',

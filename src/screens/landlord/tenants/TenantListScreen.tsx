@@ -61,9 +61,6 @@ const TenantListScreen: React.FC = () => {
     [],
   );
 
-  const currentMonth = new Date().getMonth() + 1;
-  const currentYear = new Date().getFullYear();
-
   const paymentStatusMap = useMemo(() => {
     const map: Record<string, string> = {};
     payments.forEach(p => {

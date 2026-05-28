@@ -7,7 +7,7 @@ import paymentReducer from './slices/paymentSlice';
 import notificationReducer from './slices/notificationSlice';
 import assetReducer from './slices/assetSlice';
 
-const rootReducer = combineReducers({
+const appReducer = combineReducers({
   auth: authReducer,
   apartment: apartmentReducer,
   borrow: borrowReducer,
@@ -16,5 +16,13 @@ const rootReducer = combineReducers({
   notification: notificationReducer,
   asset: assetReducer,
 });
+
+const rootReducer: typeof appReducer = (state, action) => {
+  if (action.type === 'auth/signOutRequest') {
+    return appReducer(undefined, action);
+  }
+
+  return appReducer(state, action);
+};
 
 export default rootReducer;

@@ -5,7 +5,6 @@ import {
   ActivityIndicator,
   View,
   Platform,
-  Alert,
 } from 'react-native';
 import PressableOpacity from './PressableOpacity';
 import appleAuth, {

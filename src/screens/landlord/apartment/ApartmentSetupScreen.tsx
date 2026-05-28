@@ -10,7 +10,7 @@ import Input from '../../../components/Input';
 import Button from '../../../components/Button';
 import LoadingOverlay from '../../../components/LoadingOverlay';
 import { useApartment } from '../../../hooks/useApartment';
-import { useAppDispatch, useAppSelector } from '../../../store';
+import { useAppDispatch } from '../../../store';
 import {
   createApartmentRequest,
   fetchApartmentRequest,

@@ -51,7 +51,6 @@ const CreateBillingScreen: React.FC = () => {
   const {
     control,
     handleSubmit,
-    watch,
     formState: { errors },
   } = useForm<CreateBillingFormData>({
     resolver: zodResolver(createBillingSchema),
@@ -62,17 +61,27 @@ const CreateBillingScreen: React.FC = () => {
     },
   });
 
-  const selectedMonth = watch('month');
-  const selectedYear = watch('year');
-
   const tenantList = useMemo(() => {
-    return members.map(m => ({
-      userId: m.user_id,
-      name: m.profile?.full_name ?? 'Nguoi thue',
-      room: m.room_name ?? 'Chua gan',
-      defaultAmount: m.rent_amount,
-      amount: adjustedAmounts[m.user_id] ?? m.rent_amount,
-    }));
+    return members.reduce<Array<{
+      userId: string;
+      name: string;
+      room: string;
+      defaultAmount: number;
+      amount: number;
+    }>>((list, m) => {
+      if (m.profile?.role !== 'tenant') {
+        return list;
+      }
+
+      list.push({
+        userId: m.user_id,
+        name: m.profile?.full_name ?? 'Nguoi thue',
+        room: m.room_name ?? 'Chua gan',
+        defaultAmount: m.rent_amount,
+        amount: adjustedAmounts[m.user_id] ?? m.rent_amount,
+      });
+      return list;
+    }, []);
   }, [members, adjustedAmounts]);
 
   const totalAmount = useMemo(() => {
@@ -96,6 +105,20 @@ const CreateBillingScreen: React.FC = () => {
 
   const onSubmit = useCallback(
     (data: CreateBillingFormData) => {
+      if (tenantList.length === 0) {
+        Alert.alert('Chua co nguoi thue', 'Hay moi nguoi thue vao can ho truoc.');
+        return;
+      }
+
+      const tenantsWithoutRent = tenantList.filter(t => t.amount <= 0);
+      if (tenantsWithoutRent.length > 0) {
+        Alert.alert(
+          'Thieu tien thue',
+          'Vui long cap nhat tien thue cho tat ca nguoi thue truoc khi tao ky thu.',
+        );
+        return;
+      }
+
       Alert.alert(
         'Xac nhan tao ky thu tien',
         `Thang ${data.month}/${data.year}\nHan: ${formatDate(
@@ -115,6 +138,10 @@ const CreateBillingScreen: React.FC = () => {
                     month: data.month,
                     year: data.year,
                     dueDate: dueDate.toISOString(),
+                    payments: tenantList.map(tenant => ({
+                      tenantId: tenant.userId,
+                      amount: tenant.amount,
+                    })),
                   }),
                 );
                 navigation.goBack();
@@ -127,7 +154,7 @@ const CreateBillingScreen: React.FC = () => {
     [
       apartment?.id,
       totalAmount,
-      tenantList.length,
+      tenantList,
       dueDate,
       dispatch,
       navigation,

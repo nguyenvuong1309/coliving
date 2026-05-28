@@ -1,4 +1,23 @@
 import {supabase} from '../config/supabase';
+import type {Payment} from '../types/database';
+
+function applyOverdueStatus<T extends Record<string, any>>(payment: T): T {
+  const dueDate = payment.billing_periods?.due_date;
+  if (!dueDate || payment.status !== 'unpaid') {
+    return payment;
+  }
+
+  const now = new Date();
+  const due = new Date(dueDate);
+  now.setHours(0, 0, 0, 0);
+  due.setHours(0, 0, 0, 0);
+
+  if (due < now) {
+    return {...payment, status: 'overdue'};
+  }
+
+  return payment;
+}
 
 export async function createBillingPeriod(
   apartmentId: string,
@@ -6,7 +25,32 @@ export async function createBillingPeriod(
   year: number,
   dueDate: string,
   createdBy: string,
+  paymentRows?: Array<{tenant_id: string; amount: number}>,
 ) {
+  const {data: existing, error: existingError} = await supabase
+    .from('billing_periods')
+    .select('id')
+    .eq('apartment_id', apartmentId)
+    .eq('month', month)
+    .eq('year', year)
+    .maybeSingle();
+
+  if (existingError) {
+    throw existingError;
+  }
+
+  if (existing) {
+    throw new Error('Ky thu tien nay da ton tai');
+  }
+
+  if (new Date(dueDate).toString() === 'Invalid Date') {
+    throw new Error('Han thanh toan khong hop le');
+  }
+
+  if (paymentRows?.some(row => row.amount <= 0)) {
+    throw new Error('So tien thanh toan phai lon hon 0');
+  }
+
   // Create the billing period
   const {data: billing, error: billingError} = await supabase
     .from('billing_periods')
@@ -24,30 +68,38 @@ export async function createBillingPeriod(
     throw billingError;
   }
 
-  // Fetch all members of the apartment (excluding the landlord creating the billing)
-  const {data: members, error: membersError} = await supabase
-    .from('apartment_members')
-    .select('user_id, rent_amount')
-    .eq('apartment_id', apartmentId)
-    .neq('user_id', createdBy);
+  let rows = paymentRows;
 
-  if (membersError) {
-    throw membersError;
-  }
+  if (!rows) {
+    const {data: members, error: membersError} = await supabase
+      .from('apartment_members')
+      .select('user_id, rent_amount')
+      .eq('apartment_id', apartmentId)
+      .neq('user_id', createdBy);
 
-  // Auto-create payment records for each tenant
-  if (members && members.length > 0) {
-    const paymentRows = members.map(member => ({
-      billing_period_id: billing.id,
+    if (membersError) {
+      throw membersError;
+    }
+
+    rows = (members ?? []).map(member => ({
       tenant_id: member.user_id,
       amount: member.rent_amount,
+    }));
+  }
+
+  if (rows.length > 0) {
+    const insertRows = rows.map(row => ({
+      billing_period_id: billing.id,
+      tenant_id: row.tenant_id,
+      amount: row.amount,
     }));
 
     const {error: paymentsError} = await supabase
       .from('payments')
-      .insert(paymentRows);
+      .insert(insertRows);
 
     if (paymentsError) {
+      await supabase.from('billing_periods').delete().eq('id', billing.id);
       throw paymentsError;
     }
   }
@@ -73,7 +125,9 @@ export async function getBillingPeriods(apartmentId: string) {
 export async function getPayments(billingId: string) {
   const {data, error} = await supabase
     .from('payments')
-    .select('*, tenant:tenant_id(id, full_name, avatar_url)')
+    .select(
+      '*, tenant:tenant_id(id, full_name, avatar_url), billing_periods:billing_period_id(*)',
+    )
     .eq('billing_period_id', billingId)
     .order('created_at', {ascending: true});
 
@@ -81,7 +135,7 @@ export async function getPayments(billingId: string) {
     throw error;
   }
 
-  return data;
+  return (data ?? []).map(applyOverdueStatus) as Payment[];
 }
 
 export async function getMyPayments(tenantId: string) {
@@ -95,7 +149,23 @@ export async function getMyPayments(tenantId: string) {
     throw error;
   }
 
-  return data;
+  return (data ?? []).map(applyOverdueStatus) as Payment[];
+}
+
+export async function getPayment(id: string) {
+  const {data, error} = await supabase
+    .from('payments')
+    .select(
+      '*, tenant:tenant_id(id, full_name, avatar_url), billing_periods:billing_period_id(*)',
+    )
+    .eq('id', id)
+    .single();
+
+  if (error) {
+    throw error;
+  }
+
+  return applyOverdueStatus(data) as Payment;
 }
 
 export async function reportPayment(

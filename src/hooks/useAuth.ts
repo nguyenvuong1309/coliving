@@ -1,4 +1,4 @@
-import {useCallback, useEffect} from 'react';
+import {useCallback} from 'react';
 import {useAppDispatch, useAppSelector} from '../store';
 import {
   signInRequest,
@@ -10,7 +10,7 @@ import {
   setUser,
   setSession,
 } from '../store/slices/authSlice';
-import {getAuthToken, getUserRole, clearAuth} from '../utils/mmkv';
+import {getAuthToken, clearAuth} from '../utils/mmkv';
 import {supabase} from '../config/supabase';
 import type {Profile} from '../types/database';
 
@@ -78,6 +78,9 @@ export function useAuth() {
           .single();
         if (profile) {
           dispatch(setUser(profile as Profile));
+        } else {
+          dispatch(setUser(null));
+          return 'needs_profile';
         }
         return true;
       }

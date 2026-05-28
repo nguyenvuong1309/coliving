@@ -6,6 +6,7 @@ import {
   joinApartmentRequest,
   fetchMembersRequest,
   removeMemberRequest,
+  updateMemberRequest,
 } from '../store/slices/apartmentSlice';
 
 export function useApartment() {
@@ -49,6 +50,16 @@ export function useApartment() {
     [dispatch],
   );
 
+  const updateMember = useCallback(
+    (
+      memberId: string,
+      updates: {room_name?: string | null; rent_amount?: number},
+    ) => {
+      dispatch(updateMemberRequest({memberId, updates}));
+    },
+    [dispatch],
+  );
+
   return {
     apartment,
     members,
@@ -59,5 +70,6 @@ export function useApartment() {
     joinApartment,
     fetchMembers,
     removeMember,
+    updateMember,
   };
 }

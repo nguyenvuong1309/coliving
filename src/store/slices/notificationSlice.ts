@@ -46,6 +46,7 @@ const notificationSlice = createSlice({
     },
     setNotifications(state, action: PayloadAction<Notification[]>) {
       state.notifications = action.payload;
+      state.unreadCount = action.payload.filter(item => !item.is_read).length;
       state.loading = false;
     },
     setUnreadCount(state, action: PayloadAction<number>) {
@@ -55,6 +56,24 @@ const notificationSlice = createSlice({
     addNotification(state, action: PayloadAction<Notification>) {
       state.notifications = [action.payload, ...state.notifications];
       state.unreadCount += 1;
+    },
+    markLocalAsRead(state, action: PayloadAction<string>) {
+      const notification = state.notifications.find(
+        item => item.id === action.payload,
+      );
+      if (notification && !notification.is_read) {
+        notification.is_read = true;
+        state.unreadCount = Math.max(0, state.unreadCount - 1);
+      }
+      state.loading = false;
+    },
+    markAllLocalAsRead(state) {
+      state.notifications = state.notifications.map(item => ({
+        ...item,
+        is_read: true,
+      }));
+      state.unreadCount = 0;
+      state.loading = false;
     },
     setError(state, action: PayloadAction<string | null>) {
       state.error = action.payload;
@@ -71,6 +90,8 @@ export const {
   setNotifications,
   setUnreadCount,
   addNotification,
+  markLocalAsRead,
+  markAllLocalAsRead,
   setError,
 } = notificationSlice.actions;
 
@@ -96,6 +117,7 @@ function* handleMarkAsRead(
 ): Generator<any, void, any> {
   try {
     yield call(markAsRead, action.payload.id);
+    yield put(markLocalAsRead(action.payload.id));
   } catch (error: any) {
     yield put(setError(error?.message ?? 'Failed to mark as read'));
   }
@@ -106,7 +128,7 @@ function* handleMarkAllAsRead(
 ): Generator<any, void, any> {
   try {
     yield call(markAllAsRead, action.payload.userId);
-    yield put(setUnreadCount(0));
+    yield put(markAllLocalAsRead());
   } catch (error: any) {
     yield put(setError(error?.message ?? 'Failed to mark all as read'));
   }

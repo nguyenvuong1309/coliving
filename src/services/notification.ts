@@ -1,4 +1,36 @@
 import {supabase} from '../config/supabase';
+import type {NotificationInsert} from '../types/database';
+
+export async function createNotification(payload: NotificationInsert) {
+  const {data, error} = await supabase
+    .from('notifications')
+    .insert(payload)
+    .select()
+    .single();
+
+  if (error) {
+    throw error;
+  }
+
+  return data;
+}
+
+export async function createNotifications(payloads: NotificationInsert[]) {
+  if (payloads.length === 0) {
+    return [];
+  }
+
+  const {data, error} = await supabase
+    .from('notifications')
+    .insert(payloads)
+    .select();
+
+  if (error) {
+    throw error;
+  }
+
+  return data ?? [];
+}
 
 export async function getNotifications(userId: string) {
   const {data, error} = await supabase

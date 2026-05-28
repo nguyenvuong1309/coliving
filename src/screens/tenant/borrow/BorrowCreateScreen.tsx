@@ -1,9 +1,10 @@
-import React, { useEffect, useMemo } from 'react';
-import { View, Text, FlatList, StyleSheet } from 'react-native';
+import React, { useEffect, useMemo, useState } from 'react';
+import { View, Text, FlatList, Platform, StyleSheet } from 'react-native';
 import PressableOpacity from '../../../components/PressableOpacity';
 import { useNavigation } from '@react-navigation/native';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import DateTimePicker from '@react-native-community/datetimepicker';
 import ScreenWrapper from '../../../components/ScreenWrapper';
 import Button from '../../../components/Button';
 import Input from '../../../components/Input';
@@ -27,6 +28,13 @@ const BorrowCreateScreen: React.FC = () => {
   const { apartment } = useApartment();
   const { loading } = useAppSelector(state => state.borrow);
   const assets = useAppSelector(state => state.asset.assets) as Asset[];
+  const minimumDueDate = useMemo(() => new Date(), []);
+  const [showDueDatePicker, setShowDueDatePicker] = useState(false);
+  const [dueDate, setDueDate] = useState(() => {
+    const date = new Date();
+    date.setDate(date.getDate() + 1);
+    return date;
+  });
 
   useEffect(() => {
     if (apartment?.id) {
@@ -47,6 +55,7 @@ const BorrowCreateScreen: React.FC = () => {
       lender_id: '',
       note: '',
       borrow_duration: '',
+      due_date: dueDate.toISOString(),
     },
   });
 
@@ -68,6 +77,7 @@ const BorrowCreateScreen: React.FC = () => {
         lender_id: data.lender_id,
         note: data.note,
         borrow_duration: data.borrow_duration,
+        due_date: dueDate.toISOString(),
       }),
     );
   };
@@ -167,6 +177,30 @@ const BorrowCreateScreen: React.FC = () => {
         )}
       />
 
+      <Text style={styles.label}>Han tra</Text>
+      <PressableOpacity
+        style={styles.dateButton}
+        onPress={() => setShowDueDatePicker(true)}
+      >
+        <Text style={styles.dateButtonText}>
+          {dueDate.toLocaleDateString('vi-VN')}
+        </Text>
+      </PressableOpacity>
+      {showDueDatePicker && (
+        <DateTimePicker
+          value={dueDate}
+          mode="date"
+          minimumDate={minimumDueDate}
+          onChange={(_, selectedDate) => {
+            setShowDueDatePicker(Platform.OS === 'ios');
+            if (selectedDate) {
+              setDueDate(selectedDate);
+              setValue('due_date', selectedDate.toISOString());
+            }
+          }}
+        />
+      )}
+
       <View style={styles.submitContainer}>
         <Button
           title="Gui yeu cau"
@@ -234,6 +268,20 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#DC2626',
     marginBottom: 12,
+  },
+  dateButton: {
+    backgroundColor: '#FFFFFF',
+    borderWidth: 1,
+    borderColor: '#CBD5E1',
+    borderRadius: 10,
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+    marginBottom: 12,
+  },
+  dateButtonText: {
+    fontSize: 15,
+    color: '#1E293B',
+    fontWeight: '500',
   },
   submitContainer: {
     marginTop: 16,

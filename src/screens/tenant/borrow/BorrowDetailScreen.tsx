@@ -1,7 +1,6 @@
 import React, { useEffect, useCallback } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import { useNavigation, useRoute } from '@react-navigation/native';
-import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { useRoute } from '@react-navigation/native';
 import type { RouteProp } from '@react-navigation/native';
 import ScreenWrapper from '../../../components/ScreenWrapper';
 import Card from '../../../components/Card';
@@ -19,10 +18,8 @@ import { formatDate, formatDateTime } from '../../../utils/formatters';
 import type { TenantStackParamList } from '../../../types/navigation';
 
 type ScreenRouteProp = RouteProp<TenantStackParamList, 'BorrowDetail'>;
-type NavigationProp = NativeStackNavigationProp<TenantStackParamList>;
 
 const BorrowDetailScreen: React.FC = () => {
-  const navigation = useNavigation<NavigationProp>();
   const route = useRoute<ScreenRouteProp>();
   const { id } = route.params;
   const dispatch = useAppDispatch();
@@ -69,6 +66,7 @@ const BorrowDetailScreen: React.FC = () => {
   const isLender = currentRequest.lender_id === user?.id;
   const isBorrower = currentRequest.borrower_id === user?.id;
   const { status } = currentRequest;
+  const assetName = (currentRequest as any).assets?.name ?? currentRequest.asset_id;
 
   return (
     <ScreenWrapper>
@@ -77,7 +75,7 @@ const BorrowDetailScreen: React.FC = () => {
       {/* Asset info */}
       <Card style={styles.card}>
         <Text style={styles.sectionTitle}>Thong tin do muon</Text>
-        <Text style={styles.assetName}>{currentRequest.asset_id}</Text>
+        <Text style={styles.assetName}>{assetName}</Text>
       </Card>
 
       {/* People info */}

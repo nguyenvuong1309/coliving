@@ -3,7 +3,6 @@ import {
   View,
   Text,
   Image,
-  ScrollView,
   TextInput,
   StyleSheet,
   Alert,
@@ -23,9 +22,9 @@ import {
 } from '../../../store/slices/issueSlice';
 import {
   formatDate,
-  formatRelativeTime,
   getStatusLabel,
 } from '../../../utils/formatters';
+import { getSignedImageUrl } from '../../../services/storage';
 import type { LandlordStackParamList } from '../../../types/navigation';
 
 type DetailRouteProp = RouteProp<LandlordStackParamList, 'LandlordIssueDetail'>;
@@ -74,10 +73,30 @@ const IssueDetailScreen: React.FC = () => {
   const { currentIssue: issue, loading } = useAppSelector(state => state.issue);
 
   const [note, setNote] = useState('');
+  const [imageUrls, setImageUrls] = useState<string[]>([]);
 
   useEffect(() => {
     dispatch(fetchIssueDetailRequest({ id }));
   }, [id, dispatch]);
+
+  useEffect(() => {
+    let cancelled = false;
+    const loadImages = async () => {
+      const rows = ((issue as any)?.issue_images ?? []) as Array<{
+        image_url: string;
+      }>;
+      const urls = await Promise.all(
+        rows.map(row => getSignedImageUrl('issue-images', row.image_url)),
+      );
+      if (!cancelled) {
+        setImageUrls(urls);
+      }
+    };
+    loadImages();
+    return () => {
+      cancelled = true;
+    };
+  }, [issue]);
 
   const reporterName = useMemo(() => {
     if (!issue) return '';
@@ -180,6 +199,19 @@ const IssueDetailScreen: React.FC = () => {
           <Text style={styles.sectionTitle}>Mo ta</Text>
           <Card>
             <Text style={styles.description}>{issue.description}</Text>
+          </Card>
+        </View>
+      )}
+
+      {imageUrls.length > 0 && (
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Hinh anh</Text>
+          <Card>
+            <View style={styles.imageGrid}>
+              {imageUrls.map(url => (
+                <Image key={url} source={{ uri: url }} style={styles.issueImage} />
+              ))}
+            </View>
           </Card>
         </View>
       )}
@@ -376,6 +408,17 @@ const styles = StyleSheet.create({
   },
   bottomSpacer: {
     height: 24,
+  },
+  imageGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+  },
+  issueImage: {
+    width: 96,
+    height: 96,
+    borderRadius: 8,
+    backgroundColor: '#E2E8F0',
   },
 });
 

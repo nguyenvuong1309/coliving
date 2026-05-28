@@ -1,6 +1,7 @@
 import React from 'react';
 import { createNativeBottomTabNavigator } from '@react-navigation/bottom-tabs/unstable';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { useAppSelector } from '../store';
 import type {
   TenantTabParamList,
   TenantStackParamList,
@@ -20,11 +21,14 @@ import NotificationsScreen from '../screens/tenant/NotificationsScreen';
 import TenantProfileScreen from '../screens/tenant/ProfileScreen';
 import EditProfileScreen from '../screens/shared/EditProfileScreen';
 import ChangePasswordScreen from '../screens/shared/ChangePasswordScreen';
+import JoinApartmentScreen from '../screens/auth/JoinApartmentScreen';
 
 const Tab = createNativeBottomTabNavigator<TenantTabParamList>();
 const Stack = createNativeStackNavigator<TenantStackParamList>();
 
 function TenantTabNavigator() {
+  const unreadCount = useAppSelector(state => state.notification.unreadCount);
+
   return (
     <Tab.Navigator
       screenOptions={{
@@ -54,6 +58,14 @@ function TenantTabNavigator() {
         options={{ tabBarLabel: 'Thanh toán' }}
       />
       <Tab.Screen
+        name="Notifications"
+        component={NotificationsScreen}
+        options={{
+          tabBarLabel: 'Thông báo',
+          tabBarBadge: unreadCount > 0 ? unreadCount : undefined,
+        }}
+      />
+      <Tab.Screen
         name="TenantProfile"
         component={TenantProfileScreen}
         options={{ tabBarLabel: 'Cá nhân' }}
@@ -63,6 +75,25 @@ function TenantTabNavigator() {
 }
 
 export default function TenantStack() {
+  const apartment = useAppSelector(state => state.apartment.apartment);
+
+  if (!apartment) {
+    return (
+      <Stack.Navigator>
+        <Stack.Screen
+          name="JoinApartment"
+          component={JoinApartmentScreen}
+          options={{ title: 'Tham gia căn hộ' }}
+        />
+        <Stack.Screen
+          name="ChangePassword"
+          component={ChangePasswordScreen}
+          options={{ title: 'Đổi mật khẩu' }}
+        />
+      </Stack.Navigator>
+    );
+  }
+
   return (
     <Stack.Navigator>
       <Stack.Screen

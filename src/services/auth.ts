@@ -1,4 +1,5 @@
 import { supabase } from '../config/supabase';
+import Config from 'react-native-config';
 import type { ProfileInsert, ProfileUpdate } from '../types/database';
 
 export async function signUp(
@@ -10,6 +11,12 @@ export async function signUp(
   const { data: authData, error: authError } = await supabase.auth.signUp({
     email,
     password,
+    options: {
+      data: {
+        full_name: fullName,
+        role,
+      },
+    },
   });
 
   if (authError) {
@@ -20,18 +27,20 @@ export async function signUp(
     throw new Error('Sign up failed: no user returned');
   }
 
-  const profile: ProfileInsert = {
-    id: authData.user.id,
-    full_name: fullName,
-    role,
-  };
+  if (authData.session) {
+    const profile: ProfileInsert = {
+      id: authData.user.id,
+      full_name: fullName,
+      role,
+    };
 
-  const { error: profileError } = await supabase
-    .from('profiles')
-    .insert(profile);
+    const { error: profileError } = await supabase
+      .from('profiles')
+      .upsert(profile, {onConflict: 'id'});
 
-  if (profileError) {
-    throw profileError;
+    if (profileError) {
+      throw profileError;
+    }
   }
 
   return authData;
@@ -58,10 +67,27 @@ export async function signOut() {
 }
 
 export async function resetPassword(email: string) {
-  const { data, error } = await supabase.auth.resetPasswordForEmail(email);
+  const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
+    redirectTo:
+      Config.APP_PASSWORD_RESET_REDIRECT_URL ??
+      'coliving://auth/reset-password',
+  });
   if (error) {
     throw error;
   }
+  return data;
+}
+
+export async function resendEmailConfirmation(email: string) {
+  const {data, error} = await supabase.auth.resend({
+    type: 'signup',
+    email,
+  });
+
+  if (error) {
+    throw error;
+  }
+
   return data;
 }
 

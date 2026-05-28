@@ -2,7 +2,6 @@ import React, { useEffect, useCallback } from 'react';
 import { View, Text, FlatList, StyleSheet } from 'react-native';
 import PressableOpacity from '../../components/PressableOpacity';
 import { useNavigation } from '@react-navigation/native';
-import ScreenWrapper from '../../components/ScreenWrapper';
 import EmptyState from '../../components/EmptyState';
 import LoadingOverlay from '../../components/LoadingOverlay';
 import { useAuth } from '../../hooks/useAuth';
@@ -26,7 +25,7 @@ const NotificationsScreen: React.FC = () => {
   const navigation = useNavigation();
   const dispatch = useAppDispatch();
   const { user } = useAuth();
-  const { notifications, loading } = useAppSelector(
+  const { notifications, loading, unreadCount } = useAppSelector(
     state => state.notification,
   );
 
@@ -36,13 +35,17 @@ const NotificationsScreen: React.FC = () => {
     }
   }, [user?.id, dispatch]);
 
-  const handleMarkAsRead = useCallback(
+  const handlePressNotification = useCallback(
     (notif: Notification) => {
       if (!notif.is_read) {
         dispatch(markAsReadRequest({ id: notif.id }));
       }
+      const routeName = notif.data?.route;
+      if (typeof routeName === 'string') {
+        (navigation as any).navigate(routeName, notif.data?.params);
+      }
     },
-    [dispatch],
+    [dispatch, navigation],
   );
 
   const handleMarkAllAsRead = useCallback(() => {
@@ -68,7 +71,7 @@ const NotificationsScreen: React.FC = () => {
     return (
       <PressableOpacity
         style={[styles.notifItem, !item.is_read && styles.notifItemUnread]}
-        onPress={() => handleMarkAsRead(item)}
+        onPress={() => handlePressNotification(item)}
         activeOpacity={0.7}
       >
         <View style={styles.iconContainer}>
@@ -106,6 +109,14 @@ const NotificationsScreen: React.FC = () => {
   return (
     <View style={styles.container}>
       <LoadingOverlay visible={loading} />
+      <View style={styles.screenHeader}>
+        <Text style={styles.screenTitle}>Thong bao</Text>
+        {unreadCount > 0 && (
+          <PressableOpacity onPress={handleMarkAllAsRead} activeOpacity={0.7}>
+            <Text style={styles.headerBtn}>Danh dau tat ca da doc</Text>
+          </PressableOpacity>
+        )}
+      </View>
       <FlatList
         data={notifications}
         keyExtractor={item => item.id}
@@ -130,6 +141,21 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#F8FAFC',
+  },
+  screenHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    backgroundColor: '#FFFFFF',
+    borderBottomWidth: 1,
+    borderBottomColor: '#E2E8F0',
+  },
+  screenTitle: {
+    fontSize: 20,
+    fontWeight: '700',
+    color: '#1E293B',
   },
   headerBtn: {
     fontSize: 13,

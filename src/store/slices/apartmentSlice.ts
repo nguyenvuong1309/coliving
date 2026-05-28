@@ -3,13 +3,20 @@ import {call, put, select, takeLatest} from 'redux-saga/effects';
 import {
   createApartment,
   getApartment,
+  getApartmentForUser,
   getApartmentByInviteCode,
   joinApartment,
   getMembers,
   removeMember,
+  updateMember,
   generateInviteCode,
 } from '../../services/apartment';
-import type {Apartment, ApartmentMember} from '../../types/database';
+import {createNotification} from '../../services/notification';
+import type {
+  Apartment,
+  ApartmentMember,
+  ApartmentMemberUpdate,
+} from '../../types/database';
 import type {RootState} from '../index';
 
 interface ApartmentMemberWithProfile extends ApartmentMember {
@@ -49,6 +56,13 @@ const apartmentSlice = createSlice({
       state.loading = true;
       state.error = null;
     },
+    fetchCurrentApartmentRequest(
+      state,
+      _action: PayloadAction<{userId: string; role: 'tenant' | 'landlord'}>,
+    ) {
+      state.loading = true;
+      state.error = null;
+    },
     joinApartmentRequest(
       state,
       _action: PayloadAction<{inviteCode: string}>,
@@ -70,11 +84,26 @@ const apartmentSlice = createSlice({
       state.loading = true;
       state.error = null;
     },
+    updateMemberRequest(
+      state,
+      _action: PayloadAction<{memberId: string; updates: ApartmentMemberUpdate}>,
+    ) {
+      state.loading = true;
+      state.error = null;
+    },
     setApartment(state, action: PayloadAction<Apartment | null>) {
       state.apartment = action.payload;
     },
     setMembers(state, action: PayloadAction<ApartmentMemberWithProfile[]>) {
       state.members = action.payload;
+    },
+    upsertMember(state, action: PayloadAction<ApartmentMemberWithProfile>) {
+      const idx = state.members.findIndex(m => m.id === action.payload.id);
+      if (idx === -1) {
+        state.members = [...state.members, action.payload];
+      } else {
+        state.members[idx] = action.payload;
+      }
     },
     setLoading(state, action: PayloadAction<boolean>) {
       state.loading = action.payload;
@@ -89,11 +118,14 @@ const apartmentSlice = createSlice({
 export const {
   createApartmentRequest,
   fetchApartmentRequest,
+  fetchCurrentApartmentRequest,
   joinApartmentRequest,
   fetchMembersRequest,
   removeMemberRequest,
+  updateMemberRequest,
   setApartment,
   setMembers,
+  upsertMember,
   setLoading,
   setError,
 } = apartmentSlice.actions;
@@ -133,6 +165,30 @@ function* handleFetchApartment(
   }
 }
 
+function* handleFetchCurrentApartment(
+  action: ReturnType<typeof fetchCurrentApartmentRequest>,
+): Generator<any, void, any> {
+  try {
+    const apartment = yield call(
+      getApartmentForUser,
+      action.payload.userId,
+      action.payload.role,
+    );
+    yield put(setApartment(apartment));
+    if (apartment?.id) {
+      const members = yield call(getMembers, apartment.id);
+      yield put(setMembers(members));
+    } else {
+      yield put(setMembers([]));
+    }
+    yield put(setLoading(false));
+  } catch (error: any) {
+    yield put(setApartment(null));
+    yield put(setMembers([]));
+    yield put(setError(error.message ?? 'Failed to fetch apartment'));
+  }
+}
+
 function* handleJoinApartment(
   action: ReturnType<typeof joinApartmentRequest>,
 ): Generator<any, void, any> {
@@ -147,6 +203,30 @@ function* handleJoinApartment(
     );
     yield call(joinApartment, apartment.id, userId);
     yield put(setApartment(apartment));
+    const members = yield call(getMembers, apartment.id);
+    yield put(setMembers(members));
+    try {
+      const joinedMember = members.find(
+        (member: ApartmentMemberWithProfile) => member.user_id === userId,
+      );
+      yield call(createNotification, {
+        user_id: apartment.landlord_id,
+        apartment_id: apartment.id,
+        type: 'tenant_joined',
+        title: 'Nguoi thue moi da tham gia',
+        body: `${
+          joinedMember?.profile?.full_name ?? 'Nguoi thue moi'
+        } vua tham gia can ho ${apartment.name}.`,
+        data: {
+          route: 'TenantDetail',
+          params: {id: userId},
+          entityType: 'tenant',
+          entityId: userId,
+        },
+      });
+    } catch {
+      // Notification delivery must not block apartment onboarding.
+    }
     yield put(setLoading(false));
   } catch (error: any) {
     yield put(setError(error.message ?? 'Failed to join apartment'));
@@ -176,12 +256,54 @@ function* handleRemoveMember(
   }
 }
 
+function* handleUpdateMember(
+  action: ReturnType<typeof updateMemberRequest>,
+): Generator<any, void, any> {
+  try {
+    const member = yield call(
+      updateMember,
+      action.payload.memberId,
+      action.payload.updates,
+    );
+    yield put(upsertMember(member));
+    if (
+      action.payload.updates.room_name !== undefined ||
+      action.payload.updates.rent_amount !== undefined
+    ) {
+      try {
+        yield call(createNotification, {
+          user_id: member.user_id,
+          apartment_id: member.apartment_id,
+          type: 'tenant_profile_updated',
+          title: 'Thong tin phong da duoc cap nhat',
+          body: 'Chu nha da cap nhat phong hoac tien thue cua ban.',
+          data: {
+            route: 'TenantProfile',
+            entityType: 'tenant',
+            entityId: member.user_id,
+          },
+        });
+      } catch {
+        // Notification delivery must not block member updates.
+      }
+    }
+    yield put(setLoading(false));
+  } catch (error: any) {
+    yield put(setError(error.message ?? 'Failed to update member'));
+  }
+}
+
 export function* apartmentSaga() {
   yield takeLatest(createApartmentRequest.type, handleCreateApartment);
   yield takeLatest(fetchApartmentRequest.type, handleFetchApartment);
+  yield takeLatest(
+    fetchCurrentApartmentRequest.type,
+    handleFetchCurrentApartment,
+  );
   yield takeLatest(joinApartmentRequest.type, handleJoinApartment);
   yield takeLatest(fetchMembersRequest.type, handleFetchMembers);
   yield takeLatest(removeMemberRequest.type, handleRemoveMember);
+  yield takeLatest(updateMemberRequest.type, handleUpdateMember);
 }
 
 export default apartmentSlice.reducer;

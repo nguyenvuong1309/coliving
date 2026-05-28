@@ -11,6 +11,9 @@ apply from: project(':react-native-config').projectDir.getPath() + "/dotenv.grad
 
 react {
     debuggableVariants = ["devDebug", "prodDebug"]
+    def osName = System.getProperty("os.name").toLowerCase()
+    def hermescDir = osName.contains("mac") ? "osx-bin" : osName.contains("windows") ? "win64-bin" : "linux64-bin"
+    hermesCommand = "$rootDir/../node_modules/hermes-compiler/hermesc/${hermescDir}/hermesc"
     autolinkLibrariesWithApp()
 }
 
@@ -72,8 +75,7 @@ android {
             signingConfig signingConfigs.debug
         }
         release {
-            // Neu chua co keystore release thi ky bang debug de tranh fail build local.
-            signingConfig signingConfigs.release.storeFile ? signingConfigs.release : signingConfigs.debug
+            signingConfig signingConfigs.release
             minifyEnabled enableProguardInReleaseBuilds
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
         }

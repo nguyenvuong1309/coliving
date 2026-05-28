@@ -13,8 +13,10 @@ export default function SplashScreen() {
 
   useEffect(() => {
     const init = async () => {
-      const hasSession = await checkSession();
-      if (!hasSession) {
+      const sessionState = await checkSession();
+      if (sessionState === 'needs_profile') {
+        navigation.replace('RoleSelection');
+      } else if (!sessionState) {
         navigation.replace('Welcome');
       }
     };

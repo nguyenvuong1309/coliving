@@ -7,6 +7,7 @@ export const borrowRequestSchema = z.object({
   borrow_duration: z
     .string()
     .min(1, 'Vui lòng nhập thời gian mượn'),
+  due_date: z.string().optional(),
 });
 
 export type BorrowRequestFormData = z.infer<typeof borrowRequestSchema>;

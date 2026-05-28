@@ -1,0 +1,76 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+jobs:
+  quality-and-android-release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.33.4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22.11.0
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Typecheck
+        run: pnpm exec tsc --noEmit
+
+      - name: Lint
+        run: pnpm lint
+
+      - name: Unit tests
+        run: pnpm test --runInBand
+
+      - name: Validate release secrets
+        run: |
+          test -n "${{ secrets.SUPABASE_URL }}"
+          test -n "${{ secrets.SUPABASE_ANON_KEY }}"
+          test -n "${{ secrets.GOOGLE_WEB_CLIENT_ID }}"
+          test -n "${{ secrets.GOOGLE_REVERSED_CLIENT_ID }}"
+          test -n "${{ secrets.ANDROID_RELEASE_KEYSTORE_BASE64 }}"
+          test -n "${{ secrets.RELEASE_STORE_PASSWORD }}"
+          test -n "${{ secrets.RELEASE_KEY_ALIAS }}"
+          test -n "${{ secrets.RELEASE_KEY_PASSWORD }}"
+
+      - name: Write production env
+        run: |
+          cat > .env.production <<'EOF'
+          ENV=production
+          SUPABASE_URL=${{ secrets.SUPABASE_URL }}
+          SUPABASE_ANON_KEY=${{ secrets.SUPABASE_ANON_KEY }}
+          APP_NAME=CoLiving
+          APP_DISPLAY_NAME=CoLiving
+          APP_VERSION=${{ vars.APP_VERSION || '1.0.0' }}
+          APP_PASSWORD_RESET_REDIRECT_URL=coliving://auth/reset-password
+          GOOGLE_WEB_CLIENT_ID=${{ secrets.GOOGLE_WEB_CLIENT_ID }}
+          GOOGLE_REVERSED_CLIENT_ID=${{ secrets.GOOGLE_REVERSED_CLIENT_ID }}
+          EOF
+
+      - name: Decode Android keystore
+        run: |
+          printf '%s' "${{ secrets.ANDROID_RELEASE_KEYSTORE_BASE64 }}" | base64 -d > android/app/release.keystore
+
+      - name: Build Android prod release
+        working-directory: android
+        env:
+          ORG_GRADLE_PROJECT_RELEASE_STORE_FILE: release.keystore
+          ORG_GRADLE_PROJECT_RELEASE_STORE_PASSWORD: ${{ secrets.RELEASE_STORE_PASSWORD }}
+          ORG_GRADLE_PROJECT_RELEASE_KEY_ALIAS: ${{ secrets.RELEASE_KEY_ALIAS }}
+          ORG_GRADLE_PROJECT_RELEASE_KEY_PASSWORD: ${{ secrets.RELEASE_KEY_PASSWORD }}
+        run: ./gradlew assembleProdRelease

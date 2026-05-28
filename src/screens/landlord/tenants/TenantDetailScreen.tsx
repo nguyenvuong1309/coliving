@@ -183,6 +183,13 @@ const TenantDetailScreen: React.FC = () => {
 
       {/* Remove Button */}
       <Button
+        title="Chinh sua phong / tien thue"
+        onPress={() => navigation.navigate('TenantEdit', { id })}
+        variant="outline"
+        style={styles.editBtn}
+      />
+
+      <Button
         title="Xoa khoi can ho"
         onPress={handleRemove}
         variant="danger"
@@ -271,6 +278,9 @@ const styles = StyleSheet.create({
   removeBtn: {
     marginTop: 8,
     marginBottom: 32,
+  },
+  editBtn: {
+    marginTop: 8,
   },
 });
 

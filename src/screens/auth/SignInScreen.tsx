@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import {
   View,
   Text,
@@ -27,8 +27,21 @@ type Nav = NativeStackNavigationProp<AuthStackParamList, 'SignIn'>;
 export default function SignInScreen() {
   const navigation = useNavigation<Nav>();
   const dispatch = useAppDispatch();
-  const { signIn, signInWithGoogle, signInWithApple, loading, error } =
-    useAuth();
+  const {
+    signIn,
+    signInWithGoogle,
+    signInWithApple,
+    loading,
+    error,
+    session,
+    user,
+  } = useAuth();
+
+  useEffect(() => {
+    if (session && !user) {
+      navigation.replace('RoleSelection');
+    }
+  }, [navigation, session, user]);
 
   const {
     control,

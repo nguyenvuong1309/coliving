@@ -4,11 +4,13 @@ import {
   createBillingPeriod,
   getBillingPeriods,
   getPayments,
+  getPayment,
   getMyPayments,
   reportPayment,
   confirmPayment,
   rejectPayment,
 } from '../../services/payment';
+import {createNotification} from '../../services/notification';
 import {uploadImage, getImageUrl} from '../../services/storage';
 import type {BillingPeriod, Payment} from '../../types/database';
 import type {RootState} from '../index';
@@ -40,6 +42,7 @@ const paymentSlice = createSlice({
         month: number;
         year: number;
         dueDate: string;
+        payments?: Array<{tenantId: string; amount: number}>;
       }>,
     ) {
       state.loading = true;
@@ -142,6 +145,10 @@ function* handleCreateBilling(
       action.payload.year,
       action.payload.dueDate,
       userId,
+      action.payload.payments?.map(payment => ({
+        tenant_id: payment.tenantId,
+        amount: payment.amount,
+      })),
     );
     const periods = yield call(
       getBillingPeriods,
@@ -212,7 +219,30 @@ function* handleReportPayment(
       });
       receiptUrl = getImageUrl('payment-receipts', path);
     }
-    const updated = yield call(reportPayment, paymentId, method, receiptUrl);
+    yield call(reportPayment, paymentId, method, receiptUrl);
+    const payment = yield call(getPayment, paymentId);
+    const tenantName =
+      (payment as any).tenant?.full_name ?? 'Nguoi thue';
+    const billing = (payment as any).billing_periods;
+    if (billing?.created_by) {
+      try {
+        yield call(createNotification, {
+          user_id: billing.created_by,
+          apartment_id: billing.apartment_id,
+          type: 'payment',
+          title: 'Nguoi thue da bao thanh toan',
+          body: `${tenantName} da bao thanh toan.`,
+          data: {
+            route: 'PaymentConfirm',
+            params: {id: paymentId},
+            entityType: 'payment',
+            entityId: paymentId,
+          },
+        });
+      } catch {
+        // Notification delivery must not block payment reporting.
+      }
+    }
 
     const userId = yield select((s: RootState) => s.auth.user?.id);
     if (userId) {
@@ -220,7 +250,6 @@ function* handleReportPayment(
       yield put(setMyPayments(payments));
     }
     yield put(setLoading(false));
-    return updated;
   } catch (error: any) {
     yield put(setError(error.message ?? 'Failed to report payment'));
   }
@@ -235,6 +264,29 @@ function* handleConfirmPayment(
       throw new Error('Chưa đăng nhập');
     }
     yield call(confirmPayment, action.payload.paymentId, userId);
+    const payment = yield call(getPayment, action.payload.paymentId);
+    const billing = (payment as any).billing_periods;
+    if (payment.billing_period_id) {
+      const payments = yield call(getPayments, payment.billing_period_id);
+      yield put(setPayments(payments));
+    }
+    try {
+      yield call(createNotification, {
+        user_id: payment.tenant_id,
+        apartment_id: billing?.apartment_id ?? null,
+        type: 'payment',
+        title: 'Thanh toan da duoc xac nhan',
+        body: 'Chu nha da xac nhan thanh toan cua ban.',
+        data: {
+          route: 'PaymentDetail',
+          params: {id: payment.id},
+          entityType: 'payment',
+          entityId: payment.id,
+        },
+      });
+    } catch {
+      // Notification delivery must not block payment confirmation.
+    }
     yield put(setLoading(false));
   } catch (error: any) {
     yield put(setError(error.message ?? 'Failed to confirm payment'));
@@ -250,6 +302,31 @@ function* handleRejectPayment(
       action.payload.paymentId,
       action.payload.note,
     );
+    const payment = yield call(getPayment, action.payload.paymentId);
+    const billing = (payment as any).billing_periods;
+    if (payment.billing_period_id) {
+      const payments = yield call(getPayments, payment.billing_period_id);
+      yield put(setPayments(payments));
+    }
+    try {
+      yield call(createNotification, {
+        user_id: payment.tenant_id,
+        apartment_id: billing?.apartment_id ?? null,
+        type: 'payment',
+        title: 'Thanh toan can kiem tra lai',
+        body:
+          action.payload.note ??
+          'Chu nha chua xac nhan duoc thanh toan cua ban.',
+        data: {
+          route: 'PaymentDetail',
+          params: {id: payment.id},
+          entityType: 'payment',
+          entityId: payment.id,
+        },
+      });
+    } catch {
+      // Notification delivery must not block payment rejection.
+    }
     yield put(setLoading(false));
   } catch (error: any) {
     yield put(setError(error.message ?? 'Failed to reject payment'));

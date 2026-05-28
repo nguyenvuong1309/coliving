@@ -6,6 +6,7 @@ import {
   updateBorrowStatus,
   getBorrowRequest,
 } from '../../services/borrow';
+import {createNotification} from '../../services/notification';
 import type {BorrowRequest, BorrowRequestInsert} from '../../types/database';
 
 type BorrowStatus =
@@ -34,6 +35,41 @@ const initialState: BorrowState = {
   loading: false,
   error: null,
 };
+
+function getBorrowStatusMessage(status: BorrowStatus, assetName: string) {
+  switch (status) {
+    case 'approved':
+      return {
+        title: 'Yeu cau muon do da duoc duyet',
+        body: `Yeu cau muon ${assetName} da duoc chap nhan.`,
+      };
+    case 'rejected':
+      return {
+        title: 'Yeu cau muon do bi tu choi',
+        body: `Yeu cau muon ${assetName} da bi tu choi.`,
+      };
+    case 'in_use':
+      return {
+        title: 'Tai san dang duoc muon',
+        body: `${assetName} da duoc danh dau dang muon.`,
+      };
+    case 'return_requested':
+      return {
+        title: 'Nguoi muon da bao tra do',
+        body: `Nguoi muon da bao tra ${assetName}.`,
+      };
+    case 'returned':
+      return {
+        title: 'Da xac nhan tra do',
+        body: `${assetName} da duoc xac nhan da tra.`,
+      };
+    default:
+      return {
+        title: 'Yeu cau muon do duoc cap nhat',
+        body: `Yeu cau muon ${assetName} vua duoc cap nhat.`,
+      };
+  }
+}
 
 const borrowSlice = createSlice({
   name: 'borrow',
@@ -112,8 +148,33 @@ function* handleCreateBorrowRequest(
   action: ReturnType<typeof createBorrowRequestRequest>,
 ): Generator<any, void, any> {
   try {
-    const request = yield call(createBorrowRequest, action.payload);
+    const created = yield call(createBorrowRequest, action.payload);
+    const request = yield call(getBorrowRequest, created.id);
     yield put(setCurrentRequest(request));
+    const assetName = (request as any).assets?.name ?? 'tai san';
+    const borrowerName =
+      (request as any).borrower?.full_name ?? 'Nguoi thue';
+    const lenderRoute =
+      (request as any).lender?.role === 'landlord'
+        ? 'LandlordBorrowDetail'
+        : 'BorrowDetail';
+    try {
+      yield call(createNotification, {
+        user_id: request.lender_id,
+        apartment_id: request.apartment_id,
+        type: 'borrow',
+        title: 'Co yeu cau muon do moi',
+        body: `${borrowerName} muon ${assetName}.`,
+        data: {
+          route: lenderRoute,
+          params: {id: request.id},
+          entityType: 'borrow',
+          entityId: request.id,
+        },
+      });
+    } catch {
+      // Notification delivery must not block borrow creation.
+    }
     yield put(setLoading(false));
   } catch (error: any) {
     yield put(setError(error.message ?? 'Failed to create borrow request'));
@@ -124,12 +185,43 @@ function* handleUpdateBorrowStatus(
   action: ReturnType<typeof updateBorrowStatusRequest>,
 ): Generator<any, void, any> {
   try {
-    const request = yield call(
+    const updated = yield call(
       updateBorrowStatus,
       action.payload.id,
       action.payload.status,
     );
+    const request = yield call(getBorrowRequest, updated.id);
     yield put(setCurrentRequest(request));
+    const assetName = (request as any).assets?.name ?? 'tai san';
+    const message = getBorrowStatusMessage(action.payload.status, assetName);
+    const recipientId =
+      action.payload.status === 'return_requested'
+        ? request.lender_id
+        : request.borrower_id;
+    const recipientRole =
+      recipientId === request.lender_id
+        ? (request as any).lender?.role
+        : (request as any).borrower?.role;
+    const route =
+      recipientRole === 'landlord' ? 'LandlordBorrowDetail' : 'BorrowDetail';
+    try {
+      yield call(createNotification, {
+        user_id: recipientId,
+        apartment_id: request.apartment_id,
+        type: 'borrow',
+        title: message.title,
+        body: message.body,
+        data: {
+          route,
+          params: {id: request.id},
+          entityType: 'borrow',
+          entityId: request.id,
+          status: action.payload.status,
+        },
+      });
+    } catch {
+      // Notification delivery must not block borrow status updates.
+    }
     yield put(setLoading(false));
   } catch (error: any) {
     yield put(setError(error.message ?? 'Failed to update borrow status'));

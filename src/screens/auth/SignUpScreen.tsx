@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
-  StyleSheet,
   Alert,
+  StyleSheet,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
@@ -21,6 +21,8 @@ import { GoogleSignInButton } from '../../components/GoogleSignInButton';
 import { AppleSignInButton } from '../../components/AppleSignInButton';
 import { useAppDispatch } from '../../store';
 import { setError as setAuthError } from '../../store/slices/authSlice';
+import { setUserRole } from '../../utils/mmkv';
+import { resendEmailConfirmation } from '../../services/auth';
 import type { AuthStackParamList } from '../../types/navigation';
 
 type Nav = NativeStackNavigationProp<AuthStackParamList, 'SignUp'>;
@@ -28,11 +30,21 @@ type Nav = NativeStackNavigationProp<AuthStackParamList, 'SignUp'>;
 export default function SignUpScreen() {
   const navigation = useNavigation<Nav>();
   const dispatch = useAppDispatch();
-  const { signUp, signInWithGoogle, signInWithApple, loading, error } =
-    useAuth();
+  const {
+    signUp,
+    signInWithGoogle,
+    signInWithApple,
+    loading,
+    error,
+    session,
+    user,
+  } = useAuth();
   const [selectedRole, setSelectedRole] = useState<'tenant' | 'landlord'>(
     'tenant',
   );
+  const submittedEmailRef = React.useRef<string | null>(null);
+  const [confirmationSent, setConfirmationSent] = useState(false);
+  const prevLoadingRef = React.useRef(false);
 
   const {
     control,
@@ -49,15 +61,51 @@ export default function SignUpScreen() {
     },
   });
 
+  useEffect(() => {
+    if (session && !user) {
+      navigation.replace('RoleSelection');
+    }
+  }, [navigation, session, user]);
+
+  useEffect(() => {
+    if (
+      submittedEmailRef.current &&
+      prevLoadingRef.current &&
+      !loading &&
+      !error &&
+      !session
+    ) {
+      setConfirmationSent(true);
+    }
+    prevLoadingRef.current = loading;
+  }, [error, loading, session]);
+
   const onSubmit = (data: SignUpData) => {
+    submittedEmailRef.current = data.email;
+    setConfirmationSent(false);
     signUp(data.email, data.password, data.full_name, selectedRole);
   };
 
+  const handleResendConfirmation = async () => {
+    if (!submittedEmailRef.current) {
+      return;
+    }
+
+    try {
+      await resendEmailConfirmation(submittedEmailRef.current);
+      Alert.alert('Da gui lai', 'Vui long kiem tra email xac nhan.');
+    } catch (err: any) {
+      Alert.alert('Loi', err?.message ?? 'Khong gui lai duoc email xac nhan');
+    }
+  };
+
   const handleGoogleSuccess = (idToken: string, accessToken: string) => {
+    setUserRole(selectedRole);
     signInWithGoogle(idToken, accessToken);
   };
 
   const handleAppleSuccess = (idToken: string, fullName?: any) => {
+    setUserRole(selectedRole);
     signInWithApple(idToken, fullName);
   };
 
@@ -211,6 +259,22 @@ export default function SignUpScreen() {
           </Text>
         )}
 
+        {confirmationSent && (
+          <View style={styles.confirmationBox}>
+            <Text style={styles.confirmationTitle}>Kiem tra email</Text>
+            <Text style={styles.confirmationText}>
+              Tai khoan da duoc tao. Hay mo link xac nhan trong email truoc khi
+              dang nhap.
+            </Text>
+            <Button
+              title="Gui lai email xac nhan"
+              onPress={handleResendConfirmation}
+              variant="outline"
+              style={styles.resendBtn}
+            />
+          </View>
+        )}
+
         <Button
           testID="signup-submit-btn"
           title="Đăng ký"
@@ -294,6 +358,28 @@ const styles = StyleSheet.create({
     fontSize: 14,
     marginTop: 8,
     textAlign: 'center',
+  },
+  confirmationBox: {
+    marginTop: 16,
+    padding: 14,
+    borderRadius: 10,
+    backgroundColor: '#EFF6FF',
+    borderWidth: 1,
+    borderColor: '#BFDBFE',
+  },
+  confirmationTitle: {
+    fontSize: 15,
+    fontWeight: '700',
+    color: '#1E3A8A',
+    marginBottom: 4,
+  },
+  confirmationText: {
+    fontSize: 13,
+    color: '#1E40AF',
+    lineHeight: 18,
+  },
+  resendBtn: {
+    marginTop: 12,
   },
   submitBtn: {
     marginTop: 24,

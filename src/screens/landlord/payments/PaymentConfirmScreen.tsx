@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useCallback } from 'react';
+import React, { useEffect, useMemo, useCallback, useState } from 'react';
 import { View, Text, Image, Alert, StyleSheet } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -17,8 +17,8 @@ import {
 import {
   formatCurrency,
   formatDate,
-  getStatusLabel,
 } from '../../../utils/formatters';
+import { getSignedImageUrl } from '../../../services/storage';
 import type { LandlordStackParamList } from '../../../types/navigation';
 
 type NavigationProp = NativeStackNavigationProp<LandlordStackParamList>;
@@ -31,6 +31,7 @@ const PaymentConfirmScreen: React.FC = () => {
   const { id } = route.params;
   const { members } = useApartment();
   const { payments, loading } = useAppSelector(state => state.payment);
+  const [receiptUrl, setReceiptUrl] = useState<string | null>(null);
 
   const payment = useMemo(
     () => payments.find(p => p.id === id),
@@ -79,6 +80,27 @@ const PaymentConfirmScreen: React.FC = () => {
       ],
     );
   }, [id, tenantName, dispatch, navigation]);
+
+  useEffect(() => {
+    let cancelled = false;
+    const loadReceipt = async () => {
+      if (!payment?.receipt_image_url) {
+        setReceiptUrl(null);
+        return;
+      }
+      const signedUrl = await getSignedImageUrl(
+        'payment-receipts',
+        payment.receipt_image_url,
+      );
+      if (!cancelled) {
+        setReceiptUrl(signedUrl);
+      }
+    };
+    loadReceipt();
+    return () => {
+      cancelled = true;
+    };
+  }, [payment?.receipt_image_url]);
 
   if (!payment) {
     return (
@@ -136,11 +158,11 @@ const PaymentConfirmScreen: React.FC = () => {
       </Card>
 
       {/* Receipt Image */}
-      {payment.receipt_image_url && (
+      {receiptUrl && (
         <View style={styles.receiptSection}>
           <Text style={styles.sectionTitle}>Hinh anh xac nhan</Text>
           <Image
-            source={{ uri: payment.receipt_image_url }}
+            source={{ uri: receiptUrl }}
             style={styles.receiptImage}
             resizeMode="contain"
           />

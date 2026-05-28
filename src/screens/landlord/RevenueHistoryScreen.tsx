@@ -5,7 +5,6 @@ import EmptyState from '../../components/EmptyState';
 import ScreenWrapper from '../../components/ScreenWrapper';
 import { useAppSelector } from '../../store';
 import { formatCurrency } from '../../utils/formatters';
-import type { BillingPeriod } from '../../types/database';
 
 interface MonthRevenue {
   periodId: string;

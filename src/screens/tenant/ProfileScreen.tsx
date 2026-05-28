@@ -1,6 +1,7 @@
 import React, { useCallback } from 'react';
 import { View, Text, StyleSheet, Alert } from 'react-native';
 import PressableOpacity from '../../components/PressableOpacity';
+import Config from 'react-native-config';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import ScreenWrapper from '../../components/ScreenWrapper';
@@ -15,7 +16,7 @@ type NavigationProp = NativeStackNavigationProp<TenantStackParamList>;
 
 const ProfileScreen: React.FC = () => {
   const navigation = useNavigation<NavigationProp>();
-  const { user, signOut, loading } = useAuth();
+  const { user, session, signOut, loading } = useAuth();
   const { apartment, members } = useApartment();
 
   const currentMember = members.find(m => m.user_id === user?.id);
@@ -41,7 +42,9 @@ const ProfileScreen: React.FC = () => {
           size={80}
         />
         <Text style={styles.userName}>{user?.full_name ?? 'Khong ro'}</Text>
-        <Text style={styles.userEmail}>{user?.id ?? ''}</Text>
+        <Text style={styles.userEmail}>
+          {session?.user?.email ?? 'Chua co email'}
+        </Text>
         <View style={styles.roleBadge}>
           <Text style={styles.roleBadgeText}>
             {user?.role === 'tenant' ? 'Nguoi thue' : 'Chu nha'}
@@ -112,7 +115,7 @@ const ProfileScreen: React.FC = () => {
 
         <View style={styles.settingRow}>
           <Text style={styles.settingLabel}>Phien ban</Text>
-          <Text style={styles.settingValue}>1.0.0</Text>
+          <Text style={styles.settingValue}>{Config.APP_VERSION ?? '1.0.0'}</Text>
         </View>
       </Card>
 

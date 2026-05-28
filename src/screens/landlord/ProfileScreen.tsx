@@ -1,6 +1,7 @@
 import React, { useCallback } from 'react';
 import { View, Text, Alert, StyleSheet } from 'react-native';
 import PressableOpacity from '../../components/PressableOpacity';
+import Config from 'react-native-config';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import ScreenWrapper from '../../components/ScreenWrapper';
@@ -15,7 +16,7 @@ type NavigationProp = NativeStackNavigationProp<LandlordStackParamList>;
 
 const ProfileScreen: React.FC = () => {
   const navigation = useNavigation<NavigationProp>();
-  const { user, signOut } = useAuth();
+  const { user, session, signOut } = useAuth();
   const { apartment } = useApartment();
 
   const handleSignOut = useCallback(() => {
@@ -39,6 +40,9 @@ const ProfileScreen: React.FC = () => {
           size={80}
         />
         <Text style={styles.name}>{user?.full_name ?? 'Chu nha'}</Text>
+        <Text style={styles.email}>
+          {session?.user?.email ?? 'Chua co email'}
+        </Text>
         <View style={styles.roleBadge}>
           <Text style={styles.roleBadgeText}>Chu nha</Text>
         </View>
@@ -96,6 +100,20 @@ const ProfileScreen: React.FC = () => {
             <Text style={styles.settingChevron}>{'>'}</Text>
           </PressableOpacity>
           <View style={styles.settingSeparator} />
+          <View style={styles.settingItem}>
+            <Text style={styles.settingText}>So dien thoai</Text>
+            <Text style={styles.settingMutedText}>
+              {user?.phone ?? 'Chua cap nhat'}
+            </Text>
+          </View>
+          <View style={styles.settingSeparator} />
+          <View style={styles.settingItem}>
+            <Text style={styles.settingText}>Phien ban</Text>
+            <Text style={styles.settingMutedText}>
+              {Config.APP_VERSION ?? '1.0.0'}
+            </Text>
+          </View>
+          <View style={styles.settingSeparator} />
           <PressableOpacity
             style={styles.settingItem}
             onPress={() => navigation.navigate('RevenueHistory')}
@@ -146,6 +164,11 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: '#1E293B',
     marginTop: 14,
+  },
+  email: {
+    fontSize: 14,
+    color: '#64748B',
+    marginTop: 4,
   },
   roleBadge: {
     marginTop: 8,
@@ -214,6 +237,10 @@ const styles = StyleSheet.create({
   settingText: {
     fontSize: 15,
     color: '#1E293B',
+  },
+  settingMutedText: {
+    fontSize: 14,
+    color: '#64748B',
   },
   settingChevron: {
     fontSize: 18,
