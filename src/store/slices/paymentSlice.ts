@@ -4,6 +4,7 @@ import {
   createBillingPeriod,
   getBillingPeriods,
   getPayments,
+  getPaymentsForApartment,
   getPayment,
   getMyPayments,
   reportPayment,
@@ -12,7 +13,7 @@ import {
 } from '../../services/payment';
 import {createNotification} from '../../services/notification';
 import {uploadImage, getImageUrl} from '../../services/storage';
-import type {BillingPeriod, Payment} from '../../types/database';
+import type {BillingPeriod, Json, Payment} from '../../types/database';
 import type {RootState} from '../index';
 
 interface PaymentState {
@@ -42,7 +43,13 @@ const paymentSlice = createSlice({
         month: number;
         year: number;
         dueDate: string;
-        payments?: Array<{tenantId: string; amount: number}>;
+        payments?: Array<{
+          tenantId: string;
+          amount: number;
+          rentAmount?: number;
+          utilityTotal?: number;
+          extraCharges?: Json;
+        }>;
       }>,
     ) {
       state.loading = true;
@@ -148,13 +155,21 @@ function* handleCreateBilling(
       action.payload.payments?.map(payment => ({
         tenant_id: payment.tenantId,
         amount: payment.amount,
+        rent_amount: payment.rentAmount ?? payment.amount,
+        utility_total: payment.utilityTotal ?? 0,
+        extra_charges: payment.extraCharges ?? [],
       })),
     );
     const periods = yield call(
       getBillingPeriods,
       action.payload.apartmentId,
     );
+    const payments = yield call(
+      getPaymentsForApartment,
+      action.payload.apartmentId,
+    );
     yield put(setBillingPeriods(periods));
+    yield put(setPayments(payments));
     yield put(setLoading(false));
   } catch (error: any) {
     yield put(setError(error.message ?? 'Failed to create billing'));
@@ -169,7 +184,12 @@ function* handleFetchBillingPeriods(
       getBillingPeriods,
       action.payload.apartmentId,
     );
+    const payments = yield call(
+      getPaymentsForApartment,
+      action.payload.apartmentId,
+    );
     yield put(setBillingPeriods(periods));
+    yield put(setPayments(payments));
     yield put(setLoading(false));
   } catch (error: any) {
     yield put(setError(error.message ?? 'Failed to fetch billing periods'));

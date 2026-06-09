@@ -1,5 +1,13 @@
 import {supabase} from '../config/supabase';
-import type {Payment} from '../types/database';
+import type {Json, Payment} from '../types/database';
+
+export interface CreatePaymentRow {
+  tenant_id: string;
+  amount: number;
+  rent_amount?: number | null;
+  utility_total?: number;
+  extra_charges?: Json;
+}
 
 function applyOverdueStatus<T extends Record<string, any>>(payment: T): T {
   const dueDate = payment.billing_periods?.due_date;
@@ -25,7 +33,7 @@ export async function createBillingPeriod(
   year: number,
   dueDate: string,
   createdBy: string,
-  paymentRows?: Array<{tenant_id: string; amount: number}>,
+  paymentRows?: CreatePaymentRow[],
 ) {
   const {data: existing, error: existingError} = await supabase
     .from('billing_periods')
@@ -84,6 +92,9 @@ export async function createBillingPeriod(
     rows = (members ?? []).map(member => ({
       tenant_id: member.user_id,
       amount: member.rent_amount,
+      rent_amount: member.rent_amount,
+      utility_total: 0,
+      extra_charges: [],
     }));
   }
 
@@ -92,6 +103,9 @@ export async function createBillingPeriod(
       billing_period_id: billing.id,
       tenant_id: row.tenant_id,
       amount: row.amount,
+      rent_amount: row.rent_amount ?? row.amount,
+      utility_total: row.utility_total ?? 0,
+      extra_charges: row.extra_charges ?? [],
     }));
 
     const {error: paymentsError} = await supabase
@@ -130,6 +144,22 @@ export async function getPayments(billingId: string) {
     )
     .eq('billing_period_id', billingId)
     .order('created_at', {ascending: true});
+
+  if (error) {
+    throw error;
+  }
+
+  return (data ?? []).map(applyOverdueStatus) as Payment[];
+}
+
+export async function getPaymentsForApartment(apartmentId: string) {
+  const {data, error} = await supabase
+    .from('payments')
+    .select(
+      '*, tenant:tenant_id(id, full_name, avatar_url), billing_periods:billing_period_id!inner(*)',
+    )
+    .eq('billing_periods.apartment_id', apartmentId)
+    .order('created_at', {ascending: false});
 
   if (error) {
     throw error;

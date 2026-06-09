@@ -1,0 +1,56 @@
+import {supabase} from '../config/supabase';
+import type {
+  UtilityConfig,
+  UtilityConfigInsert,
+  UtilityConfigUpdate,
+} from '../types/database';
+
+export async function getUtilityConfigs(
+  apartmentId: string,
+): Promise<UtilityConfig[]> {
+  const {data, error} = await supabase
+    .from('utility_configs')
+    .select('*')
+    .eq('apartment_id', apartmentId)
+    .order('utility_type', {ascending: true});
+
+  if (error) {
+    throw error;
+  }
+
+  return data ?? [];
+}
+
+export async function upsertUtilityConfig(
+  payload: UtilityConfigInsert,
+): Promise<UtilityConfig> {
+  const {data, error} = await supabase
+    .from('utility_configs')
+    .upsert(payload, {onConflict: 'apartment_id,utility_type'})
+    .select()
+    .single();
+
+  if (error) {
+    throw error;
+  }
+
+  return data;
+}
+
+export async function updateUtilityConfig(
+  id: string,
+  updates: UtilityConfigUpdate,
+): Promise<UtilityConfig> {
+  const {data, error} = await supabase
+    .from('utility_configs')
+    .update(updates)
+    .eq('id', id)
+    .select()
+    .single();
+
+  if (error) {
+    throw error;
+  }
+
+  return data;
+}

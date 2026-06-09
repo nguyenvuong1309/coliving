@@ -325,6 +325,9 @@ export interface Database {
           billing_period_id: string;
           tenant_id: string;
           amount: number;
+          rent_amount: number | null;
+          utility_total: number;
+          extra_charges: Json;
           status: 'unpaid' | 'tenant_reported' | 'confirmed' | 'overdue';
           payment_method: 'bank_transfer' | 'cash' | null;
           receipt_image_url: string | null;
@@ -340,6 +343,9 @@ export interface Database {
           billing_period_id: string;
           tenant_id: string;
           amount: number;
+          rent_amount?: number | null;
+          utility_total?: number;
+          extra_charges?: Json;
           status?: 'unpaid' | 'tenant_reported' | 'confirmed' | 'overdue';
           payment_method?: 'bank_transfer' | 'cash' | null;
           receipt_image_url?: string | null;
@@ -355,6 +361,9 @@ export interface Database {
           billing_period_id?: string;
           tenant_id?: string;
           amount?: number;
+          rent_amount?: number | null;
+          utility_total?: number;
+          extra_charges?: Json;
           status?: 'unpaid' | 'tenant_reported' | 'confirmed' | 'overdue';
           payment_method?: 'bank_transfer' | 'cash' | null;
           receipt_image_url?: string | null;
@@ -363,6 +372,146 @@ export interface Database {
           confirmed_by?: string | null;
           note?: string | null;
           created_at?: string;
+          updated_at?: string;
+        };
+      };
+      utility_configs: {
+        Row: {
+          id: string;
+          apartment_id: string;
+          utility_type: 'electricity' | 'water' | 'internet' | 'parking' | 'other';
+          name: string;
+          pricing_type: 'fixed' | 'per_unit' | 'tiered';
+          fixed_amount: number | null;
+          unit_price: number | null;
+          unit_name: string | null;
+          tiers: Json;
+          is_active: boolean;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          apartment_id: string;
+          utility_type: 'electricity' | 'water' | 'internet' | 'parking' | 'other';
+          name: string;
+          pricing_type?: 'fixed' | 'per_unit' | 'tiered';
+          fixed_amount?: number | null;
+          unit_price?: number | null;
+          unit_name?: string | null;
+          tiers?: Json;
+          is_active?: boolean;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          apartment_id?: string;
+          utility_type?: 'electricity' | 'water' | 'internet' | 'parking' | 'other';
+          name?: string;
+          pricing_type?: 'fixed' | 'per_unit' | 'tiered';
+          fixed_amount?: number | null;
+          unit_price?: number | null;
+          unit_name?: string | null;
+          tiers?: Json;
+          is_active?: boolean;
+          created_at?: string;
+          updated_at?: string;
+        };
+      };
+      utility_readings: {
+        Row: {
+          id: string;
+          billing_period_id: string;
+          tenant_id: string;
+          utility_config_id: string;
+          previous_reading: number | null;
+          current_reading: number | null;
+          usage_amount: number | null;
+          calculated_amount: number;
+          note: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          billing_period_id: string;
+          tenant_id: string;
+          utility_config_id: string;
+          previous_reading?: number | null;
+          current_reading?: number | null;
+          usage_amount?: number | null;
+          calculated_amount: number;
+          note?: string | null;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          billing_period_id?: string;
+          tenant_id?: string;
+          utility_config_id?: string;
+          previous_reading?: number | null;
+          current_reading?: number | null;
+          usage_amount?: number | null;
+          calculated_amount?: number;
+          note?: string | null;
+          created_at?: string;
+        };
+      };
+      device_tokens: {
+        Row: {
+          id: string;
+          user_id: string;
+          token: string;
+          platform: 'ios' | 'android';
+          is_active: boolean;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          token: string;
+          platform: 'ios' | 'android';
+          is_active?: boolean;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          user_id?: string;
+          token?: string;
+          platform?: 'ios' | 'android';
+          is_active?: boolean;
+          created_at?: string;
+          updated_at?: string;
+        };
+      };
+      notification_preferences: {
+        Row: {
+          user_id: string;
+          payment_enabled: boolean;
+          issue_enabled: boolean;
+          borrow_enabled: boolean;
+          announcement_enabled: boolean;
+          push_enabled: boolean;
+          updated_at: string;
+        };
+        Insert: {
+          user_id: string;
+          payment_enabled?: boolean;
+          issue_enabled?: boolean;
+          borrow_enabled?: boolean;
+          announcement_enabled?: boolean;
+          push_enabled?: boolean;
+          updated_at?: string;
+        };
+        Update: {
+          user_id?: string;
+          payment_enabled?: boolean;
+          issue_enabled?: boolean;
+          borrow_enabled?: boolean;
+          announcement_enabled?: boolean;
+          push_enabled?: boolean;
           updated_at?: string;
         };
       };
@@ -450,6 +599,27 @@ export type BillingPeriodInsert =
 export type Payment = Database['public']['Tables']['payments']['Row'];
 export type PaymentInsert = Database['public']['Tables']['payments']['Insert'];
 export type PaymentUpdate = Database['public']['Tables']['payments']['Update'];
+
+export type UtilityConfig =
+  Database['public']['Tables']['utility_configs']['Row'];
+export type UtilityConfigInsert =
+  Database['public']['Tables']['utility_configs']['Insert'];
+export type UtilityConfigUpdate =
+  Database['public']['Tables']['utility_configs']['Update'];
+export type UtilityReading =
+  Database['public']['Tables']['utility_readings']['Row'];
+export type UtilityReadingInsert =
+  Database['public']['Tables']['utility_readings']['Insert'];
+
+export type DeviceToken = Database['public']['Tables']['device_tokens']['Row'];
+export type DeviceTokenInsert =
+  Database['public']['Tables']['device_tokens']['Insert'];
+export type NotificationPreference =
+  Database['public']['Tables']['notification_preferences']['Row'];
+export type NotificationPreferenceInsert =
+  Database['public']['Tables']['notification_preferences']['Insert'];
+export type NotificationPreferenceUpdate =
+  Database['public']['Tables']['notification_preferences']['Update'];
 
 export type Notification = Database['public']['Tables']['notifications']['Row'];
 export type NotificationInsert =

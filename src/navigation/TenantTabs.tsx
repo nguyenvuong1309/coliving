@@ -21,6 +21,7 @@ import NotificationsScreen from '../screens/tenant/NotificationsScreen';
 import TenantProfileScreen from '../screens/tenant/ProfileScreen';
 import EditProfileScreen from '../screens/shared/EditProfileScreen';
 import ChangePasswordScreen from '../screens/shared/ChangePasswordScreen';
+import NotificationSettingsScreen from '../screens/shared/NotificationSettingsScreen';
 import JoinApartmentScreen from '../screens/auth/JoinApartmentScreen';
 
 const Tab = createNativeBottomTabNavigator<TenantTabParamList>();
@@ -90,6 +91,11 @@ export default function TenantStack() {
           component={ChangePasswordScreen}
           options={{ title: 'Đổi mật khẩu' }}
         />
+        <Stack.Screen
+          name="NotificationSettings"
+          component={NotificationSettingsScreen}
+          options={{ title: 'Cài đặt thông báo' }}
+        />
       </Stack.Navigator>
     );
   }
@@ -145,6 +151,11 @@ export default function TenantStack() {
         name="ChangePassword"
         component={ChangePasswordScreen}
         options={{ title: 'Đổi mật khẩu' }}
+      />
+      <Stack.Screen
+        name="NotificationSettings"
+        component={NotificationSettingsScreen}
+        options={{ title: 'Cài đặt thông báo' }}
       />
     </Stack.Navigator>
   );

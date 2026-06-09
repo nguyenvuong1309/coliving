@@ -1,5 +1,6 @@
 import { supabase } from '../config/supabase';
 import type {
+  Apartment,
   ApartmentInsert,
   ApartmentMemberUpdate,
 } from '../types/database';
@@ -58,39 +59,40 @@ export async function getApartment(id: string) {
   return data;
 }
 
-export async function getApartmentForUser(
+export async function getApartmentsForUser(
   userId: string,
   role: 'tenant' | 'landlord',
 ) {
   if (role === 'landlord') {
-    const { data, error } = await supabase
+    const {data, error} = await supabase
       .from('apartments')
       .select('*')
       .eq('landlord_id', userId)
-      .order('created_at', { ascending: true })
-      .limit(1)
-      .maybeSingle();
+      .order('created_at', {ascending: true});
 
     if (error) {
       throw error;
     }
 
-    return data ?? null;
+    return data ?? [];
   }
 
-  const { data, error } = await supabase
+  const {data, error} = await supabase
     .from('apartment_members')
     .select('apartment:apartment_id(*)')
     .eq('user_id', userId)
-    .order('joined_at', { ascending: true })
-    .limit(1)
-    .maybeSingle();
+    .order('joined_at', {ascending: true});
 
   if (error) {
     throw error;
   }
 
-  return (data?.apartment as any) ?? null;
+  return (data ?? []).reduce<Apartment[]>((list, row) => {
+    if (row.apartment) {
+      list.push(row.apartment as unknown as Apartment);
+    }
+    return list;
+  }, []);
 }
 
 export async function getApartmentByInviteCode(code: string) {

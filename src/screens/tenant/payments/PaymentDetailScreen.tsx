@@ -88,6 +88,29 @@ const PaymentDetailScreen: React.FC = () => {
   const isUnpaid = payment.status === 'unpaid' || payment.status === 'overdue';
   const isTenantReported = payment.status === 'tenant_reported';
   const isConfirmed = payment.status === 'confirmed';
+  const extraCharges: Array<{name: string; amount: number}> = Array.isArray(
+    payment.extra_charges,
+  )
+    ? payment.extra_charges.reduce<Array<{name: string; amount: number}>>(
+        (list, item) => {
+          if (
+            item &&
+            typeof item === 'object' &&
+            !Array.isArray(item) &&
+            'name' in item &&
+            'amount' in item
+          ) {
+            list.push({
+              name: String((item as {name?: unknown}).name ?? 'Phu thu'),
+              amount: Number((item as {amount?: unknown}).amount) || 0,
+            });
+          }
+          return list;
+        },
+        [],
+      )
+    : [];
+  const rentAmount = payment.rent_amount ?? payment.amount - payment.utility_total;
 
   return (
     <ScreenWrapper>
@@ -147,6 +170,28 @@ const PaymentDetailScreen: React.FC = () => {
             </Text>
           </View>
         )}
+      </Card>
+
+      <Card style={styles.card}>
+        <Text style={styles.sectionTitle}>Chi tiet so tien</Text>
+        <View style={styles.infoRow}>
+          <Text style={styles.infoLabel}>Tien phong:</Text>
+          <Text style={styles.infoValue}>{formatCurrency(rentAmount)}</Text>
+        </View>
+        <View style={styles.infoRow}>
+          <Text style={styles.infoLabel}>Dich vu:</Text>
+          <Text style={styles.infoValue}>
+            {formatCurrency(payment.utility_total)}
+          </Text>
+        </View>
+        {extraCharges.map((charge, index) => (
+          <View style={styles.infoRow} key={`${charge.name}-${index}`}>
+            <Text style={styles.infoLabel}>{String(charge.name)}:</Text>
+            <Text style={styles.infoValue}>
+              {formatCurrency(Number(charge.amount) || 0)}
+            </Text>
+          </View>
+        ))}
       </Card>
 
       {/* Unpaid / Overdue: show payment form */}

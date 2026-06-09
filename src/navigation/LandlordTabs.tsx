@@ -21,12 +21,16 @@ import LandlordPaymentsScreen from '../screens/landlord/payments/PaymentsScreen'
 import CreateBillingScreen from '../screens/landlord/payments/CreateBillingScreen';
 import PaymentOverviewScreen from '../screens/landlord/payments/PaymentOverviewScreen';
 import PaymentConfirmScreen from '../screens/landlord/payments/PaymentConfirmScreen';
+import UtilityConfigScreen from '../screens/landlord/utility/UtilityConfigScreen';
+import ReportExportScreen from '../screens/landlord/reports/ReportExportScreen';
 import ApartmentSetupScreen from '../screens/landlord/apartment/ApartmentSetupScreen';
+import ApartmentSwitcherScreen from '../screens/landlord/apartment/ApartmentSwitcherScreen';
 import InviteCodeScreen from '../screens/landlord/apartment/InviteCodeScreen';
 import RevenueHistoryScreen from '../screens/landlord/RevenueHistoryScreen';
 import LandlordProfileScreen from '../screens/landlord/ProfileScreen';
 import EditProfileScreen from '../screens/shared/EditProfileScreen';
 import ChangePasswordScreen from '../screens/shared/ChangePasswordScreen';
+import NotificationSettingsScreen from '../screens/shared/NotificationSettingsScreen';
 
 const Tab = createNativeBottomTabNavigator<LandlordTabParamList>();
 const Stack = createNativeStackNavigator<LandlordStackParamList>();
@@ -86,6 +90,11 @@ export default function LandlordStack() {
           options={{ title: 'Thiết lập căn hộ' }}
         />
         <Stack.Screen
+          name="ApartmentSwitcher"
+          component={ApartmentSwitcherScreen}
+          options={{ title: 'Chọn căn hộ' }}
+        />
+        <Stack.Screen
           name="InviteCode"
           component={InviteCodeScreen}
           options={{ title: 'Mã mời' }}
@@ -94,6 +103,11 @@ export default function LandlordStack() {
           name="ChangePassword"
           component={ChangePasswordScreen}
           options={{ title: 'Đổi mật khẩu' }}
+        />
+        <Stack.Screen
+          name="NotificationSettings"
+          component={NotificationSettingsScreen}
+          options={{ title: 'Cài đặt thông báo' }}
         />
       </Stack.Navigator>
     );
@@ -110,6 +124,11 @@ export default function LandlordStack() {
         name="ApartmentSetup"
         component={ApartmentSetupScreen}
         options={{ title: 'Thiết lập căn hộ' }}
+      />
+      <Stack.Screen
+        name="ApartmentSwitcher"
+        component={ApartmentSwitcherScreen}
+        options={{ title: 'Chọn căn hộ' }}
       />
       <Stack.Screen
         name="InviteCode"
@@ -162,6 +181,16 @@ export default function LandlordStack() {
         options={{ title: 'Xác nhận thanh toán' }}
       />
       <Stack.Screen
+        name="UtilityConfig"
+        component={UtilityConfigScreen}
+        options={{ title: 'Cấu hình dịch vụ' }}
+      />
+      <Stack.Screen
+        name="ReportExport"
+        component={ReportExportScreen}
+        options={{ title: 'Xuất báo cáo' }}
+      />
+      <Stack.Screen
         name="RevenueHistory"
         component={RevenueHistoryScreen}
         options={{ title: 'Lịch sử doanh thu' }}
@@ -175,6 +204,11 @@ export default function LandlordStack() {
         name="ChangePassword"
         component={ChangePasswordScreen}
         options={{ title: 'Đổi mật khẩu' }}
+      />
+      <Stack.Screen
+        name="NotificationSettings"
+        component={NotificationSettingsScreen}
+        options={{ title: 'Cài đặt thông báo' }}
       />
     </Stack.Navigator>
   );

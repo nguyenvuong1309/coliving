@@ -3,6 +3,8 @@ import {useAppDispatch, useAppSelector} from '../store';
 import {
   createApartmentRequest,
   fetchApartmentRequest,
+  fetchApartmentsRequest,
+  selectApartmentRequest,
   joinApartmentRequest,
   fetchMembersRequest,
   removeMemberRequest,
@@ -11,7 +13,7 @@ import {
 
 export function useApartment() {
   const dispatch = useAppDispatch();
-  const {apartment, members, loading, error} = useAppSelector(
+  const {apartment, apartments, members, loading, error} = useAppSelector(
     state => state.apartment,
   );
 
@@ -25,6 +27,20 @@ export function useApartment() {
   const fetchApartment = useCallback(
     (id: string) => {
       dispatch(fetchApartmentRequest({id}));
+    },
+    [dispatch],
+  );
+
+  const fetchApartments = useCallback(
+    (userId: string, role: 'tenant' | 'landlord') => {
+      dispatch(fetchApartmentsRequest({userId, role}));
+    },
+    [dispatch],
+  );
+
+  const selectApartment = useCallback(
+    (apartmentId: string) => {
+      dispatch(selectApartmentRequest({apartmentId}));
     },
     [dispatch],
   );
@@ -62,11 +78,14 @@ export function useApartment() {
 
   return {
     apartment,
+    apartments,
     members,
     loading,
     error,
     createApartment,
     fetchApartment,
+    fetchApartments,
+    selectApartment,
     joinApartment,
     fetchMembers,
     removeMember,

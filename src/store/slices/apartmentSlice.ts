@@ -3,7 +3,7 @@ import {call, put, select, takeLatest} from 'redux-saga/effects';
 import {
   createApartment,
   getApartment,
-  getApartmentForUser,
+  getApartmentsForUser,
   getApartmentByInviteCode,
   joinApartment,
   getMembers,
@@ -25,6 +25,7 @@ interface ApartmentMemberWithProfile extends ApartmentMember {
 
 interface ApartmentState {
   apartment: Apartment | null;
+  apartments: Apartment[];
   members: ApartmentMemberWithProfile[];
   loading: boolean;
   error: string | null;
@@ -32,6 +33,7 @@ interface ApartmentState {
 
 const initialState: ApartmentState = {
   apartment: null,
+  apartments: [],
   members: [],
   loading: false,
   error: null,
@@ -60,6 +62,17 @@ const apartmentSlice = createSlice({
       state,
       _action: PayloadAction<{userId: string; role: 'tenant' | 'landlord'}>,
     ) {
+      state.loading = true;
+      state.error = null;
+    },
+    fetchApartmentsRequest(
+      state,
+      _action: PayloadAction<{userId: string; role: 'tenant' | 'landlord'}>,
+    ) {
+      state.loading = true;
+      state.error = null;
+    },
+    selectApartmentRequest(state, _action: PayloadAction<{apartmentId: string}>) {
       state.loading = true;
       state.error = null;
     },
@@ -94,6 +107,17 @@ const apartmentSlice = createSlice({
     setApartment(state, action: PayloadAction<Apartment | null>) {
       state.apartment = action.payload;
     },
+    setApartments(state, action: PayloadAction<Apartment[]>) {
+      state.apartments = action.payload;
+    },
+    upsertApartment(state, action: PayloadAction<Apartment>) {
+      const idx = state.apartments.findIndex(a => a.id === action.payload.id);
+      if (idx === -1) {
+        state.apartments = [action.payload, ...state.apartments];
+      } else {
+        state.apartments[idx] = action.payload;
+      }
+    },
     setMembers(state, action: PayloadAction<ApartmentMemberWithProfile[]>) {
       state.members = action.payload;
     },
@@ -119,11 +143,15 @@ export const {
   createApartmentRequest,
   fetchApartmentRequest,
   fetchCurrentApartmentRequest,
+  fetchApartmentsRequest,
+  selectApartmentRequest,
   joinApartmentRequest,
   fetchMembersRequest,
   removeMemberRequest,
   updateMemberRequest,
   setApartment,
+  setApartments,
+  upsertApartment,
   setMembers,
   upsertMember,
   setLoading,
@@ -147,6 +175,8 @@ function* handleCreateApartment(
       invite_code: inviteCode,
     });
     yield put(setApartment(apartment));
+    const apartments = yield select((s: RootState) => s.apartment.apartments);
+    yield put(setApartments([apartment, ...apartments]));
     yield put(setLoading(false));
   } catch (error: any) {
     yield put(setError(error.message ?? 'Failed to create apartment'));
@@ -159,6 +189,7 @@ function* handleFetchApartment(
   try {
     const apartment = yield call(getApartment, action.payload.id);
     yield put(setApartment(apartment));
+    yield put(upsertApartment(apartment));
     yield put(setLoading(false));
   } catch (error: any) {
     yield put(setError(error.message ?? 'Failed to fetch apartment'));
@@ -169,11 +200,13 @@ function* handleFetchCurrentApartment(
   action: ReturnType<typeof fetchCurrentApartmentRequest>,
 ): Generator<any, void, any> {
   try {
-    const apartment = yield call(
-      getApartmentForUser,
+    const apartments = yield call(
+      getApartmentsForUser,
       action.payload.userId,
       action.payload.role,
     );
+    const apartment = apartments[0] ?? null;
+    yield put(setApartments(apartments));
     yield put(setApartment(apartment));
     if (apartment?.id) {
       const members = yield call(getMembers, apartment.id);
@@ -184,8 +217,50 @@ function* handleFetchCurrentApartment(
     yield put(setLoading(false));
   } catch (error: any) {
     yield put(setApartment(null));
+    yield put(setApartments([]));
     yield put(setMembers([]));
     yield put(setError(error.message ?? 'Failed to fetch apartment'));
+  }
+}
+
+function* handleFetchApartments(
+  action: ReturnType<typeof fetchApartmentsRequest>,
+): Generator<any, void, any> {
+  try {
+    const apartments = yield call(
+      getApartmentsForUser,
+      action.payload.userId,
+      action.payload.role,
+    );
+    yield put(setApartments(apartments));
+    yield put(setLoading(false));
+  } catch (error: any) {
+    yield put(setError(error.message ?? 'Failed to fetch apartments'));
+  }
+}
+
+function* handleSelectApartment(
+  action: ReturnType<typeof selectApartmentRequest>,
+): Generator<any, void, any> {
+  try {
+    const apartments: Apartment[] = yield select(
+      (s: RootState) => s.apartment.apartments,
+    );
+    let apartment =
+      apartments.find(item => item.id === action.payload.apartmentId) ?? null;
+    if (!apartment) {
+      apartment = yield call(getApartment, action.payload.apartmentId);
+    }
+    yield put(setApartment(apartment));
+    if (apartment?.id) {
+      const members = yield call(getMembers, apartment.id);
+      yield put(setMembers(members));
+    } else {
+      yield put(setMembers([]));
+    }
+    yield put(setLoading(false));
+  } catch (error: any) {
+    yield put(setError(error.message ?? 'Failed to select apartment'));
   }
 }
 
@@ -203,6 +278,7 @@ function* handleJoinApartment(
     );
     yield call(joinApartment, apartment.id, userId);
     yield put(setApartment(apartment));
+    yield put(upsertApartment(apartment));
     const members = yield call(getMembers, apartment.id);
     yield put(setMembers(members));
     try {
@@ -296,6 +372,8 @@ function* handleUpdateMember(
 export function* apartmentSaga() {
   yield takeLatest(createApartmentRequest.type, handleCreateApartment);
   yield takeLatest(fetchApartmentRequest.type, handleFetchApartment);
+  yield takeLatest(fetchApartmentsRequest.type, handleFetchApartments);
+  yield takeLatest(selectApartmentRequest.type, handleSelectApartment);
   yield takeLatest(
     fetchCurrentApartmentRequest.type,
     handleFetchCurrentApartment,

@@ -21,22 +21,77 @@ import LoadingOverlay from '../../../components/LoadingOverlay';
 import { useApartment } from '../../../hooks/useApartment';
 import { useAppDispatch, useAppSelector } from '../../../store';
 import { createBillingRequest } from '../../../store/slices/paymentSlice';
+import { fetchUtilityConfigsRequest } from '../../../store/slices/utilitySlice';
 import {
   createBillingSchema,
   type CreateBillingFormData,
 } from '../../../schemas/payment';
 import { formatCurrency, formatDate } from '../../../utils/formatters';
+import { parseMoneyInput } from '../../../utils/utilityCalculator';
 import type { LandlordStackParamList } from '../../../types/navigation';
 
 type NavigationProp = NativeStackNavigationProp<LandlordStackParamList>;
 
 const MONTHS = Array.from({ length: 12 }, (_, i) => i + 1);
 
+interface TenantBillingItem {
+  userId: string;
+  name: string;
+  room: string;
+  rentAmount: number;
+  utilityAmount: number;
+  amount: number;
+}
+
+interface TenantBillingRowProps {
+  item: TenantBillingItem;
+  onRentChange: (userId: string, text: string) => void;
+  onUtilityChange: (userId: string, text: string) => void;
+}
+
+const TenantBillingRow = React.memo(function TenantBillingRow({
+  item,
+  onRentChange,
+  onUtilityChange,
+}: TenantBillingRowProps) {
+  return (
+    <View style={styles.tenantItem}>
+      <View style={styles.tenantInfo}>
+        <Text style={styles.tenantName}>{item.name}</Text>
+        <Text style={styles.tenantRoom}>
+          {item.room} - Tong {formatCurrency(item.amount)}
+        </Text>
+      </View>
+      <View style={styles.amountColumn}>
+        <Text style={styles.amountLabel}>Tien phong</Text>
+        <TextInput
+          style={styles.amountInput}
+          value={String(item.rentAmount)}
+          onChangeText={text => onRentChange(item.userId, text)}
+          keyboardType="number-pad"
+          selectTextOnFocus
+        />
+        <Text style={styles.amountLabel}>Dich vu</Text>
+        <TextInput
+          style={styles.amountInput}
+          value={String(item.utilityAmount)}
+          onChangeText={text => onUtilityChange(item.userId, text)}
+          keyboardType="number-pad"
+          selectTextOnFocus
+        />
+      </View>
+    </View>
+  );
+});
+
 const CreateBillingScreen: React.FC = () => {
   const navigation = useNavigation<NavigationProp>();
   const dispatch = useAppDispatch();
   const { apartment, members } = useApartment();
   const { loading } = useAppSelector(state => state.payment);
+  const { configs: utilityConfigs, loading: utilityLoading } = useAppSelector(
+    state => state.utility,
+  );
 
   const currentDate = useMemo(() => new Date(), []);
   const [showDatePicker, setShowDatePicker] = useState(false);
@@ -47,6 +102,15 @@ const CreateBillingScreen: React.FC = () => {
   const [adjustedAmounts, setAdjustedAmounts] = useState<
     Record<string, number>
   >({});
+  const [utilityAmounts, setUtilityAmounts] = useState<Record<string, number>>(
+    {},
+  );
+
+  React.useEffect(() => {
+    if (apartment?.id) {
+      dispatch(fetchUtilityConfigsRequest({ apartmentId: apartment.id }));
+    }
+  }, [apartment?.id, dispatch]);
 
   const {
     control,
@@ -61,40 +125,54 @@ const CreateBillingScreen: React.FC = () => {
     },
   });
 
+  const defaultUtilityTotal = useMemo(() => {
+    return utilityConfigs
+      .filter(config => config.is_active && config.pricing_type === 'fixed')
+      .reduce((sum, config) => sum + (config.fixed_amount ?? 0), 0);
+  }, [utilityConfigs]);
+
   const tenantList = useMemo(() => {
-    return members.reduce<Array<{
-      userId: string;
-      name: string;
-      room: string;
-      defaultAmount: number;
-      amount: number;
-    }>>((list, m) => {
+    return members.reduce<TenantBillingItem[]>((list, m) => {
       if (m.profile?.role !== 'tenant') {
         return list;
       }
+
+      const rentAmount = adjustedAmounts[m.user_id] ?? m.rent_amount;
+      const utilityAmount =
+        utilityAmounts[m.user_id] ?? defaultUtilityTotal;
 
       list.push({
         userId: m.user_id,
         name: m.profile?.full_name ?? 'Nguoi thue',
         room: m.room_name ?? 'Chua gan',
-        defaultAmount: m.rent_amount,
-        amount: adjustedAmounts[m.user_id] ?? m.rent_amount,
+        rentAmount,
+        utilityAmount,
+        amount: rentAmount + utilityAmount,
       });
       return list;
     }, []);
-  }, [members, adjustedAmounts]);
+  }, [members, adjustedAmounts, utilityAmounts, defaultUtilityTotal]);
 
   const totalAmount = useMemo(() => {
     return tenantList.reduce((sum, t) => sum + t.amount, 0);
   }, [tenantList]);
 
   const handleAmountChange = useCallback((userId: string, text: string) => {
-    const num = parseInt(text.replace(/\D/g, ''), 10);
     setAdjustedAmounts(prev => ({
       ...prev,
-      [userId]: isNaN(num) ? 0 : num,
+      [userId]: parseMoneyInput(text),
     }));
   }, []);
+
+  const handleUtilityAmountChange = useCallback(
+    (userId: string, text: string) => {
+      setUtilityAmounts(prev => ({
+        ...prev,
+        [userId]: parseMoneyInput(text),
+      }));
+    },
+    [],
+  );
 
   const onDateChange = useCallback((_: any, selectedDate?: Date) => {
     setShowDatePicker(Platform.OS === 'ios');
@@ -110,7 +188,7 @@ const CreateBillingScreen: React.FC = () => {
         return;
       }
 
-      const tenantsWithoutRent = tenantList.filter(t => t.amount <= 0);
+      const tenantsWithoutRent = tenantList.filter(t => t.rentAmount <= 0);
       if (tenantsWithoutRent.length > 0) {
         Alert.alert(
           'Thieu tien thue',
@@ -141,6 +219,9 @@ const CreateBillingScreen: React.FC = () => {
                     payments: tenantList.map(tenant => ({
                       tenantId: tenant.userId,
                       amount: tenant.amount,
+                      rentAmount: tenant.rentAmount,
+                      utilityTotal: tenant.utilityAmount,
+                      extraCharges: [],
                     })),
                   }),
                 );
@@ -161,29 +242,27 @@ const CreateBillingScreen: React.FC = () => {
     ],
   );
 
-  const renderTenantItem = ({ item }: { item: (typeof tenantList)[0] }) => (
-    <View style={styles.tenantItem}>
-      <View style={styles.tenantInfo}>
-        <Text style={styles.tenantName}>{item.name}</Text>
-        <Text style={styles.tenantRoom}>{item.room}</Text>
-      </View>
-      <TextInput
-        style={styles.amountInput}
-        value={String(item.amount)}
-        onChangeText={text => handleAmountChange(item.userId, text)}
-        keyboardType="number-pad"
-        selectTextOnFocus
+  const renderTenantItem = useCallback(
+    ({ item }: { item: TenantBillingItem }) => (
+      <TenantBillingRow
+        item={item}
+        onRentChange={handleAmountChange}
+        onUtilityChange={handleUtilityAmountChange}
       />
-    </View>
+    ),
+    [handleAmountChange, handleUtilityAmountChange],
+  );
+  const renderSeparator = useCallback(
+    () => <View style={styles.separator} />,
+    [],
   );
 
   return (
     <ScreenWrapper scroll>
-      <LoadingOverlay visible={loading} />
+      <LoadingOverlay visible={loading || utilityLoading} />
 
       <Text style={styles.title}>Tao ky thu tien</Text>
 
-      {/* Month Picker */}
       <Text style={styles.label}>Thang</Text>
       <Controller
         control={control}
@@ -216,7 +295,6 @@ const CreateBillingScreen: React.FC = () => {
         <Text style={styles.errorText}>{errors.month.message}</Text>
       )}
 
-      {/* Year Picker */}
       <Controller
         control={control}
         name="year"
@@ -249,7 +327,6 @@ const CreateBillingScreen: React.FC = () => {
         <Text style={styles.errorText}>{errors.year.message}</Text>
       )}
 
-      {/* Due Date */}
       <Text style={styles.label}>Han thanh toan</Text>
       <PressableOpacity
         style={styles.datePickerBtn}
@@ -269,23 +346,26 @@ const CreateBillingScreen: React.FC = () => {
         />
       )}
 
-      {/* Tenant Preview */}
       <View style={styles.previewSection}>
         <Text style={styles.sectionTitle}>
           Danh sach nguoi thue ({tenantList.length})
         </Text>
+        {defaultUtilityTotal > 0 && (
+          <Text style={styles.utilityHint}>
+            Phi dich vu mac dinh: {formatCurrency(defaultUtilityTotal)} / nguoi
+          </Text>
+        )}
         <Card>
           <FlatList
             data={tenantList}
             keyExtractor={item => item.userId}
             renderItem={renderTenantItem}
             scrollEnabled={false}
-            ItemSeparatorComponent={() => <View style={styles.separator} />}
+            ItemSeparatorComponent={renderSeparator}
           />
         </Card>
       </View>
 
-      {/* Total */}
       <Card style={styles.totalCard}>
         <View style={styles.totalRow}>
           <Text style={styles.totalLabel}>Tong cong</Text>
@@ -293,7 +373,6 @@ const CreateBillingScreen: React.FC = () => {
         </View>
       </Card>
 
-      {/* Submit */}
       <Button
         title="Tao ky thu tien"
         onPress={handleSubmit(onSubmit)}
@@ -406,13 +485,21 @@ const styles = StyleSheet.create({
     color: '#1E293B',
     marginBottom: 10,
   },
+  utilityHint: {
+    fontSize: 12,
+    color: '#64748B',
+    marginTop: -6,
+    marginBottom: 10,
+  },
   tenantItem: {
     flexDirection: 'row',
-    alignItems: 'center',
+    alignItems: 'flex-start',
     paddingVertical: 10,
+    gap: 12,
   },
   tenantInfo: {
     flex: 1,
+    paddingTop: 4,
   },
   tenantName: {
     fontSize: 14,
@@ -424,8 +511,16 @@ const styles = StyleSheet.create({
     color: '#94A3B8',
     marginTop: 2,
   },
-  amountInput: {
+  amountColumn: {
     width: 120,
+    gap: 4,
+  },
+  amountLabel: {
+    fontSize: 11,
+    color: '#64748B',
+    textAlign: 'right',
+  },
+  amountInput: {
     height: 40,
     borderRadius: 8,
     borderWidth: 1.5,

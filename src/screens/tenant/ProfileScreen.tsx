@@ -113,6 +113,14 @@ const ProfileScreen: React.FC = () => {
           <Text style={styles.settingChevron}>›</Text>
         </PressableOpacity>
 
+        <PressableOpacity
+          style={styles.settingRow}
+          onPress={() => navigation.navigate('NotificationSettings')}
+        >
+          <Text style={styles.settingLabel}>Cai dat thong bao</Text>
+          <Text style={styles.settingChevron}>›</Text>
+        </PressableOpacity>
+
         <View style={styles.settingRow}>
           <Text style={styles.settingLabel}>Phien ban</Text>
           <Text style={styles.settingValue}>{Config.APP_VERSION ?? '1.0.0'}</Text>

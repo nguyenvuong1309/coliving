@@ -18,6 +18,7 @@ import {
   updateAssetRequest,
   deleteAssetRequest,
 } from '../../../store/slices/assetSlice';
+import { getSignedImageUrl } from '../../../services/storage';
 import type { LandlordStackParamList } from '../../../types/navigation';
 import type { Asset } from '../../../types/database';
 
@@ -98,6 +99,9 @@ const AssetEditScreen: React.FC = () => {
     getInitialAssetFormState,
   );
   const newImagePickedRef = React.useRef(false);
+  const [signedPreviewUrl, setSignedPreviewUrl] = React.useState<string | null>(
+    null,
+  );
 
   useEffect(() => {
     navigation.setOptions({
@@ -116,12 +120,33 @@ const AssetEditScreen: React.FC = () => {
       if (result.assets && result.assets.length > 0) {
         const uri = result.assets[0].uri ?? null;
         updateForm({ type: 'setImageUri', value: uri });
+        setSignedPreviewUrl(null);
         newImagePickedRef.current = true;
       }
     } catch {
       // User cancelled
     }
   }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+    const loadSignedPreview = async () => {
+      if (!form.imageUri || newImagePickedRef.current) {
+        setSignedPreviewUrl(null);
+        return;
+      }
+
+      const signedUrl = await getSignedImageUrl('asset-images', form.imageUri);
+      if (!cancelled) {
+        setSignedPreviewUrl(signedUrl);
+      }
+    };
+
+    loadSignedPreview();
+    return () => {
+      cancelled = true;
+    };
+  }, [form.imageUri]);
 
   const prevLoadingRef = React.useRef(loading);
   useEffect(() => {
@@ -200,7 +225,10 @@ const AssetEditScreen: React.FC = () => {
         activeOpacity={0.7}
       >
         {form.imageUri ? (
-          <Image source={{ uri: form.imageUri }} style={styles.imagePreview} />
+          <Image
+            source={{ uri: signedPreviewUrl ?? form.imageUri }}
+            style={styles.imagePreview}
+          />
         ) : (
           <View style={styles.imagePlaceholder}>
             <Text style={styles.imagePlaceholderIcon}>+</Text>

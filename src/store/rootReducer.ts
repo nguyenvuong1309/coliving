@@ -6,6 +6,7 @@ import issueReducer from './slices/issueSlice';
 import paymentReducer from './slices/paymentSlice';
 import notificationReducer from './slices/notificationSlice';
 import assetReducer from './slices/assetSlice';
+import utilityReducer from './slices/utilitySlice';
 
 const appReducer = combineReducers({
   auth: authReducer,
@@ -15,6 +16,7 @@ const appReducer = combineReducers({
   payment: paymentReducer,
   notification: notificationReducer,
   asset: assetReducer,
+  utility: utilityReducer,
 });
 
 const rootReducer: typeof appReducer = (state, action) => {

@@ -10,6 +10,7 @@ import LoadingOverlay from '../../../components/LoadingOverlay';
 import { useApartment } from '../../../hooks/useApartment';
 import { useAppSelector, useAppDispatch } from '../../../store';
 import { fetchAssetsRequest } from '../../../store/slices/assetSlice';
+import { getSignedImageUrl } from '../../../services/storage';
 import type { LandlordStackParamList } from '../../../types/navigation';
 import type { Asset } from '../../../types/database';
 
@@ -22,6 +23,9 @@ const AssetListScreen: React.FC = () => {
   const { requests: borrowRequests } = useAppSelector(state => state.borrow);
   const { assets, loading } = useAppSelector(state => state.asset);
   const [refreshing, setRefreshing] = React.useState(false);
+  const [signedImageUrls, setSignedImageUrls] = React.useState<
+    Record<string, string>
+  >({});
 
   const borrowedAssetMap = useMemo(() => {
     const map: Record<string, string> = {};
@@ -38,6 +42,37 @@ const AssetListScreen: React.FC = () => {
       dispatch(fetchAssetsRequest({ apartmentId: apartment.id }));
     }
   }, [apartment?.id, dispatch]);
+
+  useEffect(() => {
+    let cancelled = false;
+    const loadSignedUrls = async () => {
+      const imageAssets = [];
+      for (const asset of assets) {
+        if (asset.image_url) {
+          imageAssets.push(asset);
+        }
+      }
+
+      const entries = await Promise.all(
+        imageAssets.map(
+          async asset =>
+            [
+              asset.id,
+              await getSignedImageUrl('asset-images', asset.image_url!),
+            ] as const,
+        ),
+      );
+
+      if (!cancelled) {
+        setSignedImageUrls(Object.fromEntries(entries));
+      }
+    };
+
+    loadSignedUrls();
+    return () => {
+      cancelled = true;
+    };
+  }, [assets]);
 
   const onRefresh = React.useCallback(() => {
     if (!apartment?.id) {
@@ -63,7 +98,10 @@ const AssetListScreen: React.FC = () => {
       >
         <View style={styles.assetRow}>
           {item.image_url ? (
-            <Image source={{ uri: item.image_url }} style={styles.thumbnail} />
+            <Image
+              source={{ uri: signedImageUrls[item.id] ?? item.image_url }}
+              style={styles.thumbnail}
+            />
           ) : (
             <View style={styles.thumbnailPlaceholder}>
               <Text style={styles.thumbnailText}>IMG</Text>

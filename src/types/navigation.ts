@@ -41,6 +41,7 @@ export type TenantStackParamList = TenantTabParamList & {
   IssueDetail: {id: string};
   PaymentDetail: {id: string};
   RoommateList: undefined;
+  NotificationSettings: undefined;
   EditProfile: undefined;
   ChangePassword: undefined;
 };
@@ -48,6 +49,7 @@ export type TenantStackParamList = TenantTabParamList & {
 // Landlord stack (tabs + detail screens)
 export type LandlordStackParamList = LandlordTabParamList & {
   ApartmentSetup: {id?: string} | undefined;
+  ApartmentSwitcher: undefined;
   InviteCode: {apartmentId: string};
   TenantDetail: {id: string};
   TenantEdit: {id: string};
@@ -58,7 +60,10 @@ export type LandlordStackParamList = LandlordTabParamList & {
   CreateBilling: undefined;
   PaymentOverview: {billingId: string};
   PaymentConfirm: {id: string};
+  UtilityConfig: undefined;
+  ReportExport: undefined;
   RevenueHistory: undefined;
+  NotificationSettings: undefined;
   EditProfile: undefined;
   ChangePassword: undefined;
 };

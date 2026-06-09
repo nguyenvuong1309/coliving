@@ -17,7 +17,7 @@ type NavigationProp = NativeStackNavigationProp<LandlordStackParamList>;
 const ProfileScreen: React.FC = () => {
   const navigation = useNavigation<NavigationProp>();
   const { user, session, signOut } = useAuth();
-  const { apartment } = useApartment();
+  const { apartment, apartments } = useApartment();
 
   const handleSignOut = useCallback(() => {
     Alert.alert('Dang xuat', 'Ban co chac chan muon dang xuat?', [
@@ -100,6 +100,14 @@ const ProfileScreen: React.FC = () => {
             <Text style={styles.settingChevron}>{'>'}</Text>
           </PressableOpacity>
           <View style={styles.settingSeparator} />
+          <PressableOpacity
+            style={styles.settingItem}
+            onPress={() => navigation.navigate('NotificationSettings')}
+          >
+            <Text style={styles.settingText}>Cai dat thong bao</Text>
+            <Text style={styles.settingChevron}>{'>'}</Text>
+          </PressableOpacity>
+          <View style={styles.settingSeparator} />
           <View style={styles.settingItem}>
             <Text style={styles.settingText}>So dien thoai</Text>
             <Text style={styles.settingMutedText}>
@@ -120,6 +128,32 @@ const ProfileScreen: React.FC = () => {
           >
             <Text style={styles.settingText}>Lich su doanh thu</Text>
             <Text style={styles.settingChevron}>{'>'}</Text>
+          </PressableOpacity>
+          <View style={styles.settingSeparator} />
+          <PressableOpacity
+            style={styles.settingItem}
+            onPress={() => navigation.navigate('ReportExport')}
+          >
+            <Text style={styles.settingText}>Xuat bao cao CSV</Text>
+            <Text style={styles.settingChevron}>{'>'}</Text>
+          </PressableOpacity>
+          <View style={styles.settingSeparator} />
+          <PressableOpacity
+            style={styles.settingItem}
+            onPress={() => navigation.navigate('UtilityConfig')}
+          >
+            <Text style={styles.settingText}>Cau hinh dich vu</Text>
+            <Text style={styles.settingChevron}>{'>'}</Text>
+          </PressableOpacity>
+          <View style={styles.settingSeparator} />
+          <PressableOpacity
+            style={styles.settingItem}
+            onPress={() => navigation.navigate('ApartmentSwitcher')}
+          >
+            <Text style={styles.settingText}>Chon can ho</Text>
+            <Text style={styles.settingMutedText}>
+              {apartments.length} can ho
+            </Text>
           </PressableOpacity>
           <View style={styles.settingSeparator} />
           <PressableOpacity

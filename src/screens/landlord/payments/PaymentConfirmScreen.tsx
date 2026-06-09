@@ -43,6 +43,9 @@ const PaymentConfirmScreen: React.FC = () => {
     const member = members.find(m => m.user_id === payment.tenant_id);
     return member?.profile?.full_name ?? 'Nguoi thue';
   }, [payment, members]);
+  const rentAmount = payment
+    ? payment.rent_amount ?? payment.amount - payment.utility_total
+    : 0;
 
   const handleConfirm = useCallback(() => {
     Alert.alert(
@@ -127,6 +130,16 @@ const PaymentConfirmScreen: React.FC = () => {
           <Text style={styles.infoLabel}>So tien</Text>
           <Text style={[styles.infoValue, styles.amountText]}>
             {formatCurrency(payment.amount)}
+          </Text>
+        </View>
+        <View style={styles.infoRow}>
+          <Text style={styles.infoLabel}>Tien phong</Text>
+          <Text style={styles.infoValue}>{formatCurrency(rentAmount)}</Text>
+        </View>
+        <View style={styles.infoRow}>
+          <Text style={styles.infoLabel}>Dich vu</Text>
+          <Text style={styles.infoValue}>
+            {formatCurrency(payment.utility_total)}
           </Text>
         </View>
         <View style={styles.infoRow}>

@@ -15,6 +15,7 @@ import {fetchUnreadCountRequest} from '../store/slices/notificationSlice';
 import {supabase} from '../config/supabase';
 import {getProfile} from '../services/auth';
 import {setAuthToken} from '../utils/mmkv';
+import {usePushNotifications} from '../hooks/usePushNotifications';
 import type {RootStackParamList} from '../types/navigation';
 
 import AuthStack from './AuthStack';
@@ -46,6 +47,7 @@ export default function RootNavigator() {
   const pendingPasswordResetRef = React.useRef(false);
   const isAuthenticated = !!session && !!user;
   const isAuthenticatedRef = React.useRef(isAuthenticated);
+  usePushNotifications(user?.id);
 
   const openPendingPasswordReset = React.useCallback(
     (role?: 'tenant' | 'landlord' | null) => {
