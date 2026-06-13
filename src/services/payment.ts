@@ -1,5 +1,6 @@
 import {supabase} from '../config/supabase';
 import type {Json, Payment} from '../types/database';
+import {e2eBackend, isE2EMode} from '../e2e/fakeBackend';
 
 export interface CreatePaymentRow {
   tenant_id: string;
@@ -35,6 +36,17 @@ export async function createBillingPeriod(
   createdBy: string,
   paymentRows?: CreatePaymentRow[],
 ) {
+  if (isE2EMode) {
+    return e2eBackend.createBillingPeriod(
+      apartmentId,
+      month,
+      year,
+      dueDate,
+      createdBy,
+      paymentRows,
+    );
+  }
+
   const {data: existing, error: existingError} = await supabase
     .from('billing_periods')
     .select('id')
@@ -122,6 +134,10 @@ export async function createBillingPeriod(
 }
 
 export async function getBillingPeriods(apartmentId: string) {
+  if (isE2EMode) {
+    return e2eBackend.getBillingPeriods(apartmentId);
+  }
+
   const {data, error} = await supabase
     .from('billing_periods')
     .select('*')
@@ -137,6 +153,10 @@ export async function getBillingPeriods(apartmentId: string) {
 }
 
 export async function getPayments(billingId: string) {
+  if (isE2EMode) {
+    return e2eBackend.getPayments(billingId);
+  }
+
   const {data, error} = await supabase
     .from('payments')
     .select(
@@ -153,6 +173,10 @@ export async function getPayments(billingId: string) {
 }
 
 export async function getPaymentsForApartment(apartmentId: string) {
+  if (isE2EMode) {
+    return e2eBackend.getPaymentsForApartment(apartmentId);
+  }
+
   const {data, error} = await supabase
     .from('payments')
     .select(
@@ -169,6 +193,10 @@ export async function getPaymentsForApartment(apartmentId: string) {
 }
 
 export async function getMyPayments(tenantId: string) {
+  if (isE2EMode) {
+    return e2eBackend.getMyPayments(tenantId);
+  }
+
   const {data, error} = await supabase
     .from('payments')
     .select('*, billing_periods:billing_period_id(*)')
@@ -183,6 +211,10 @@ export async function getMyPayments(tenantId: string) {
 }
 
 export async function getPayment(id: string) {
+  if (isE2EMode) {
+    return e2eBackend.getPayment(id);
+  }
+
   const {data, error} = await supabase
     .from('payments')
     .select(
@@ -203,6 +235,10 @@ export async function reportPayment(
   method: 'bank_transfer' | 'cash',
   receiptUrl?: string,
 ) {
+  if (isE2EMode) {
+    return e2eBackend.reportPayment(id, method, receiptUrl);
+  }
+
   const updates: Record<string, any> = {
     status: 'tenant_reported',
     payment_method: method,
@@ -229,6 +265,10 @@ export async function reportPayment(
 }
 
 export async function confirmPayment(id: string, confirmedBy: string) {
+  if (isE2EMode) {
+    return e2eBackend.confirmPayment(id, confirmedBy);
+  }
+
   const {data, error} = await supabase
     .from('payments')
     .update({
@@ -249,6 +289,10 @@ export async function confirmPayment(id: string, confirmedBy: string) {
 }
 
 export async function rejectPayment(id: string, note?: string) {
+  if (isE2EMode) {
+    return e2eBackend.rejectPayment(id, note);
+  }
+
   const updates: Record<string, any> = {
     status: 'unpaid',
     paid_at: null,

@@ -14,6 +14,7 @@ import { useAppDispatch } from '../../../store';
 import {
   createApartmentRequest,
   fetchApartmentRequest,
+  updateApartmentRequest,
 } from '../../../store/slices/apartmentSlice';
 import {
   apartmentSetupSchema,
@@ -28,7 +29,7 @@ const ApartmentSetupScreen: React.FC = () => {
   const navigation = useNavigation<NavigationProp>();
   const route = useRoute<SetupRouteProp>();
   const dispatch = useAppDispatch();
-  const { apartment, loading } = useApartment();
+  const { apartment, loading, error } = useApartment();
 
   const editId = route.params?.id;
   const isEditMode = !!editId;
@@ -64,19 +65,36 @@ const ApartmentSetupScreen: React.FC = () => {
   }, [isEditMode, apartment, reset]);
 
   const prevLoadingRef = React.useRef(loading);
+  const submittedRef = React.useRef(false);
   useEffect(() => {
-    if (prevLoadingRef.current && !loading && apartment && !isEditMode) {
-      navigation.navigate('InviteCode', { apartmentId: apartment.id });
+    if (
+      prevLoadingRef.current &&
+      !loading &&
+      !error &&
+      apartment &&
+      submittedRef.current
+    ) {
+      submittedRef.current = false;
+      if (isEditMode) {
+        navigation.goBack();
+      } else {
+        navigation.navigate('InviteCode', { apartmentId: apartment.id });
+      }
     }
     prevLoadingRef.current = loading;
-  }, [loading, apartment, isEditMode, navigation]);
+  }, [loading, error, apartment, isEditMode, navigation]);
 
   const onSubmit = (data: ApartmentSetupFormData) => {
+    submittedRef.current = true;
+    if (isEditMode && editId) {
+      dispatch(updateApartmentRequest({ id: editId, updates: data }));
+      return;
+    }
     dispatch(createApartmentRequest(data));
   };
 
   return (
-    <ScreenWrapper scroll>
+    <ScreenWrapper testID="apartment-setup-screen" scroll>
       <LoadingOverlay visible={loading} />
 
       <Text style={styles.title}>
@@ -94,6 +112,7 @@ const ApartmentSetupScreen: React.FC = () => {
           name="name"
           render={({ field: { onChange, value } }) => (
             <Input
+              testID="apartment-name-input"
               label="Ten can ho"
               placeholder="VD: Chung cu Sunrise"
               value={value}
@@ -108,6 +127,7 @@ const ApartmentSetupScreen: React.FC = () => {
           name="address"
           render={({ field: { onChange, value } }) => (
             <Input
+              testID="apartment-address-input"
               label="Dia chi"
               placeholder="VD: 123 Nguyen Hue, Q.1, TP.HCM"
               value={value}
@@ -122,6 +142,7 @@ const ApartmentSetupScreen: React.FC = () => {
           name="num_rooms"
           render={({ field: { onChange, value } }) => (
             <Input
+              testID="apartment-rooms-input"
               label="So phong"
               placeholder="VD: 10"
               value={value ? String(value) : ''}
@@ -136,6 +157,7 @@ const ApartmentSetupScreen: React.FC = () => {
         />
 
         <Button
+          testID="apartment-submit-btn"
           title={isEditMode ? 'Cap nhat' : 'Tao can ho'}
           onPress={handleSubmit(onSubmit)}
           loading={loading}

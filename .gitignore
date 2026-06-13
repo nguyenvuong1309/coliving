@@ -78,4 +78,7 @@ yarn-error.log
 .env
 .env.*
 !.env.example
+!.env.e2e
 e2e/logs/
+e2e/artifacts/
+e2e/build/

@@ -56,7 +56,7 @@ const BorrowDetailScreen: React.FC = () => {
 
   if (!currentRequest) {
     return (
-      <ScreenWrapper>
+      <ScreenWrapper testID="tenant-borrow-detail-screen">
         <LoadingOverlay visible={loading} />
         <Text style={styles.emptyText}>Khong tim thay yeu cau</Text>
       </ScreenWrapper>
@@ -69,7 +69,7 @@ const BorrowDetailScreen: React.FC = () => {
   const assetName = (currentRequest as any).assets?.name ?? currentRequest.asset_id;
 
   return (
-    <ScreenWrapper>
+    <ScreenWrapper testID="tenant-borrow-detail-screen">
       <LoadingOverlay visible={loading} />
 
       {/* Asset info */}
@@ -199,6 +199,7 @@ const BorrowDetailScreen: React.FC = () => {
 
         {isBorrower && status === 'in_use' && (
           <Button
+            testID="tenant-borrow-return-btn"
             title="Da tra"
             onPress={() => handleUpdateStatus('return_requested')}
             loading={loading}

@@ -89,6 +89,7 @@ const PaymentOverviewScreen: React.FC = () => {
 
     return (
       <Card
+        testID={`payment-overview-item-${item.id}`}
         style={styles.paymentCard}
         onPress={
           canConfirm
@@ -110,7 +111,7 @@ const PaymentOverviewScreen: React.FC = () => {
   };
 
   return (
-    <View style={styles.container}>
+    <View testID="payment-overview-screen" style={styles.container}>
       <LoadingOverlay visible={loading && !refreshing} />
 
       {/* Summary */}

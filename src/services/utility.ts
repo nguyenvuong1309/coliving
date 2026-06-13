@@ -4,10 +4,15 @@ import type {
   UtilityConfigInsert,
   UtilityConfigUpdate,
 } from '../types/database';
+import {e2eBackend, isE2EMode} from '../e2e/fakeBackend';
 
 export async function getUtilityConfigs(
   apartmentId: string,
 ): Promise<UtilityConfig[]> {
+  if (isE2EMode) {
+    return e2eBackend.getUtilityConfigs(apartmentId);
+  }
+
   const {data, error} = await supabase
     .from('utility_configs')
     .select('*')
@@ -24,6 +29,10 @@ export async function getUtilityConfigs(
 export async function upsertUtilityConfig(
   payload: UtilityConfigInsert,
 ): Promise<UtilityConfig> {
+  if (isE2EMode) {
+    return e2eBackend.upsertUtilityConfig(payload);
+  }
+
   const {data, error} = await supabase
     .from('utility_configs')
     .upsert(payload, {onConflict: 'apartment_id,utility_type'})
@@ -41,6 +50,10 @@ export async function updateUtilityConfig(
   id: string,
   updates: UtilityConfigUpdate,
 ): Promise<UtilityConfig> {
+  if (isE2EMode) {
+    return e2eBackend.updateUtilityConfig(id, updates);
+  }
+
   const {data, error} = await supabase
     .from('utility_configs')
     .update(updates)

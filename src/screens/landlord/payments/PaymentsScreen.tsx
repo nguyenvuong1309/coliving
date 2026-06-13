@@ -35,6 +35,7 @@ const PaymentsScreen: React.FC = () => {
     navigation.setOptions({
       headerRight: () => (
         <PressableOpacity
+          testID="payments-create-btn"
           onPress={() => navigation.navigate('CreateBilling')}
           style={styles.headerBtn}
         >
@@ -89,6 +90,7 @@ const PaymentsScreen: React.FC = () => {
 
     return (
       <Card
+        testID={`billing-item-${item.id}`}
         style={styles.periodCard}
         onPress={() =>
           navigation.navigate('PaymentOverview', { billingId: item.id })
@@ -123,7 +125,7 @@ const PaymentsScreen: React.FC = () => {
 
   if (!loading && billingPeriods.length === 0) {
     return (
-      <View style={styles.container}>
+      <View testID="landlord-payments-screen" style={styles.container}>
         <EmptyState
           title="Chua co ky thu tien"
           description="Tao ky thu tien de bat dau thu tien tu nguoi thue"
@@ -135,7 +137,7 @@ const PaymentsScreen: React.FC = () => {
   }
 
   return (
-    <View style={styles.container}>
+    <View testID="landlord-payments-screen" style={styles.container}>
       <LoadingOverlay visible={loading && !refreshing} />
       <FlatList
         data={sortedPeriods}

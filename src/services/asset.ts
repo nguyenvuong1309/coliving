@@ -1,7 +1,12 @@
 import {supabase} from '../config/supabase';
 import type {Asset, AssetInsert, AssetUpdate} from '../types/database';
+import {e2eBackend, isE2EMode} from '../e2e/fakeBackend';
 
 export async function getAssets(apartmentId: string): Promise<Asset[]> {
+  if (isE2EMode) {
+    return e2eBackend.getAssets(apartmentId);
+  }
+
   const {data, error} = await supabase
     .from('assets')
     .select('*')
@@ -16,6 +21,10 @@ export async function getAssets(apartmentId: string): Promise<Asset[]> {
 }
 
 export async function getAsset(id: string): Promise<Asset> {
+  if (isE2EMode) {
+    return e2eBackend.getAsset(id);
+  }
+
   const {data, error} = await supabase
     .from('assets')
     .select('*')
@@ -32,6 +41,10 @@ export async function getAsset(id: string): Promise<Asset> {
 export async function createAsset(
   payload: Omit<AssetInsert, 'id' | 'created_at'>,
 ): Promise<Asset> {
+  if (isE2EMode) {
+    return e2eBackend.createAsset(payload);
+  }
+
   const {data, error} = await supabase
     .from('assets')
     .insert(payload)
@@ -49,6 +62,10 @@ export async function updateAsset(
   id: string,
   updates: AssetUpdate,
 ): Promise<Asset> {
+  if (isE2EMode) {
+    return e2eBackend.updateAsset(id, updates);
+  }
+
   const {data, error} = await supabase
     .from('assets')
     .update(updates)
@@ -64,6 +81,10 @@ export async function updateAsset(
 }
 
 export async function deleteAsset(id: string): Promise<void> {
+  if (isE2EMode) {
+    return e2eBackend.deleteAsset(id);
+  }
+
   const {error} = await supabase.from('assets').delete().eq('id', id);
 
   if (error) {

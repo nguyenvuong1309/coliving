@@ -1,9 +1,14 @@
 import {supabase} from '../config/supabase';
 import type {IssueInsert} from '../types/database';
+import {e2eBackend, isE2EMode} from '../e2e/fakeBackend';
 
 export async function createIssue(
   data: Omit<IssueInsert, 'id' | 'created_at' | 'updated_at'>,
 ) {
+  if (isE2EMode) {
+    return e2eBackend.createIssue(data);
+  }
+
   const {data: issue, error} = await supabase
     .from('issues')
     .insert(data)
@@ -18,6 +23,10 @@ export async function createIssue(
 }
 
 export async function getIssues(apartmentId: string) {
+  if (isE2EMode) {
+    return e2eBackend.getIssues(apartmentId);
+  }
+
   const {data, error} = await supabase
     .from('issues')
     .select('*, reporter:reporter_id(id, full_name, avatar_url)')
@@ -32,6 +41,10 @@ export async function getIssues(apartmentId: string) {
 }
 
 export async function getIssue(id: string) {
+  if (isE2EMode) {
+    return e2eBackend.getIssue(id);
+  }
+
   const {data, error} = await supabase
     .from('issues')
     .select(
@@ -52,6 +65,10 @@ export async function updateIssueStatus(
   status: 'open' | 'in_progress' | 'resolved' | 'closed' | 'reopened',
   note?: string,
 ) {
+  if (isE2EMode) {
+    return e2eBackend.updateIssueStatus(id, status, note);
+  }
+
   const updates: Record<string, any> = {
     status,
     updated_at: new Date().toISOString(),
@@ -81,6 +98,10 @@ export async function updateIssueStatus(
 }
 
 export async function addIssueImages(issueId: string, urls: string[]) {
+  if (isE2EMode) {
+    return e2eBackend.addIssueImages(issueId, urls);
+  }
+
   const rows = urls.map(url => ({
     issue_id: issueId,
     image_url: url,

@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { View, Text, FlatList, StyleSheet } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import PressableOpacity from '../../../components/PressableOpacity';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -77,6 +78,7 @@ const BorrowListScreen: React.FC = () => {
     const assetName = (item as any).assets?.name ?? item.asset_id;
     return (
       <Card
+        testID={`borrow-item-${item.id}`}
         style={styles.itemCard}
         onPress={() => navigation.navigate('BorrowDetail', { id: item.id })}
       >
@@ -100,7 +102,11 @@ const BorrowListScreen: React.FC = () => {
   };
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView
+      testID="tenant-borrow-list-screen"
+      style={styles.container}
+      edges={['top', 'left', 'right']}
+    >
       <LoadingOverlay visible={loading} />
 
       {/* Filter tabs */}
@@ -108,6 +114,7 @@ const BorrowListScreen: React.FC = () => {
         {FILTER_TABS.map(tab => (
           <PressableOpacity
             key={tab.key}
+            testID={`borrow-filter-${tab.key}`}
             style={[styles.tab, activeTab === tab.key && styles.activeTab]}
             onPress={() => setActiveTab(tab.key)}
             activeOpacity={0.7}
@@ -145,13 +152,14 @@ const BorrowListScreen: React.FC = () => {
 
       {/* FAB */}
       <PressableOpacity
+        testID="borrow-create-fab"
         style={styles.fab}
         onPress={() => navigation.navigate('BorrowCreate')}
         activeOpacity={0.8}
       >
         <Text style={styles.fabText}>+</Text>
       </PressableOpacity>
-    </View>
+    </SafeAreaView>
   );
 };
 
@@ -223,7 +231,7 @@ const styles = StyleSheet.create({
   fab: {
     position: 'absolute',
     right: 20,
-    bottom: 24,
+    bottom: 96,
     width: 56,
     height: 56,
     borderRadius: 28,

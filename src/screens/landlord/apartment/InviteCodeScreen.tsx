@@ -27,7 +27,7 @@ const InviteCodeScreen: React.FC = () => {
   };
 
   return (
-    <ScreenWrapper scroll>
+    <ScreenWrapper testID="invite-code-screen" scroll>
       <View style={styles.container}>
         <Text style={styles.title}>Ma moi tham gia</Text>
         <Text style={styles.subtitle}>
@@ -43,12 +43,14 @@ const InviteCodeScreen: React.FC = () => {
 
         <View style={styles.actions}>
           <Button
+            testID="invite-copy-btn"
             title="Sao chep"
             onPress={handleCopy}
             variant="primary"
             style={styles.actionBtn}
           />
           <Button
+            testID="invite-share-btn"
             title="Chia se"
             onPress={handleShare}
             variant="outline"

@@ -45,12 +45,13 @@ const ChangePasswordScreen: React.FC = () => {
   }, [newPassword, confirm, dispatch]);
 
   return (
-    <ScreenWrapper>
+    <ScreenWrapper testID="change-password-screen">
       <LoadingOverlay visible={loading} />
 
       <Text style={styles.hint}>Mật khẩu mới phải có ít nhất 6 ký tự.</Text>
 
       <Input
+        testID="change-password-new-input"
         label="Mật khẩu mới"
         value={newPassword}
         onChangeText={setNewPassword}
@@ -59,6 +60,7 @@ const ChangePasswordScreen: React.FC = () => {
       />
 
       <Input
+        testID="change-password-confirm-input"
         label="Xác nhận mật khẩu"
         value={confirm}
         onChangeText={setConfirm}
@@ -67,6 +69,7 @@ const ChangePasswordScreen: React.FC = () => {
       />
 
       <Button
+        testID="change-password-submit-btn"
         title="Đổi mật khẩu"
         onPress={handleSubmit}
         loading={loading}

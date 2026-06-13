@@ -1,9 +1,14 @@
 import { supabase } from '../config/supabase';
 import type { BorrowRequestInsert } from '../types/database';
+import {e2eBackend, isE2EMode} from '../e2e/fakeBackend';
 
 export async function createBorrowRequest(
   data: Omit<BorrowRequestInsert, 'id' | 'created_at' | 'updated_at'>,
 ) {
+  if (isE2EMode) {
+    return e2eBackend.createBorrowRequest(data);
+  }
+
   const { data: request, error } = await supabase
     .from('borrow_requests')
     .insert(data)
@@ -18,6 +23,10 @@ export async function createBorrowRequest(
 }
 
 export async function getBorrowRequests(apartmentId: string) {
+  if (isE2EMode) {
+    return e2eBackend.getBorrowRequests(apartmentId);
+  }
+
   const { data, error } = await supabase
     .from('borrow_requests')
     .select(
@@ -34,6 +43,10 @@ export async function getBorrowRequests(apartmentId: string) {
 }
 
 export async function getBorrowRequest(id: string) {
+  if (isE2EMode) {
+    return e2eBackend.getBorrowRequest(id);
+  }
+
   const { data, error } = await supabase
     .from('borrow_requests')
     .select(
@@ -59,6 +72,10 @@ export async function updateBorrowStatus(
     | 'return_requested'
     | 'returned',
 ) {
+  if (isE2EMode) {
+    return e2eBackend.updateBorrowStatus(id, status);
+  }
+
   const { data, error } = await supabase
     .from('borrow_requests')
     .update({ status, updated_at: new Date().toISOString() })

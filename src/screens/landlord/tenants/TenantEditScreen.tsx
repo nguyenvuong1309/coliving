@@ -28,7 +28,7 @@ const TenantEditScreen: React.FC = () => {
 
   if (!member) {
     return (
-      <ScreenWrapper>
+      <ScreenWrapper testID="tenant-edit-screen">
         <Text style={styles.emptyText}>Khong tim thay nguoi thue</Text>
       </ScreenWrapper>
     );
@@ -88,18 +88,20 @@ function TenantEditForm({
   };
 
   return (
-    <ScreenWrapper>
+    <ScreenWrapper testID="tenant-edit-screen">
       <LoadingOverlay visible={loading} />
       <Text style={styles.title}>
         {member.profile?.full_name ?? 'Nguoi thue'}
       </Text>
       <Input
+        testID="tenant-edit-room-input"
         label="Phong"
         placeholder="VD: P101"
         value={roomName}
         onChangeText={setRoomName}
       />
       <Input
+        testID="tenant-edit-rent-input"
         label="Tien thue hang thang"
         placeholder="VD: 3500000"
         value={rentAmount}
@@ -107,6 +109,7 @@ function TenantEditForm({
         keyboardType="number-pad"
       />
       <Button
+        testID="tenant-edit-submit-btn"
         title="Luu thay doi"
         onPress={handleSubmit}
         loading={loading}

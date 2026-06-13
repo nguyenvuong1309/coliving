@@ -1,10 +1,11 @@
 import WelcomeScreen from '../../screenObjects/WelcomeScreen';
 import SignInScreen from '../../screenObjects/SignInScreen';
 import SignUpScreen from '../../screenObjects/SignUpScreen';
+import { restartAtWelcome } from '../../helpers/session';
 
 describe('WelcomeScreen', () => {
-  before(async () => {
-    await WelcomeScreen.waitForShown();
+  beforeEach(async () => {
+    await restartAtWelcome();
   });
 
   it('should display welcome screen on launch', async () => {
@@ -17,7 +18,8 @@ describe('WelcomeScreen', () => {
   });
 
   it('should navigate back and go to SignIn', async () => {
-    // Quay về welcome từ SignUp
+    await WelcomeScreen.tapSignUp();
+    await SignUpScreen.waitForShown();
     await driver.back();
     await WelcomeScreen.waitForShown();
 

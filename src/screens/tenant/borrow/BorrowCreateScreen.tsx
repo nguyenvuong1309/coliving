@@ -95,6 +95,7 @@ const BorrowCreateScreen: React.FC = () => {
     const isSelected = selectedAssetId === item.id;
     return (
       <PressableOpacity
+        testID={`borrow-asset-${item.id}`}
         style={[styles.assetItem, isSelected && styles.assetItemSelected]}
         onPress={() => {
           setValue('asset_id', item.id, { shouldValidate: true });
@@ -117,7 +118,7 @@ const BorrowCreateScreen: React.FC = () => {
   };
 
   return (
-    <ScreenWrapper>
+    <ScreenWrapper testID="tenant-borrow-create-screen">
       <LoadingOverlay visible={loading} message="Dang tao yeu cau..." />
 
       <Text style={styles.title}>Tao yeu cau muon do</Text>
@@ -151,6 +152,7 @@ const BorrowCreateScreen: React.FC = () => {
         name="note"
         render={({ field: { onChange, value } }) => (
           <Input
+            testID="borrow-note-input"
             label="Ghi chu"
             placeholder="Ly do muon, thoi gian du kien..."
             value={value ?? ''}
@@ -168,6 +170,7 @@ const BorrowCreateScreen: React.FC = () => {
         name="borrow_duration"
         render={({ field: { onChange, value } }) => (
           <Input
+            testID="borrow-duration-input"
             label="Thoi gian muon"
             placeholder="VD: 2 ngay, 1 tuan..."
             value={value}
@@ -179,6 +182,7 @@ const BorrowCreateScreen: React.FC = () => {
 
       <Text style={styles.label}>Han tra</Text>
       <PressableOpacity
+        testID="borrow-due-date-btn"
         style={styles.dateButton}
         onPress={() => setShowDueDatePicker(true)}
       >
@@ -203,6 +207,7 @@ const BorrowCreateScreen: React.FC = () => {
 
       <View style={styles.submitContainer}>
         <Button
+          testID="borrow-submit-btn"
           title="Gui yeu cau"
           onPress={handleSubmit(onSubmit)}
           loading={loading}

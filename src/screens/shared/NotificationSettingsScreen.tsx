@@ -98,7 +98,7 @@ const NotificationSettingsScreen: React.FC = () => {
   );
 
   return (
-    <ScreenWrapper>
+    <ScreenWrapper testID="notification-settings-screen">
       <LoadingOverlay visible={loading} />
       <Card style={styles.card}>
         {TOGGLES.map((item, index) => (
@@ -109,6 +109,7 @@ const NotificationSettingsScreen: React.FC = () => {
                 <Text style={styles.description}>{item.description}</Text>
               </View>
               <Switch
+                testID={`notification-setting-${item.key}`}
                 value={preference?.[item.key] ?? true}
                 onValueChange={value => handleToggle(item.key, value)}
                 trackColor={{false: '#CBD5E1', true: '#93C5FD'}}

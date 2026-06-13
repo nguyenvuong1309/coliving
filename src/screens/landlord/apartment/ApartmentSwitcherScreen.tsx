@@ -41,7 +41,10 @@ const ApartmentSwitcherScreen: React.FC = () => {
     const isSelected = item.id === apartment?.id;
 
     return (
-      <Card style={styles.card} onPress={() => handleSelect(item)}>
+      <Card
+        testID={`apartment-item-${item.id}`}
+        style={styles.card}
+        onPress={() => handleSelect(item)}>
         <View style={styles.row}>
           <View style={styles.info}>
             <Text style={styles.name}>{item.name}</Text>
@@ -61,7 +64,7 @@ const ApartmentSwitcherScreen: React.FC = () => {
   };
 
   return (
-    <View style={styles.container}>
+    <View testID="apartment-switcher-screen" style={styles.container}>
       <LoadingOverlay visible={loading} />
       <FlatList
         data={apartments}

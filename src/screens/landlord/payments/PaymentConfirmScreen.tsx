@@ -107,7 +107,7 @@ const PaymentConfirmScreen: React.FC = () => {
 
   if (!payment) {
     return (
-      <ScreenWrapper scroll>
+      <ScreenWrapper testID="payment-confirm-screen" scroll>
         <LoadingOverlay visible={loading} />
         <Text style={styles.emptyText}>Khong tim thay thanh toan</Text>
       </ScreenWrapper>
@@ -115,7 +115,7 @@ const PaymentConfirmScreen: React.FC = () => {
   }
 
   return (
-    <ScreenWrapper scroll>
+    <ScreenWrapper testID="payment-confirm-screen" scroll>
       <LoadingOverlay visible={loading} />
 
       <Text style={styles.title}>Xac nhan thanh toan</Text>
@@ -186,12 +186,14 @@ const PaymentConfirmScreen: React.FC = () => {
       {payment.status === 'tenant_reported' && (
         <View style={styles.actions}>
           <Button
+            testID="payment-confirm-btn"
             title="Xac nhan da nhan"
             onPress={handleConfirm}
             variant="primary"
             style={styles.confirmBtn}
           />
           <Button
+            testID="payment-reject-btn"
             title="Chua nhan duoc"
             onPress={handleReject}
             variant="danger"

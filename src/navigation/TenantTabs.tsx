@@ -1,4 +1,5 @@
 import React from 'react';
+import { ActivityIndicator, StyleSheet, View } from 'react-native';
 import { createNativeBottomTabNavigator } from '@react-navigation/bottom-tabs/unstable';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { useAppSelector } from '../store';
@@ -27,9 +28,15 @@ import JoinApartmentScreen from '../screens/auth/JoinApartmentScreen';
 const Tab = createNativeBottomTabNavigator<TenantTabParamList>();
 const Stack = createNativeStackNavigator<TenantStackParamList>();
 
-function TenantTabNavigator() {
-  const unreadCount = useAppSelector(state => state.notification.unreadCount);
+function ApartmentLoadingScreen() {
+  return (
+    <View testID="apartment-loading-screen" style={styles.loading}>
+      <ActivityIndicator size="large" color="#2563EB" />
+    </View>
+  );
+}
 
+function TenantTabNavigator() {
   return (
     <Tab.Navigator
       screenOptions={{
@@ -41,42 +48,51 @@ function TenantTabNavigator() {
       <Tab.Screen
         name="TenantHome"
         component={TenantHomeScreen}
-        options={{ tabBarLabel: 'Trang chủ' }}
+        options={{
+          tabBarLabel: 'Trang chủ',
+        }}
       />
       <Tab.Screen
         name="BorrowList"
         component={BorrowListScreen}
-        options={{ tabBarLabel: 'Mượn đồ' }}
+        options={{
+          tabBarLabel: 'Mượn đồ',
+        }}
       />
       <Tab.Screen
         name="IssueList"
         component={IssueListScreen}
-        options={{ tabBarLabel: 'Sự cố' }}
+        options={{
+          tabBarLabel: 'Sự cố',
+        }}
       />
       <Tab.Screen
         name="PaymentHistory"
         component={PaymentHistoryScreen}
-        options={{ tabBarLabel: 'Thanh toán' }}
-      />
-      <Tab.Screen
-        name="Notifications"
-        component={NotificationsScreen}
         options={{
-          tabBarLabel: 'Thông báo',
-          tabBarBadge: unreadCount > 0 ? unreadCount : undefined,
+          tabBarLabel: 'Thanh toán',
         }}
       />
       <Tab.Screen
         name="TenantProfile"
         component={TenantProfileScreen}
-        options={{ tabBarLabel: 'Cá nhân' }}
+        options={{
+          tabBarLabel: 'Cá nhân',
+        }}
       />
     </Tab.Navigator>
   );
 }
 
 export default function TenantStack() {
-  const apartment = useAppSelector(state => state.apartment.apartment);
+  const userId = useAppSelector(state => state.auth.user?.id);
+  const { apartment, loadedForUserId } = useAppSelector(
+    state => state.apartment,
+  );
+
+  if (userId && loadedForUserId !== userId) {
+    return <ApartmentLoadingScreen />;
+  }
 
   if (!apartment) {
     return (
@@ -160,3 +176,12 @@ export default function TenantStack() {
     </Stack.Navigator>
   );
 }
+
+const styles = StyleSheet.create({
+  loading: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#F8FAFC',
+  },
+});

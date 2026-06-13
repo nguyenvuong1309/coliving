@@ -30,7 +30,7 @@ export default function ForgotPasswordScreen() {
 
   if (sent) {
     return (
-      <View style={styles.container}>
+      <View testID="forgotpassword-screen" style={styles.container}>
         <Text style={styles.icon}>✓</Text>
         <Text style={styles.title}>Email đã gửi!</Text>
         <Text style={styles.desc}>
@@ -41,7 +41,7 @@ export default function ForgotPasswordScreen() {
   }
 
   return (
-    <View style={styles.container}>
+    <View testID="forgotpassword-screen" style={styles.container}>
       <Text style={styles.title}>Quên mật khẩu</Text>
       <Text style={styles.desc}>
         Nhập email đã đăng ký, chúng tôi sẽ gửi link đặt lại mật khẩu.
@@ -52,6 +52,7 @@ export default function ForgotPasswordScreen() {
         name="email"
         render={({ field: { onChange, onBlur, value } }) => (
           <Input
+            testID="forgot-password-email-input"
             label="Email"
             placeholder="email@example.com"
             value={value}
@@ -65,6 +66,7 @@ export default function ForgotPasswordScreen() {
       />
 
       <Button
+        testID="forgot-password-submit-btn"
         title="Gửi link đặt lại"
         onPress={handleSubmit(onSubmit)}
         loading={loading}

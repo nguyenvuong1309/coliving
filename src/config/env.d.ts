@@ -1,6 +1,7 @@
 declare module 'react-native-config' {
   export interface NativeConfig {
-    ENV: 'development' | 'production';
+    ENV: 'development' | 'production' | 'e2e';
+    E2E_MODE?: string;
     SUPABASE_URL: string;
     SUPABASE_ANON_KEY: string;
     APP_NAME: string;

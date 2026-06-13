@@ -36,6 +36,7 @@ export default function RoleSelectionScreen() {
 
   return (
     <KeyboardAvoidingView
+      testID="role-selection-screen"
       style={styles.container}
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
     >
@@ -45,6 +46,7 @@ export default function RoleSelectionScreen() {
 
         <View style={styles.roleContainer}>
           <PressableOpacity
+            testID="role-selection-tenant-btn"
             style={[
               styles.roleCard,
               selectedRole === 'tenant' && styles.roleCardActive,
@@ -57,6 +59,7 @@ export default function RoleSelectionScreen() {
           </PressableOpacity>
 
           <PressableOpacity
+            testID="role-selection-landlord-btn"
             style={[
               styles.roleCard,
               selectedRole === 'landlord' && styles.roleCardActive,
@@ -70,6 +73,7 @@ export default function RoleSelectionScreen() {
         </View>
 
         <Button
+          testID="role-selection-continue-btn"
           title="Tiếp tục"
           onPress={handleContinue}
           disabled={!selectedRole}

@@ -77,7 +77,7 @@ const IssueDetailScreen: React.FC = () => {
 
   if (!currentIssue) {
     return (
-      <ScreenWrapper>
+      <ScreenWrapper testID="tenant-issue-detail-screen">
         <LoadingOverlay visible={loading} />
         <Text style={styles.emptyText}>Khong tim thay su co</Text>
       </ScreenWrapper>
@@ -87,7 +87,7 @@ const IssueDetailScreen: React.FC = () => {
   const { status } = currentIssue;
 
   return (
-    <ScreenWrapper>
+    <ScreenWrapper testID="tenant-issue-detail-screen">
       <LoadingOverlay visible={loading} />
 
       {/* Title and status */}
@@ -234,12 +234,14 @@ const IssueDetailScreen: React.FC = () => {
       {status === 'resolved' && (
         <View style={styles.actionsContainer}>
           <Button
+            testID="tenant-issue-close-btn"
             title="Xac nhan da on"
             onPress={() => handleUpdateStatus('closed')}
             loading={loading}
             style={styles.actionBtn}
           />
           <Button
+            testID="tenant-issue-reopen-btn"
             title="Chua xong, mo lai"
             onPress={() => handleUpdateStatus('reopened')}
             variant="outline"

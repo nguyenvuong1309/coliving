@@ -1,5 +1,11 @@
 import BasePage from './BasePage';
-import { tap, typeText, isDisplayed, getText } from '../helpers/utils';
+import {
+  tap,
+  typeText,
+  isDisplayed,
+  waitForDisplayed,
+  TIMEOUT,
+} from '../helpers/utils';
 
 class SignUpScreen extends BasePage {
   readonly pageId = 'signup-screen';
@@ -33,10 +39,12 @@ class SignUpScreen extends BasePage {
   }
 
   async getErrorMessage(): Promise<string | null> {
-    if (await isDisplayed('signup-error-message')) {
-      return getText('signup-error-message');
+    try {
+      const error = await waitForDisplayed('signup-error-message', TIMEOUT.short);
+      return error.getText();
+    } catch {
+      return null;
     }
-    return null;
   }
 
   async hasFullNameError(): Promise<boolean> {

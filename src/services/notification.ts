@@ -1,7 +1,12 @@
 import {supabase} from '../config/supabase';
 import type {NotificationInsert} from '../types/database';
+import {e2eBackend, isE2EMode} from '../e2e/fakeBackend';
 
 export async function createNotification(payload: NotificationInsert) {
+  if (isE2EMode) {
+    return e2eBackend.createNotification(payload);
+  }
+
   const {data, error} = await supabase
     .from('notifications')
     .insert(payload)
@@ -16,6 +21,10 @@ export async function createNotification(payload: NotificationInsert) {
 }
 
 export async function getNotifications(userId: string) {
+  if (isE2EMode) {
+    return e2eBackend.getNotifications(userId);
+  }
+
   const {data, error} = await supabase
     .from('notifications')
     .select('*')
@@ -30,6 +39,10 @@ export async function getNotifications(userId: string) {
 }
 
 export async function markAsRead(id: string) {
+  if (isE2EMode) {
+    return e2eBackend.markAsRead(id);
+  }
+
   const {data, error} = await supabase
     .from('notifications')
     .update({is_read: true})
@@ -45,6 +58,10 @@ export async function markAsRead(id: string) {
 }
 
 export async function markAllAsRead(userId: string) {
+  if (isE2EMode) {
+    return e2eBackend.markAllAsRead(userId);
+  }
+
   const {data, error} = await supabase
     .from('notifications')
     .update({is_read: true})
@@ -60,6 +77,10 @@ export async function markAllAsRead(userId: string) {
 }
 
 export async function getUnreadCount(userId: string) {
+  if (isE2EMode) {
+    return e2eBackend.getUnreadCount(userId);
+  }
+
   const {count, error} = await supabase
     .from('notifications')
     .select('*', {count: 'exact', head: true})

@@ -38,7 +38,10 @@ const RoommateListScreen: React.FC = () => {
   );
 
   return (
-    <ScreenWrapper scroll={false} padding={0}>
+    <ScreenWrapper
+      testID="tenant-roommate-list-screen"
+      scroll={false}
+      padding={0}>
       <LoadingOverlay visible={loading} />
       <FlatList
         data={roommates}

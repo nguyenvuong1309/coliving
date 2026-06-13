@@ -140,7 +140,7 @@ const IssueDetailScreen: React.FC = () => {
 
   if (!issue && !loading) {
     return (
-      <ScreenWrapper scroll>
+      <ScreenWrapper testID="landlord-issue-detail-screen" scroll>
         <Text style={styles.emptyText}>Khong tim thay su co</Text>
       </ScreenWrapper>
     );
@@ -148,14 +148,14 @@ const IssueDetailScreen: React.FC = () => {
 
   if (!issue) {
     return (
-      <ScreenWrapper scroll>
+      <ScreenWrapper testID="landlord-issue-detail-screen" scroll>
         <LoadingOverlay visible />
       </ScreenWrapper>
     );
   }
 
   return (
-    <ScreenWrapper scroll>
+    <ScreenWrapper testID="landlord-issue-detail-screen" scroll>
       <LoadingOverlay visible={loading} />
 
       {/* Title & Status */}
@@ -266,6 +266,7 @@ const IssueDetailScreen: React.FC = () => {
           <Text style={styles.sectionTitle}>Hanh dong</Text>
           <Card>
             <TextInput
+              testID="landlord-issue-note-input"
               style={styles.noteInput}
               placeholder={
                 currentAction.next === 'resolved'
@@ -280,6 +281,7 @@ const IssueDetailScreen: React.FC = () => {
               placeholderTextColor="#94A3B8"
             />
             <Button
+              testID="landlord-issue-action-btn"
               title={currentAction.nextLabel}
               onPress={() => handleStatusUpdate(currentAction.next)}
               loading={loading}

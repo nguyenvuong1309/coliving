@@ -120,7 +120,7 @@ const IssueCreateScreen: React.FC = () => {
   };
 
   return (
-    <ScreenWrapper>
+    <ScreenWrapper testID="tenant-issue-create-screen">
       <LoadingOverlay visible={loading} message="Dang tao bao cao..." />
 
       <Text style={styles.title}>Bao cao su co</Text>
@@ -130,6 +130,7 @@ const IssueCreateScreen: React.FC = () => {
       <View style={styles.optionRow}>
         {CATEGORIES.map(cat => (
           <PressableOpacity
+            testID={`issue-category-${cat.value}`}
             key={cat.value}
             style={[
               styles.optionChip,
@@ -160,6 +161,7 @@ const IssueCreateScreen: React.FC = () => {
       <View style={styles.optionRow}>
         {LOCATIONS.map(loc => (
           <PressableOpacity
+            testID={`issue-location-${loc.value}`}
             key={loc.value}
             style={[
               styles.optionChip,
@@ -190,6 +192,7 @@ const IssueCreateScreen: React.FC = () => {
       <View style={styles.urgencyRow}>
         {URGENCY_OPTIONS.map(opt => (
           <PressableOpacity
+            testID={`issue-urgency-${opt.value}`}
             key={opt.value}
             style={[
               styles.urgencyBtn,
@@ -221,6 +224,7 @@ const IssueCreateScreen: React.FC = () => {
         name="title"
         render={({ field: { onChange, value } }) => (
           <Input
+            testID="issue-title-input"
             label="Tieu de"
             placeholder="Mo ta ngan gon su co..."
             value={value}
@@ -236,6 +240,7 @@ const IssueCreateScreen: React.FC = () => {
         name="description"
         render={({ field: { onChange, value } }) => (
           <Input
+            testID="issue-description-input"
             label="Mo ta chi tiet"
             placeholder="Mo ta chi tiet hon ve su co..."
             value={value ?? ''}
@@ -263,6 +268,7 @@ const IssueCreateScreen: React.FC = () => {
         ))}
         {images.length < 3 && (
           <PressableOpacity
+            testID="issue-add-image-btn"
             style={styles.addImageBtn}
             onPress={handlePickImage}
             activeOpacity={0.7}
@@ -275,6 +281,7 @@ const IssueCreateScreen: React.FC = () => {
 
       <View style={styles.submitContainer}>
         <Button
+          testID="issue-submit-btn"
           title="Gui bao cao"
           onPress={handleSubmit(onSubmit)}
           loading={loading}

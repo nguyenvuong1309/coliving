@@ -215,7 +215,7 @@ const AssetEditScreen: React.FC = () => {
   }, [editId, dispatch]);
 
   return (
-    <ScreenWrapper scroll>
+    <ScreenWrapper testID="asset-edit-screen" scroll>
       <LoadingOverlay visible={loading} />
 
       {/* Image Picker */}
@@ -239,6 +239,7 @@ const AssetEditScreen: React.FC = () => {
 
       {/* Name */}
       <Input
+        testID="asset-name-input"
         label="Ten tai san"
         placeholder="VD: May giat Samsung"
         value={form.name}
@@ -250,6 +251,7 @@ const AssetEditScreen: React.FC = () => {
       <View style={styles.pickerRow}>
         {CATEGORIES.map(cat => (
           <PressableOpacity
+            testID={`asset-category-${cat}`}
             key={cat}
             style={[
               styles.pickerChip,
@@ -274,6 +276,7 @@ const AssetEditScreen: React.FC = () => {
       <View style={styles.pickerRow}>
         {LOCATIONS.map(loc => (
           <PressableOpacity
+            testID={`asset-location-${loc}`}
             key={loc}
             style={[
               styles.pickerChip,
@@ -298,6 +301,7 @@ const AssetEditScreen: React.FC = () => {
       <View style={styles.pickerRow}>
         {CONDITIONS.map(c => (
           <PressableOpacity
+            testID={`asset-condition-${c.value}`}
             key={c.value}
             style={[
               styles.pickerChip,
@@ -327,6 +331,7 @@ const AssetEditScreen: React.FC = () => {
             </Text>
           </View>
           <Switch
+            testID="asset-borrowable-switch"
             value={form.isBorrowable}
             onValueChange={value =>
               updateForm({ type: 'setIsBorrowable', value })
@@ -339,6 +344,7 @@ const AssetEditScreen: React.FC = () => {
 
       {/* Submit */}
       <Button
+        testID="asset-submit-btn"
         title={isEditMode ? 'Cap nhat' : 'Them tai san'}
         onPress={handleSubmit}
         loading={loading}
@@ -348,6 +354,7 @@ const AssetEditScreen: React.FC = () => {
       {/* Delete (edit mode only) */}
       {isEditMode && (
         <Button
+          testID="asset-delete-btn"
           title="Xoa tai san"
           onPress={handleDelete}
           variant="danger"

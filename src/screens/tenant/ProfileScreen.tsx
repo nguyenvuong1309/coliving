@@ -33,7 +33,7 @@ const ProfileScreen: React.FC = () => {
   }, [signOut]);
 
   return (
-    <ScreenWrapper>
+    <ScreenWrapper testID="tenant-profile-screen">
       {/* Profile header */}
       <View style={styles.profileHeader}>
         <Avatar
@@ -98,6 +98,7 @@ const ProfileScreen: React.FC = () => {
         <Text style={styles.sectionTitle}>Tai khoan</Text>
 
         <PressableOpacity
+          testID="tenant-profile-edit-btn"
           style={styles.settingRow}
           onPress={() => navigation.navigate('EditProfile')}
         >
@@ -106,6 +107,7 @@ const ProfileScreen: React.FC = () => {
         </PressableOpacity>
 
         <PressableOpacity
+          testID="tenant-profile-password-btn"
           style={styles.settingRow}
           onPress={() => navigation.navigate('ChangePassword')}
         >
@@ -114,6 +116,7 @@ const ProfileScreen: React.FC = () => {
         </PressableOpacity>
 
         <PressableOpacity
+          testID="tenant-profile-notifications-btn"
           style={styles.settingRow}
           onPress={() => navigation.navigate('NotificationSettings')}
         >
@@ -130,6 +133,7 @@ const ProfileScreen: React.FC = () => {
       {/* Sign out */}
       <View style={styles.signOutContainer}>
         <Button
+          testID="tenant-profile-signout-btn"
           title="Dang xuat"
           onPress={handleSignOut}
           variant="danger"

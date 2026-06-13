@@ -127,7 +127,7 @@ const DashboardScreen: React.FC = () => {
   );
 
   return (
-    <ScreenWrapper scroll>
+    <ScreenWrapper testID="landlord-dashboard-screen" scroll>
       <LoadingOverlay visible={apartmentLoading} />
 
       {/* Header */}
@@ -158,6 +158,7 @@ const DashboardScreen: React.FC = () => {
 
       {/* Open Issues Card */}
       <Card
+        testID="dashboard-open-issues-btn"
         style={styles.infoCard}
         onPress={() => navigation.navigate('LandlordIssueList')}
       >
@@ -172,6 +173,7 @@ const DashboardScreen: React.FC = () => {
 
       {/* Pending Borrows Card */}
       <Card
+        testID="dashboard-borrow-requests-btn"
         style={styles.infoCard}
         onPress={() => navigation.navigate('LandlordBorrowList')}
       >
@@ -205,12 +207,14 @@ const DashboardScreen: React.FC = () => {
         <Text style={styles.sectionTitle}>Thao tac nhanh</Text>
         <View style={styles.quickActions}>
           <Button
+            testID="dashboard-create-billing-btn"
             title="Tao ky thu tien"
             onPress={() => navigation.navigate('CreateBilling')}
             variant="primary"
             style={styles.quickActionBtn}
           />
           <Button
+            testID="dashboard-apartment-btn"
             title="Quan ly can ho"
             onPress={() =>
               navigation.navigate('ApartmentSetup', {

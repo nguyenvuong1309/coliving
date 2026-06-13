@@ -115,7 +115,7 @@ const TenantDetailScreen: React.FC = () => {
   );
 
   return (
-    <ScreenWrapper scroll>
+    <ScreenWrapper testID="tenant-detail-screen" scroll>
       <LoadingOverlay visible={loading} />
 
       {/* Profile Section */}
@@ -183,6 +183,7 @@ const TenantDetailScreen: React.FC = () => {
 
       {/* Remove Button */}
       <Button
+        testID="tenant-detail-edit-btn"
         title="Chinh sua phong / tien thue"
         onPress={() => navigation.navigate('TenantEdit', { id })}
         variant="outline"
@@ -190,6 +191,7 @@ const TenantDetailScreen: React.FC = () => {
       />
 
       <Button
+        testID="tenant-detail-remove-btn"
         title="Xoa khoi can ho"
         onPress={handleRemove}
         variant="danger"

@@ -6,12 +6,14 @@ interface CardProps {
   children: React.ReactNode;
   style?: ViewStyle;
   onPress?: () => void;
+  testID?: string;
 }
 
-const Card: React.FC<CardProps> = ({ children, style, onPress }) => {
+const Card: React.FC<CardProps> = ({ children, style, onPress, testID }) => {
   if (onPress) {
     return (
       <PressableOpacity
+        testID={testID}
         style={[styles.card, style]}
         onPress={onPress}
         activeOpacity={0.7}
@@ -21,7 +23,11 @@ const Card: React.FC<CardProps> = ({ children, style, onPress }) => {
     );
   }
 
-  return <View style={[styles.card, style]}>{children}</View>;
+  return (
+    <View testID={testID} style={[styles.card, style]}>
+      {children}
+    </View>
+  );
 };
 
 const styles = StyleSheet.create({

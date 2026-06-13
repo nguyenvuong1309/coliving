@@ -68,6 +68,7 @@ const UtilityConfigRow = React.memo(function UtilityConfigRow({
           <Text style={styles.meta}>{description}</Text>
         </View>
         <Switch
+          testID={`utility-active-${item.type}`}
           value={active}
           onValueChange={value => onActiveChange(item.type, value)}
           trackColor={SWITCH_TRACK_COLOR}
@@ -77,6 +78,7 @@ const UtilityConfigRow = React.memo(function UtilityConfigRow({
 
       <Text style={styles.label}>So tien moi nguoi / thang</Text>
       <TextInput
+        testID={`utility-amount-${item.type}`}
         value={amountText}
         onChangeText={text => onAmountChange(item.type, text)}
         keyboardType="number-pad"
@@ -86,6 +88,7 @@ const UtilityConfigRow = React.memo(function UtilityConfigRow({
       <Text style={styles.preview}>{formatCurrency(amount)}</Text>
 
       <Button
+        testID={`utility-save-${item.type}`}
         title={exists ? 'Cap nhat' : 'Luu cau hinh'}
         onPress={() => onSave(item.type)}
         loading={loading}
@@ -189,7 +192,7 @@ const UtilityConfigScreen: React.FC = () => {
   const renderSeparator = useCallback(() => <View style={styles.gap} />, []);
 
   return (
-    <ScreenWrapper scroll={false}>
+    <ScreenWrapper testID="utility-config-screen" scroll={false}>
       <LoadingOverlay visible={loading} />
       <FlatList
         data={DEFAULT_UTILITIES}

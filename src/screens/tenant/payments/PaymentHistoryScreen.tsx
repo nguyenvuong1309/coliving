@@ -94,6 +94,7 @@ const PaymentHistoryScreen: React.FC = () => {
 
   const renderItem = ({ item }: { item: Payment }) => (
     <Card
+      testID={`payment-item-${item.id}`}
       style={styles.itemCard}
       onPress={() => navigation.navigate('PaymentDetail', { id: item.id })}
     >
@@ -135,7 +136,7 @@ const PaymentHistoryScreen: React.FC = () => {
   );
 
   return (
-    <View style={styles.container}>
+    <View testID="tenant-payment-history-screen" style={styles.container}>
       <LoadingOverlay visible={loading} />
       <SectionList
         sections={sections}

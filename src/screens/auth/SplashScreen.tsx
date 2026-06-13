@@ -24,7 +24,7 @@ export default function SplashScreen() {
   }, [checkSession, navigation]);
 
   return (
-    <View style={styles.container}>
+    <View testID="splash-screen" style={styles.container}>
       <Text style={styles.logo}>CoLiving</Text>
       <Text style={styles.tagline}>Quản lý căn hộ thông minh</Text>
       <ActivityIndicator

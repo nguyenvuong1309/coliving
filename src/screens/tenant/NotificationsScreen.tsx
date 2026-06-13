@@ -70,6 +70,7 @@ const NotificationsScreen: React.FC = () => {
 
     return (
       <PressableOpacity
+        testID={`notification-item-${item.id}`}
         style={[styles.notifItem, !item.is_read && styles.notifItemUnread]}
         onPress={() => handlePressNotification(item)}
         activeOpacity={0.7}
@@ -107,12 +108,15 @@ const NotificationsScreen: React.FC = () => {
   };
 
   return (
-    <View style={styles.container}>
+    <View testID="notifications-screen" style={styles.container}>
       <LoadingOverlay visible={loading} />
       <View style={styles.screenHeader}>
         <Text style={styles.screenTitle}>Thong bao</Text>
         {unreadCount > 0 && (
-          <PressableOpacity onPress={handleMarkAllAsRead} activeOpacity={0.7}>
+          <PressableOpacity
+            testID="notifications-mark-all-btn"
+            onPress={handleMarkAllAsRead}
+            activeOpacity={0.7}>
             <Text style={styles.headerBtn}>Danh dau tat ca da doc</Text>
           </PressableOpacity>
         )}

@@ -27,7 +27,7 @@ export default function JoinApartmentScreen() {
   };
 
   return (
-    <View style={styles.container}>
+    <View testID="join-apartment-screen" style={styles.container}>
       <Text style={styles.title}>Tham gia căn hộ</Text>
       <Text style={styles.desc}>
         Nhập mã mời từ chủ nhà để tham gia căn hộ của bạn.
@@ -38,6 +38,7 @@ export default function JoinApartmentScreen() {
         name="invite_code"
         render={({ field: { onChange, onBlur, value } }) => (
           <Input
+            testID="join-apartment-code-input"
             label="Mã mời"
             placeholder="Nhập mã 8 ký tự"
             value={value}
@@ -52,6 +53,7 @@ export default function JoinApartmentScreen() {
       {error && <Text style={styles.error}>{error}</Text>}
 
       <Button
+        testID="join-apartment-submit-btn"
         title="Tham gia"
         onPress={handleSubmit(onSubmit)}
         loading={loading}

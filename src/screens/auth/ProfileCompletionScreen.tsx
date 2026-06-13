@@ -107,6 +107,7 @@ export default function ProfileCompletionScreen() {
 
   return (
     <KeyboardAvoidingView
+      testID="profile-completion-screen"
       style={styles.container}
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
     >
@@ -131,6 +132,7 @@ export default function ProfileCompletionScreen() {
           name="full_name"
           render={({ field: { onChange, onBlur, value } }) => (
             <Input
+              testID="profile-completion-name-input"
               label="Họ và tên"
               placeholder="Nguyễn Văn A"
               value={value}
@@ -145,6 +147,7 @@ export default function ProfileCompletionScreen() {
         {error && <Text style={styles.error}>{error}</Text>}
 
         <Button
+          testID="profile-completion-submit-btn"
           title="Lưu & Vào ứng dụng"
           onPress={handleSubmit(onSubmit)}
           loading={isSaving || loading}

@@ -1,6 +1,7 @@
 import { supabase } from '../config/supabase';
 import Config from 'react-native-config';
 import type { ProfileInsert, ProfileUpdate } from '../types/database';
+import {e2eBackend, isE2EMode} from '../e2e/fakeBackend';
 
 export async function signUp(
   email: string,
@@ -8,6 +9,10 @@ export async function signUp(
   fullName: string,
   role: 'tenant' | 'landlord',
 ) {
+  if (isE2EMode) {
+    return e2eBackend.signUp(email, password, fullName, role);
+  }
+
   const { data: authData, error: authError } = await supabase.auth.signUp({
     email,
     password,
@@ -47,6 +52,10 @@ export async function signUp(
 }
 
 export async function signIn(email: string, password: string) {
+  if (isE2EMode) {
+    return e2eBackend.signIn(email, password);
+  }
+
   const { data, error } = await supabase.auth.signInWithPassword({
     email,
     password,
@@ -60,6 +69,10 @@ export async function signIn(email: string, password: string) {
 }
 
 export async function signOut() {
+  if (isE2EMode) {
+    return e2eBackend.signOut();
+  }
+
   const { error } = await supabase.auth.signOut();
   if (error) {
     throw error;
@@ -67,6 +80,10 @@ export async function signOut() {
 }
 
 export async function resetPassword(email: string) {
+  if (isE2EMode) {
+    return e2eBackend.resetPassword(email);
+  }
+
   const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
     redirectTo:
       Config.APP_PASSWORD_RESET_REDIRECT_URL ??
@@ -79,6 +96,10 @@ export async function resetPassword(email: string) {
 }
 
 export async function resendEmailConfirmation(email: string) {
+  if (isE2EMode) {
+    return e2eBackend.resendEmailConfirmation(email);
+  }
+
   const {data, error} = await supabase.auth.resend({
     type: 'signup',
     email,
@@ -92,6 +113,10 @@ export async function resendEmailConfirmation(email: string) {
 }
 
 export async function changePassword(newPassword: string) {
+  if (isE2EMode) {
+    return e2eBackend.changePassword(newPassword);
+  }
+
   const { data, error } = await supabase.auth.updateUser({
     password: newPassword,
   });
@@ -102,6 +127,10 @@ export async function changePassword(newPassword: string) {
 }
 
 export async function getProfile(userId: string) {
+  if (isE2EMode) {
+    return e2eBackend.getProfile(userId);
+  }
+
   const { data, error } = await supabase
     .from('profiles')
     .select('*')
@@ -116,6 +145,10 @@ export async function getProfile(userId: string) {
 }
 
 export async function updateProfile(userId: string, updates: ProfileUpdate) {
+  if (isE2EMode) {
+    return e2eBackend.updateProfile(userId, updates);
+  }
+
   const { data, error } = await supabase
     .from('profiles')
     .update({ ...updates, updated_at: new Date().toISOString() })
@@ -133,6 +166,10 @@ export async function updateProfile(userId: string, updates: ProfileUpdate) {
 // ── OAuth Functions ──────────────────────────────────────────────
 
 export async function signInWithGoogle(idToken: string, accessToken: string) {
+  if (isE2EMode) {
+    return e2eBackend.signInWithProvider();
+  }
+
   const { data, error } = await supabase.auth.signInWithIdToken({
     provider: 'google',
     token: idToken,
@@ -150,6 +187,10 @@ export async function signInWithApple(
   idToken: string,
   fullName?: { givenName?: string; familyName?: string },
 ) {
+  if (isE2EMode) {
+    return e2eBackend.signInWithProvider();
+  }
+
   const { data, error } = await supabase.auth.signInWithIdToken({
     provider: 'apple',
     token: idToken,

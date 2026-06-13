@@ -8,10 +8,7 @@ const ROOT = path.join(__dirname, '../..');
 //   cd android && ./gradlew assembleDevDebug
 const APP_PATH =
   process.env.ANDROID_APP_PATH ||
-  path.join(
-    ROOT,
-    'android/app/build/outputs/apk/devDebug/app-devDebug.apk',
-  );
+  path.join(ROOT, 'android/app/build/outputs/apk/devDebug/app-devDebug.apk');
 
 export const config: Options.Testrunner = {
   ...(sharedConfig as Options.Testrunner),
@@ -27,6 +24,8 @@ export const config: Options.Testrunner = {
       'appium:noReset': false,
       'appium:fullReset': false,
       'appium:autoGrantPermissions': true,
+      'appium:disableWindowAnimation': true,
+      'appium:uiautomator2ServerLaunchTimeout': 120000,
     },
   ],
 };

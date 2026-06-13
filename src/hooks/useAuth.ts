@@ -13,6 +13,7 @@ import {
 import {getAuthToken, clearAuth} from '../utils/mmkv';
 import {supabase} from '../config/supabase';
 import type {Profile} from '../types/database';
+import {isE2EMode} from '../e2e/fakeBackend';
 
 export function useAuth() {
   const dispatch = useAppDispatch();
@@ -63,6 +64,11 @@ export function useAuth() {
   );
 
   const checkSession = useCallback(async () => {
+    if (isE2EMode) {
+      clearAuth();
+      return false;
+    }
+
     const token = getAuthToken();
     if (!token) {
       return false;

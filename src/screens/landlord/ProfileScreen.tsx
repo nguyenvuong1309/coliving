@@ -31,7 +31,7 @@ const ProfileScreen: React.FC = () => {
   }, [signOut]);
 
   return (
-    <ScreenWrapper scroll>
+    <ScreenWrapper testID="landlord-profile-screen" scroll>
       {/* Profile Header */}
       <View style={styles.profileHeader}>
         <Avatar
@@ -53,6 +53,7 @@ const ProfileScreen: React.FC = () => {
         <Text style={styles.sectionTitle}>Can ho</Text>
         {apartment ? (
           <Card
+            testID="landlord-profile-apartment-card"
             style={styles.apartmentCard}
             onPress={() =>
               navigation.navigate('ApartmentSetup', { id: apartment.id })
@@ -85,6 +86,7 @@ const ProfileScreen: React.FC = () => {
         <Text style={styles.sectionTitle}>Tai khoan</Text>
         <Card>
           <PressableOpacity
+            testID="landlord-profile-edit-btn"
             style={styles.settingItem}
             onPress={() => navigation.navigate('EditProfile')}
           >
@@ -93,6 +95,7 @@ const ProfileScreen: React.FC = () => {
           </PressableOpacity>
           <View style={styles.settingSeparator} />
           <PressableOpacity
+            testID="landlord-profile-password-btn"
             style={styles.settingItem}
             onPress={() => navigation.navigate('ChangePassword')}
           >
@@ -101,6 +104,7 @@ const ProfileScreen: React.FC = () => {
           </PressableOpacity>
           <View style={styles.settingSeparator} />
           <PressableOpacity
+            testID="landlord-profile-notifications-btn"
             style={styles.settingItem}
             onPress={() => navigation.navigate('NotificationSettings')}
           >
@@ -123,6 +127,7 @@ const ProfileScreen: React.FC = () => {
           </View>
           <View style={styles.settingSeparator} />
           <PressableOpacity
+            testID="landlord-profile-revenue-btn"
             style={styles.settingItem}
             onPress={() => navigation.navigate('RevenueHistory')}
           >
@@ -131,6 +136,7 @@ const ProfileScreen: React.FC = () => {
           </PressableOpacity>
           <View style={styles.settingSeparator} />
           <PressableOpacity
+            testID="landlord-profile-report-btn"
             style={styles.settingItem}
             onPress={() => navigation.navigate('ReportExport')}
           >
@@ -139,6 +145,7 @@ const ProfileScreen: React.FC = () => {
           </PressableOpacity>
           <View style={styles.settingSeparator} />
           <PressableOpacity
+            testID="landlord-profile-utility-btn"
             style={styles.settingItem}
             onPress={() => navigation.navigate('UtilityConfig')}
           >
@@ -147,6 +154,7 @@ const ProfileScreen: React.FC = () => {
           </PressableOpacity>
           <View style={styles.settingSeparator} />
           <PressableOpacity
+            testID="landlord-profile-apartment-switcher-btn"
             style={styles.settingItem}
             onPress={() => navigation.navigate('ApartmentSwitcher')}
           >
@@ -157,6 +165,7 @@ const ProfileScreen: React.FC = () => {
           </PressableOpacity>
           <View style={styles.settingSeparator} />
           <PressableOpacity
+            testID="landlord-profile-invite-btn"
             style={styles.settingItem}
             onPress={() => {
               if (apartment?.id) {
@@ -174,6 +183,7 @@ const ProfileScreen: React.FC = () => {
 
       {/* Sign Out */}
       <Button
+        testID="landlord-profile-signout-btn"
         title="Dang xuat"
         onPress={handleSignOut}
         variant="danger"

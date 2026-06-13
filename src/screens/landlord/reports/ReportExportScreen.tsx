@@ -114,7 +114,7 @@ const ReportExportScreen: React.FC = () => {
   };
 
   return (
-    <ScreenWrapper>
+    <ScreenWrapper testID="report-export-screen">
       <View style={styles.tabs}>
         {REPORTS.map(report => (
           <PressableOpacity
@@ -145,14 +145,16 @@ const ReportExportScreen: React.FC = () => {
       </Card>
 
       <TextInput
+        testID="report-preview-input"
         value={csv}
         editable={false}
         multiline
         style={styles.preview}
       />
 
-      <Button
-        title={copied ? 'Da copy CSV' : 'Copy CSV'}
+        <Button
+          testID="report-copy-btn"
+          title={copied ? 'Da copy CSV' : 'Copy CSV'}
         onPress={handleCopy}
         style={styles.button}
       />

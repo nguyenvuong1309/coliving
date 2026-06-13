@@ -2,14 +2,14 @@ import WelcomeScreen from '../../screenObjects/WelcomeScreen';
 import SignUpScreen from '../../screenObjects/SignUpScreen';
 import SignInScreen from '../../screenObjects/SignInScreen';
 import { TIMEOUT, waitForDisplayed } from '../../helpers/utils';
+import { restartAtWelcome } from '../../helpers/session';
 
 // Dùng timestamp để tạo email unique mỗi lần test
 const uniqueEmail = () => `e2e+${Date.now()}@coliving.dev`;
 
 describe('SignUp', () => {
   beforeEach(async () => {
-    await driver.reloadSession();
-    await WelcomeScreen.waitForShown();
+    await restartAtWelcome();
     await WelcomeScreen.tapSignUp();
     await SignUpScreen.waitForShown();
   });
@@ -63,25 +63,23 @@ describe('SignUp', () => {
     expect(await SignInScreen.isShown()).toBe(true);
   });
 
-  // Bật khi Supabase test environment đã sẵn sàng
-  it.skip('should register a new tenant account successfully', async () => {
+  it('should register a new tenant account successfully', async () => {
     await SignUpScreen.signUp(
       'Test Tenant',
       uniqueEmail(),
       'Password123!',
       'tenant',
     );
-    // Sau khi đăng ký, chuyển đến màn hình profile completion hoặc home
-    await waitForDisplayed('tenant-home-screen', TIMEOUT.long);
+    await waitForDisplayed('join-apartment-screen', TIMEOUT.long);
   });
 
-  it.skip('should register a new landlord account successfully', async () => {
+  it('should register a new landlord account successfully', async () => {
     await SignUpScreen.signUp(
       'Test Landlord',
       uniqueEmail(),
       'Password123!',
       'landlord',
     );
-    await waitForDisplayed('landlord-dashboard-screen', TIMEOUT.long);
+    await waitForDisplayed('apartment-setup-screen', TIMEOUT.long);
   });
 });

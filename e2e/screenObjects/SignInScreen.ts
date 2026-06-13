@@ -1,5 +1,12 @@
 import BasePage from './BasePage';
-import { tap, typeText, isDisplayed, getText } from '../helpers/utils';
+import {
+  tap,
+  typeText,
+  waitForDisplayed,
+  waitForExisting,
+  dismissIosPasswordSavePrompt,
+  TIMEOUT,
+} from '../helpers/utils';
 
 class SignInScreen extends BasePage {
   readonly pageId = 'signin-screen';
@@ -25,18 +32,30 @@ class SignInScreen extends BasePage {
   }
 
   async getErrorMessage(): Promise<string | null> {
-    if (await isDisplayed('signin-error-message')) {
-      return getText('signin-error-message');
+    try {
+      const error = await waitForExisting('signin-error-message', TIMEOUT.medium);
+      return error.getText();
+    } catch {
+      return null;
     }
-    return null;
   }
 
   async hasEmailError(): Promise<boolean> {
-    return isDisplayed('signin-email-input-error');
+    try {
+      await waitForDisplayed('signin-email-input-error', TIMEOUT.short);
+      return true;
+    } catch {
+      return false;
+    }
   }
 
   async hasPasswordError(): Promise<boolean> {
-    return isDisplayed('signin-password-input-error');
+    try {
+      await waitForDisplayed('signin-password-input-error', TIMEOUT.short);
+      return true;
+    } catch {
+      return false;
+    }
   }
 
   /** Điền form và submit */
@@ -44,6 +63,7 @@ class SignInScreen extends BasePage {
     await this.enterEmail(email);
     await this.enterPassword(password);
     await this.tapSubmit();
+    await dismissIosPasswordSavePrompt();
   }
 }
 

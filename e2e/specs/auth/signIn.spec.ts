@@ -1,16 +1,12 @@
 import WelcomeScreen from '../../screenObjects/WelcomeScreen';
 import SignInScreen from '../../screenObjects/SignInScreen';
 import SignUpScreen from '../../screenObjects/SignUpScreen';
-import { waitForDisplayed, TIMEOUT } from '../../helpers/utils';
-
-// Đặt trong .env hoặc biến môi trường khi chạy CI
-const TEST_EMAIL = process.env.E2E_USER_EMAIL ?? 'test@coliving.dev';
-const TEST_PASSWORD = process.env.E2E_USER_PASSWORD ?? 'Test123456';
+import { waitForExisting, TIMEOUT } from '../../helpers/utils';
+import { E2E_ACCOUNT, restartAtWelcome } from '../../helpers/session';
 
 describe('SignIn', () => {
   beforeEach(async () => {
-    await driver.reloadSession();
-    await WelcomeScreen.waitForShown();
+    await restartAtWelcome();
     await WelcomeScreen.tapSignIn();
     await SignInScreen.waitForShown();
   });
@@ -38,18 +34,27 @@ describe('SignIn', () => {
 
   it('should navigate to ForgotPassword screen', async () => {
     await SignInScreen.tapForgotPassword();
-    await waitForDisplayed('forgotpassword-screen', TIMEOUT.medium);
+    await waitForExisting('forgotpassword-screen', TIMEOUT.medium);
   });
 
   it('should navigate to SignUp screen', async () => {
     await SignInScreen.tapGoToSignUp();
-    expect(await SignUpScreen.isShown()).toBe(true);
+    await SignUpScreen.waitForShown();
   });
 
-  // Bật khi đã có test account trên Supabase
-  it.skip('should sign in successfully with valid credentials', async () => {
-    await SignInScreen.signIn(TEST_EMAIL, TEST_PASSWORD);
-    // Sau khi đăng nhập, chuyển đến màn hình chính tương ứng với role
-    await waitForDisplayed('tenant-home-screen', TIMEOUT.long);
+  it('should sign in successfully as tenant', async () => {
+    await SignInScreen.signIn(
+      E2E_ACCOUNT.tenant.email,
+      E2E_ACCOUNT.tenant.password,
+    );
+    await waitForExisting('tenant-home-screen', TIMEOUT.long);
+  });
+
+  it('should sign in successfully as landlord', async () => {
+    await SignInScreen.signIn(
+      E2E_ACCOUNT.landlord.email,
+      E2E_ACCOUNT.landlord.password,
+    );
+    await waitForExisting('landlord-dashboard-screen', TIMEOUT.long);
   });
 });

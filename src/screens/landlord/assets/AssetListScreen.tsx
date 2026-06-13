@@ -93,6 +93,7 @@ const AssetListScreen: React.FC = () => {
 
     return (
       <Card
+        testID={`asset-item-${item.id}`}
         style={styles.assetCard}
         onPress={() => navigation.navigate('AssetEdit', { id: item.id })}
       >
@@ -127,7 +128,7 @@ const AssetListScreen: React.FC = () => {
 
   if (!loading && assets.length === 0) {
     return (
-      <View style={styles.container}>
+      <View testID="asset-list-screen" style={styles.container}>
         <EmptyState
           title="Chua co tai san"
           description="Them tai san de quan ly va cho muon"
@@ -135,6 +136,7 @@ const AssetListScreen: React.FC = () => {
           onAction={() => navigation.navigate('AssetEdit', {})}
         />
         <PressableOpacity
+          testID="asset-create-fab"
           style={styles.fab}
           onPress={() => navigation.navigate('AssetEdit', {})}
           activeOpacity={0.8}
@@ -146,7 +148,7 @@ const AssetListScreen: React.FC = () => {
   }
 
   return (
-    <View style={styles.container}>
+    <View testID="asset-list-screen" style={styles.container}>
       <LoadingOverlay visible={loading && !refreshing} />
       <FlatList
         data={assets}
@@ -158,6 +160,7 @@ const AssetListScreen: React.FC = () => {
         ItemSeparatorComponent={renderSeparator}
       />
       <PressableOpacity
+        testID="asset-create-fab"
         style={styles.fab}
         onPress={() => navigation.navigate('AssetEdit', {})}
         activeOpacity={0.8}

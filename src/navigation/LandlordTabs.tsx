@@ -1,4 +1,5 @@
 import React from 'react';
+import { ActivityIndicator, StyleSheet, View } from 'react-native';
 import { createNativeBottomTabNavigator } from '@react-navigation/bottom-tabs/unstable';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { useAppSelector } from '../store';
@@ -35,6 +36,14 @@ import NotificationSettingsScreen from '../screens/shared/NotificationSettingsSc
 const Tab = createNativeBottomTabNavigator<LandlordTabParamList>();
 const Stack = createNativeStackNavigator<LandlordStackParamList>();
 
+function ApartmentLoadingScreen() {
+  return (
+    <View testID="apartment-loading-screen" style={styles.loading}>
+      <ActivityIndicator size="large" color="#2563EB" />
+    </View>
+  );
+}
+
 function LandlordTabNavigator() {
   return (
     <Tab.Navigator
@@ -47,39 +56,51 @@ function LandlordTabNavigator() {
       <Tab.Screen
         name="LandlordDashboard"
         component={DashboardScreen}
-        options={{ tabBarLabel: 'Tổng quan' }}
+        options={{
+          tabBarLabel: 'Tổng quan',
+        }}
       />
       <Tab.Screen
         name="TenantManagement"
         component={TenantListScreen}
-        options={{ tabBarLabel: 'Người thuê' }}
+        options={{
+          tabBarLabel: 'Người thuê',
+        }}
       />
       <Tab.Screen
         name="AssetList"
         component={AssetListScreen}
-        options={{ tabBarLabel: 'Tài sản' }}
-      />
-      <Tab.Screen
-        name="LandlordIssueList"
-        component={LandlordIssueListScreen}
-        options={{ tabBarLabel: 'Sự cố' }}
+        options={{
+          tabBarLabel: 'Tài sản',
+        }}
       />
       <Tab.Screen
         name="LandlordPayments"
         component={LandlordPaymentsScreen}
-        options={{ tabBarLabel: 'Thu tiền' }}
+        options={{
+          tabBarLabel: 'Thu tiền',
+        }}
       />
       <Tab.Screen
         name="LandlordProfile"
         component={LandlordProfileScreen}
-        options={{ tabBarLabel: 'Cá nhân' }}
+        options={{
+          tabBarLabel: 'Cá nhân',
+        }}
       />
     </Tab.Navigator>
   );
 }
 
 export default function LandlordStack() {
-  const apartment = useAppSelector(state => state.apartment.apartment);
+  const userId = useAppSelector(state => state.auth.user?.id);
+  const { apartment, loadedForUserId } = useAppSelector(
+    state => state.apartment,
+  );
+
+  if (userId && loadedForUserId !== userId) {
+    return <ApartmentLoadingScreen />;
+  }
 
   if (!apartment) {
     return (
@@ -156,6 +177,11 @@ export default function LandlordStack() {
         options={{ title: 'Xử lý sự cố' }}
       />
       <Stack.Screen
+        name="LandlordIssueList"
+        component={LandlordIssueListScreen}
+        options={{ title: 'Sự cố' }}
+      />
+      <Stack.Screen
         name="LandlordBorrowList"
         component={LandlordBorrowListScreen}
         options={{ title: 'Yêu cầu mượn đồ' }}
@@ -213,3 +239,12 @@ export default function LandlordStack() {
     </Stack.Navigator>
   );
 }
+
+const styles = StyleSheet.create({
+  loading: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#F8FAFC',
+  },
+});

@@ -49,7 +49,7 @@ const BorrowDetailScreen: React.FC = () => {
 
   if (!currentRequest) {
     return (
-      <ScreenWrapper>
+      <ScreenWrapper testID="landlord-borrow-detail-screen">
         <LoadingOverlay visible={loading} />
         <Text style={styles.emptyText}>Khong tim thay yeu cau</Text>
       </ScreenWrapper>
@@ -62,7 +62,7 @@ const BorrowDetailScreen: React.FC = () => {
   const lenderName = (currentRequest as any).lender?.full_name ?? 'Nguoi cho muon';
 
   return (
-    <ScreenWrapper>
+    <ScreenWrapper testID="landlord-borrow-detail-screen">
       <LoadingOverlay visible={loading} />
       <Card style={styles.card}>
         <Text style={styles.sectionTitle}>Tai san</Text>
@@ -105,12 +105,14 @@ const BorrowDetailScreen: React.FC = () => {
       {currentRequest.status === 'pending' && (
         <View style={styles.actions}>
           <Button
+            testID="landlord-borrow-approve-btn"
             title="Chap nhan"
             onPress={() => handleStatusUpdate('approved')}
             loading={loading}
             style={styles.actionButton}
           />
           <Button
+            testID="landlord-borrow-reject-btn"
             title="Tu choi"
             onPress={() => handleStatusUpdate('rejected')}
             variant="danger"
@@ -122,6 +124,7 @@ const BorrowDetailScreen: React.FC = () => {
 
       {currentRequest.status === 'approved' && (
         <Button
+          testID="landlord-borrow-in-use-btn"
           title="Danh dau dang muon"
           onPress={() => handleStatusUpdate('in_use')}
           loading={loading}
@@ -131,6 +134,7 @@ const BorrowDetailScreen: React.FC = () => {
 
       {currentRequest.status === 'return_requested' && (
         <Button
+          testID="landlord-borrow-returned-btn"
           title="Xac nhan da nhan lai"
           onPress={() => handleStatusUpdate('returned')}
           loading={loading}

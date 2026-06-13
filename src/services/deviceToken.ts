@@ -5,12 +5,17 @@ import type {
   NotificationPreference,
   NotificationPreferenceUpdate,
 } from '../types/database';
+import {e2eBackend, isE2EMode} from '../e2e/fakeBackend';
 
 export async function registerDeviceToken(
   userId: string,
   token: string,
 ): Promise<DeviceToken> {
   const platform = Platform.OS === 'ios' ? 'ios' : 'android';
+  if (isE2EMode) {
+    return e2eBackend.registerDeviceToken(userId, token, platform);
+  }
+
   const {data, error} = await supabase
     .from('device_tokens')
     .upsert(
@@ -35,6 +40,10 @@ export async function registerDeviceToken(
 export async function getNotificationPreference(
   userId: string,
 ): Promise<NotificationPreference> {
+  if (isE2EMode) {
+    return e2eBackend.getNotificationPreference(userId);
+  }
+
   const {data, error} = await supabase
     .from('notification_preferences')
     .select('*')
@@ -56,6 +65,10 @@ export async function upsertNotificationPreference(
   userId: string,
   updates: NotificationPreferenceUpdate,
 ): Promise<NotificationPreference> {
+  if (isE2EMode) {
+    return e2eBackend.upsertNotificationPreference(userId, updates);
+  }
+
   const {data, error} = await supabase
     .from('notification_preferences')
     .upsert(

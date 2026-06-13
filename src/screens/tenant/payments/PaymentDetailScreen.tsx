@@ -78,7 +78,7 @@ const PaymentDetailScreen: React.FC = () => {
 
   if (!payment) {
     return (
-      <ScreenWrapper>
+      <ScreenWrapper testID="tenant-payment-detail-screen">
         <LoadingOverlay visible={loading} />
         <Text style={styles.emptyText}>Khong tim thay thanh toan</Text>
       </ScreenWrapper>
@@ -113,7 +113,7 @@ const PaymentDetailScreen: React.FC = () => {
   const rentAmount = payment.rent_amount ?? payment.amount - payment.utility_total;
 
   return (
-    <ScreenWrapper>
+    <ScreenWrapper testID="tenant-payment-detail-screen">
       <LoadingOverlay visible={loading} />
 
       {/* Amount card */}
@@ -204,6 +204,7 @@ const PaymentDetailScreen: React.FC = () => {
           <View style={styles.methodRow}>
             {PAYMENT_METHODS.map(method => (
               <PressableOpacity
+                testID={`payment-method-${method.value}`}
                 key={method.value}
                 style={[
                   styles.methodBtn,
@@ -244,6 +245,7 @@ const PaymentDetailScreen: React.FC = () => {
             </View>
           ) : (
             <PressableOpacity
+              testID="payment-add-receipt-btn"
               style={styles.addReceiptBtn}
               onPress={handlePickReceipt}
               activeOpacity={0.7}
@@ -254,6 +256,7 @@ const PaymentDetailScreen: React.FC = () => {
 
           <View style={styles.submitContainer}>
             <Button
+              testID="payment-report-btn"
               title="Toi da thanh toan"
               onPress={handleReportPayment}
               loading={loading}

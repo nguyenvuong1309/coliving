@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { FlatList, StyleSheet, Text, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import PressableOpacity from '../../../components/PressableOpacity';
@@ -60,6 +61,7 @@ const BorrowListScreen: React.FC = () => {
 
     return (
       <Card
+        testID={`landlord-borrow-item-${item.id}`}
         style={styles.itemCard}
         onPress={() =>
           navigation.navigate('LandlordBorrowDetail', { id: item.id })
@@ -80,12 +82,17 @@ const BorrowListScreen: React.FC = () => {
   };
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView
+      testID="landlord-borrow-list-screen"
+      style={styles.container}
+      edges={['top', 'left', 'right']}
+    >
       <LoadingOverlay visible={loading} />
       <View style={styles.tabContainer}>
         {FILTER_TABS.map(tab => (
           <PressableOpacity
             key={tab.key}
+            testID={`landlord-borrow-filter-${tab.key}`}
             style={[styles.tab, activeTab === tab.key && styles.activeTab]}
             onPress={() => setActiveTab(tab.key)}
           >
@@ -118,7 +125,7 @@ const BorrowListScreen: React.FC = () => {
           />
         }
       />
-    </View>
+    </SafeAreaView>
   );
 };
 

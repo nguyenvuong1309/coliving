@@ -65,6 +65,7 @@ const TenantBillingRow = React.memo(function TenantBillingRow({
       <View style={styles.amountColumn}>
         <Text style={styles.amountLabel}>Tien phong</Text>
         <TextInput
+          testID={`billing-rent-${item.userId}`}
           style={styles.amountInput}
           value={String(item.rentAmount)}
           onChangeText={text => onRentChange(item.userId, text)}
@@ -73,6 +74,7 @@ const TenantBillingRow = React.memo(function TenantBillingRow({
         />
         <Text style={styles.amountLabel}>Dich vu</Text>
         <TextInput
+          testID={`billing-utility-${item.userId}`}
           style={styles.amountInput}
           value={String(item.utilityAmount)}
           onChangeText={text => onUtilityChange(item.userId, text)}
@@ -258,7 +260,7 @@ const CreateBillingScreen: React.FC = () => {
   );
 
   return (
-    <ScreenWrapper scroll>
+    <ScreenWrapper testID="create-billing-screen" scroll>
       <LoadingOverlay visible={loading || utilityLoading} />
 
       <Text style={styles.title}>Tao ky thu tien</Text>
@@ -271,6 +273,7 @@ const CreateBillingScreen: React.FC = () => {
           <View style={styles.monthRow}>
             {MONTHS.map(m => (
               <PressableOpacity
+                testID={`billing-month-${m}`}
                 key={m}
                 style={[
                   styles.monthChip,
@@ -306,6 +309,7 @@ const CreateBillingScreen: React.FC = () => {
               currentDate.getFullYear() + 1,
             ].map(y => (
               <PressableOpacity
+                testID={`billing-year-${y}`}
                 key={y}
                 style={[styles.yearChip, value === y && styles.yearChipActive]}
                 onPress={() => onChange(y)}
@@ -329,6 +333,7 @@ const CreateBillingScreen: React.FC = () => {
 
       <Text style={styles.label}>Han thanh toan</Text>
       <PressableOpacity
+        testID="billing-due-date-btn"
         style={styles.datePickerBtn}
         onPress={() => setShowDatePicker(true)}
       >
@@ -374,6 +379,7 @@ const CreateBillingScreen: React.FC = () => {
       </Card>
 
       <Button
+        testID="billing-submit-btn"
         title="Tao ky thu tien"
         onPress={handleSubmit(onSubmit)}
         loading={loading}

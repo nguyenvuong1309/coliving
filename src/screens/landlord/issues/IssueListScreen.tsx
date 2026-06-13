@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { View, Text, FlatList, StyleSheet } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import PressableOpacity from '../../../components/PressableOpacity';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -103,6 +104,7 @@ const IssueListScreen: React.FC = () => {
 
   const renderItem = ({ item }: { item: Issue }) => (
     <Card
+      testID={`landlord-issue-item-${item.id}`}
       style={styles.issueCard}
       onPress={() =>
         navigation.navigate('LandlordIssueDetail', { id: item.id })
@@ -137,7 +139,11 @@ const IssueListScreen: React.FC = () => {
   );
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView
+      testID="landlord-issue-list-screen"
+      style={styles.container}
+      edges={['top', 'left', 'right']}
+    >
       <LoadingOverlay visible={loading && !refreshing} />
 
       {/* Filter Tabs */}
@@ -145,6 +151,7 @@ const IssueListScreen: React.FC = () => {
         {FILTER_TABS.map(tab => (
           <PressableOpacity
             key={tab.key}
+            testID={`landlord-issue-filter-${tab.key}`}
             style={[
               styles.filterTab,
               activeFilter === tab.key && styles.filterTabActive,
@@ -179,7 +186,7 @@ const IssueListScreen: React.FC = () => {
           ItemSeparatorComponent={renderSeparator}
         />
       )}
-    </View>
+    </SafeAreaView>
   );
 };
 

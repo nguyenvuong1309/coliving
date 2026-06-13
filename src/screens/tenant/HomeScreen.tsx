@@ -56,7 +56,7 @@ const HomeScreen: React.FC = () => {
   }, [issues]);
 
   return (
-    <ScreenWrapper>
+    <ScreenWrapper testID="tenant-home-screen">
       <LoadingOverlay visible={loading} />
 
       {/* Welcome */}
@@ -107,6 +107,7 @@ const HomeScreen: React.FC = () => {
       <Text style={styles.sectionTitle}>Thao tac nhanh</Text>
       <View style={styles.quickActions}>
         <PressableOpacity
+          testID="home-borrow-create-btn"
           style={styles.quickActionBtn}
           onPress={() => navigation.navigate('BorrowCreate')}
           activeOpacity={0.7}
@@ -120,6 +121,7 @@ const HomeScreen: React.FC = () => {
         </PressableOpacity>
 
         <PressableOpacity
+          testID="home-issue-create-btn"
           style={styles.quickActionBtn}
           onPress={() => navigation.navigate('IssueCreate')}
           activeOpacity={0.7}
@@ -133,6 +135,7 @@ const HomeScreen: React.FC = () => {
         </PressableOpacity>
 
         <PressableOpacity
+          testID="home-roommates-btn"
           style={styles.quickActionBtn}
           onPress={() => navigation.navigate('RoommateList')}
           activeOpacity={0.7}
@@ -143,6 +146,20 @@ const HomeScreen: React.FC = () => {
             <Text style={styles.quickActionEmoji}>👥</Text>
           </View>
           <Text style={styles.quickActionLabel}>Xem roommates</Text>
+        </PressableOpacity>
+
+        <PressableOpacity
+          testID="home-notifications-btn"
+          style={styles.quickActionBtn}
+          onPress={() => navigation.navigate('Notifications')}
+          activeOpacity={0.7}
+        >
+          <View
+            style={[styles.quickActionIcon, { backgroundColor: '#EEF2FF' }]}
+          >
+            <Text style={styles.quickActionEmoji}>🔔</Text>
+          </View>
+          <Text style={styles.quickActionLabel}>Thong bao</Text>
         </PressableOpacity>
       </View>
     </ScreenWrapper>
@@ -195,11 +212,11 @@ const styles = StyleSheet.create({
   },
   quickActions: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    flexWrap: 'wrap',
     gap: 12,
   },
   quickActionBtn: {
-    flex: 1,
+    width: '48%',
     alignItems: 'center',
     backgroundColor: '#FFFFFF',
     borderRadius: 12,

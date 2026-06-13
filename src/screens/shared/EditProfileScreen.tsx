@@ -93,7 +93,7 @@ const EditProfileScreen: React.FC = () => {
   }, [fullName, phone, avatarUri, user?.id, dispatch]);
 
   return (
-    <ScreenWrapper scroll>
+    <ScreenWrapper testID="edit-profile-screen" scroll>
       <LoadingOverlay visible={loading || uploading} />
 
       <PressableOpacity
@@ -112,6 +112,7 @@ const EditProfileScreen: React.FC = () => {
       </PressableOpacity>
 
       <Input
+        testID="edit-profile-name-input"
         label="Họ và tên"
         value={fullName}
         onChangeText={setFullName}
@@ -119,6 +120,7 @@ const EditProfileScreen: React.FC = () => {
       />
 
       <Input
+        testID="edit-profile-phone-input"
         label="Số điện thoại"
         value={phone}
         onChangeText={setPhone}
@@ -127,6 +129,7 @@ const EditProfileScreen: React.FC = () => {
       />
 
       <Button
+        testID="edit-profile-submit-btn"
         title="Lưu thay đổi"
         onPress={handleSubmit}
         loading={loading || uploading}

@@ -1,8 +1,9 @@
-import {createSlice, PayloadAction} from '@reduxjs/toolkit';
-import {call, put, select, takeLatest} from 'redux-saga/effects';
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { call, put, select, takeLatest } from 'redux-saga/effects';
 import {
   createApartment,
   getApartment,
+  updateApartment,
   getApartmentsForUser,
   getApartmentByInviteCode,
   joinApartment,
@@ -11,13 +12,13 @@ import {
   updateMember,
   generateInviteCode,
 } from '../../services/apartment';
-import {createNotification} from '../../services/notification';
+import { createNotification } from '../../services/notification';
 import type {
   Apartment,
   ApartmentMember,
   ApartmentMemberUpdate,
 } from '../../types/database';
-import type {RootState} from '../index';
+import type { RootState } from '../index';
 
 interface ApartmentMemberWithProfile extends ApartmentMember {
   profile: any;
@@ -27,6 +28,7 @@ interface ApartmentState {
   apartment: Apartment | null;
   apartments: Apartment[];
   members: ApartmentMemberWithProfile[];
+  loadedForUserId: string | null;
   loading: boolean;
   error: string | null;
 }
@@ -35,6 +37,7 @@ const initialState: ApartmentState = {
   apartment: null,
   apartments: [],
   members: [],
+  loadedForUserId: null,
   loading: false,
   error: null,
 };
@@ -54,52 +57,70 @@ const apartmentSlice = createSlice({
       state.loading = true;
       state.error = null;
     },
-    fetchApartmentRequest(state, _action: PayloadAction<{id: string}>) {
+    updateApartmentRequest(
+      state,
+      _action: PayloadAction<{
+        id: string;
+        updates: {
+          name: string;
+          address: string;
+          num_rooms: number;
+        };
+      }>,
+    ) {
+      state.loading = true;
+      state.error = null;
+    },
+    fetchApartmentRequest(state, _action: PayloadAction<{ id: string }>) {
       state.loading = true;
       state.error = null;
     },
     fetchCurrentApartmentRequest(
       state,
-      _action: PayloadAction<{userId: string; role: 'tenant' | 'landlord'}>,
+      _action: PayloadAction<{ userId: string; role: 'tenant' | 'landlord' }>,
     ) {
       state.loading = true;
+      state.loadedForUserId = null;
       state.error = null;
     },
     fetchApartmentsRequest(
       state,
-      _action: PayloadAction<{userId: string; role: 'tenant' | 'landlord'}>,
+      _action: PayloadAction<{ userId: string; role: 'tenant' | 'landlord' }>,
     ) {
       state.loading = true;
       state.error = null;
     },
-    selectApartmentRequest(state, _action: PayloadAction<{apartmentId: string}>) {
+    selectApartmentRequest(
+      state,
+      _action: PayloadAction<{ apartmentId: string }>,
+    ) {
       state.loading = true;
       state.error = null;
     },
     joinApartmentRequest(
       state,
-      _action: PayloadAction<{inviteCode: string}>,
+      _action: PayloadAction<{ inviteCode: string }>,
     ) {
       state.loading = true;
       state.error = null;
     },
     fetchMembersRequest(
       state,
-      _action: PayloadAction<{apartmentId: string}>,
+      _action: PayloadAction<{ apartmentId: string }>,
     ) {
       state.loading = true;
       state.error = null;
     },
-    removeMemberRequest(
-      state,
-      _action: PayloadAction<{memberId: string}>,
-    ) {
+    removeMemberRequest(state, _action: PayloadAction<{ memberId: string }>) {
       state.loading = true;
       state.error = null;
     },
     updateMemberRequest(
       state,
-      _action: PayloadAction<{memberId: string; updates: ApartmentMemberUpdate}>,
+      _action: PayloadAction<{
+        memberId: string;
+        updates: ApartmentMemberUpdate;
+      }>,
     ) {
       state.loading = true;
       state.error = null;
@@ -121,6 +142,12 @@ const apartmentSlice = createSlice({
     setMembers(state, action: PayloadAction<ApartmentMemberWithProfile[]>) {
       state.members = action.payload;
     },
+    setCurrentApartmentLoadedForUser(
+      state,
+      action: PayloadAction<string | null>,
+    ) {
+      state.loadedForUserId = action.payload;
+    },
     upsertMember(state, action: PayloadAction<ApartmentMemberWithProfile>) {
       const idx = state.members.findIndex(m => m.id === action.payload.id);
       if (idx === -1) {
@@ -128,6 +155,11 @@ const apartmentSlice = createSlice({
       } else {
         state.members[idx] = action.payload;
       }
+    },
+    removeMemberFromState(state, action: PayloadAction<string>) {
+      state.members = state.members.filter(
+        member => member.id !== action.payload,
+      );
     },
     setLoading(state, action: PayloadAction<boolean>) {
       state.loading = action.payload;
@@ -141,6 +173,7 @@ const apartmentSlice = createSlice({
 
 export const {
   createApartmentRequest,
+  updateApartmentRequest,
   fetchApartmentRequest,
   fetchCurrentApartmentRequest,
   fetchApartmentsRequest,
@@ -153,7 +186,9 @@ export const {
   setApartments,
   upsertApartment,
   setMembers,
+  setCurrentApartmentLoadedForUser,
   upsertMember,
+  removeMemberFromState,
   setLoading,
   setError,
 } = apartmentSlice.actions;
@@ -175,11 +210,29 @@ function* handleCreateApartment(
       invite_code: inviteCode,
     });
     yield put(setApartment(apartment));
+    yield put(setCurrentApartmentLoadedForUser(userId));
     const apartments = yield select((s: RootState) => s.apartment.apartments);
     yield put(setApartments([apartment, ...apartments]));
     yield put(setLoading(false));
   } catch (error: any) {
     yield put(setError(error.message ?? 'Failed to create apartment'));
+  }
+}
+
+function* handleUpdateApartment(
+  action: ReturnType<typeof updateApartmentRequest>,
+): Generator<any, void, any> {
+  try {
+    const apartment = yield call(
+      updateApartment,
+      action.payload.id,
+      action.payload.updates,
+    );
+    yield put(setApartment(apartment));
+    yield put(upsertApartment(apartment));
+    yield put(setLoading(false));
+  } catch (error: any) {
+    yield put(setError(error.message ?? 'Failed to update apartment'));
   }
 }
 
@@ -214,11 +267,13 @@ function* handleFetchCurrentApartment(
     } else {
       yield put(setMembers([]));
     }
+    yield put(setCurrentApartmentLoadedForUser(action.payload.userId));
     yield put(setLoading(false));
   } catch (error: any) {
     yield put(setApartment(null));
     yield put(setApartments([]));
     yield put(setMembers([]));
+    yield put(setCurrentApartmentLoadedForUser(action.payload.userId));
     yield put(setError(error.message ?? 'Failed to fetch apartment'));
   }
 }
@@ -278,6 +333,7 @@ function* handleJoinApartment(
     );
     yield call(joinApartment, apartment.id, userId);
     yield put(setApartment(apartment));
+    yield put(setCurrentApartmentLoadedForUser(userId));
     yield put(upsertApartment(apartment));
     const members = yield call(getMembers, apartment.id);
     yield put(setMembers(members));
@@ -295,7 +351,7 @@ function* handleJoinApartment(
         } vua tham gia can ho ${apartment.name}.`,
         data: {
           route: 'TenantDetail',
-          params: {id: userId},
+          params: { id: userId },
           entityType: 'tenant',
           entityId: userId,
         },
@@ -326,6 +382,7 @@ function* handleRemoveMember(
 ): Generator<any, void, any> {
   try {
     yield call(removeMember, action.payload.memberId);
+    yield put(removeMemberFromState(action.payload.memberId));
     yield put(setLoading(false));
   } catch (error: any) {
     yield put(setError(error.message ?? 'Failed to remove member'));
@@ -371,6 +428,7 @@ function* handleUpdateMember(
 
 export function* apartmentSaga() {
   yield takeLatest(createApartmentRequest.type, handleCreateApartment);
+  yield takeLatest(updateApartmentRequest.type, handleUpdateApartment);
   yield takeLatest(fetchApartmentRequest.type, handleFetchApartment);
   yield takeLatest(fetchApartmentsRequest.type, handleFetchApartments);
   yield takeLatest(selectApartmentRequest.type, handleSelectApartment);

@@ -7,6 +7,7 @@ interface ScreenWrapperProps {
   scroll?: boolean;
   padding?: number;
   style?: ViewStyle;
+  testID?: string;
 }
 
 const ScreenWrapper: React.FC<ScreenWrapperProps> = ({
@@ -14,9 +15,13 @@ const ScreenWrapper: React.FC<ScreenWrapperProps> = ({
   scroll = true,
   padding = 16,
   style,
+  testID,
 }) => {
   return (
-    <SafeAreaView style={styles.safe} edges={['top', 'left', 'right']}>
+    <SafeAreaView
+      testID={testID}
+      style={styles.safe}
+      edges={['top', 'left', 'right']}>
       {scroll ? (
         <ScrollView
           style={styles.scroll}

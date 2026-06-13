@@ -7,6 +7,7 @@ import {
   ViewStyle,
   TextInputProps,
 } from 'react-native';
+import { isE2EMode } from '../e2e/fakeBackend';
 
 interface InputProps extends Omit<TextInputProps, 'style'> {
   ref?: React.Ref<TextInput>;
@@ -39,6 +40,15 @@ const Input: React.FC<InputProps> = ({
   const [isFocused, setIsFocused] = useState(false);
 
   const borderColor = error ? '#DC2626' : isFocused ? '#2563EB' : '#CBD5E1';
+  const effectiveSecureTextEntry = isE2EMode ? false : secureTextEntry;
+  const e2eSecureTextProps =
+    isE2EMode && secureTextEntry
+      ? ({
+          autoComplete: 'off',
+          importantForAutofill: 'no',
+          textContentType: 'none',
+        } satisfies TextInputProps)
+      : undefined;
 
   return (
     <View style={[styles.container, style]}>
@@ -60,7 +70,7 @@ const Input: React.FC<InputProps> = ({
           ]}
           placeholder={placeholder}
           placeholderTextColor="#94A3B8"
-          secureTextEntry={secureTextEntry}
+          secureTextEntry={effectiveSecureTextEntry}
           value={value}
           onChangeText={onChangeText}
           multiline={multiline}
@@ -68,6 +78,7 @@ const Input: React.FC<InputProps> = ({
           onFocus={() => setIsFocused(true)}
           onBlur={() => setIsFocused(false)}
           {...rest}
+          {...e2eSecureTextProps}
         />
       </View>
       {error && (

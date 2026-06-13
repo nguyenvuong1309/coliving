@@ -33,6 +33,7 @@ const TenantListScreen: React.FC = () => {
     navigation.setOptions({
       headerRight: () => (
         <PressableOpacity
+          testID="tenants-invite-btn"
           onPress={() => {
             if (apartment?.id) {
               navigation.navigate('InviteCode', {
@@ -76,6 +77,7 @@ const TenantListScreen: React.FC = () => {
 
     return (
       <Card
+        testID={`tenant-item-${item.user_id}`}
         style={styles.tenantCard}
         onPress={() =>
           navigation.navigate('TenantDetail', { id: item.user_id })
@@ -98,7 +100,7 @@ const TenantListScreen: React.FC = () => {
 
   if (!loading && members.length === 0) {
     return (
-      <ScreenWrapper scroll={false}>
+      <ScreenWrapper testID="tenant-list-screen" scroll={false}>
         <EmptyState
           title="Chua co nguoi thue"
           description="Moi nguoi thue tham gia can ho cua ban bang ma moi"
@@ -116,7 +118,7 @@ const TenantListScreen: React.FC = () => {
   }
 
   return (
-    <ScreenWrapper scroll={false}>
+    <ScreenWrapper testID="tenant-list-screen" scroll={false}>
       <LoadingOverlay visible={loading && !refreshing} />
       <FlatList
         data={members}

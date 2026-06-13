@@ -71,7 +71,7 @@ const RevenueHistoryScreen: React.FC = () => {
 
   if (revenueData.length === 0) {
     return (
-      <ScreenWrapper scroll={false}>
+      <ScreenWrapper testID="revenue-history-screen" scroll={false}>
         <EmptyState
           title="Chua co doanh thu"
           description="Doanh thu se hien thi khi co thanh toan duoc xac nhan"
@@ -81,7 +81,7 @@ const RevenueHistoryScreen: React.FC = () => {
   }
 
   return (
-    <View style={styles.container}>
+    <View testID="revenue-history-screen" style={styles.container}>
       {/* Summary Header */}
       <View style={styles.summaryHeader}>
         <Text style={styles.summaryLabel}>Tong doanh thu</Text>
