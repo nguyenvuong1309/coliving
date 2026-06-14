@@ -37,12 +37,12 @@ android {
     productFlavors {
         dev {
             dimension "environment"
-            applicationId "com.coliving.dev"
+            applicationId "com.vuongnguyen.coliving.dev"
             resValue "string", "app_name", "CoLiving Dev"
         }
         prod {
             dimension "environment"
-            applicationId "com.coliving"
+            applicationId "com.vuongnguyen.coliving"
             resValue "string", "app_name", "CoLiving"
         }
     }

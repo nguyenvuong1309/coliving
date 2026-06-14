@@ -276,7 +276,7 @@
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.coliving.dev;
+				PRODUCT_BUNDLE_IDENTIFIER = com.vuongnguyen.coliving.dev;
 				PRODUCT_NAME = CoLiving;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
@@ -308,7 +308,7 @@
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.coliving;
+				PRODUCT_BUNDLE_IDENTIFIER = com.vuongnguyen.coliving;
 				PRODUCT_NAME = CoLiving;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SWIFT_VERSION = 5.0;
