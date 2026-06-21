@@ -4,7 +4,6 @@ import {
   acceptAlert,
   openBottomTab,
   tap,
-  tapText,
   waitForDisplayed,
   waitForText,
 } from '../../helpers/utils';
