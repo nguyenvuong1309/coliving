@@ -1,0 +1,56 @@
+# Dependabot keeps dependencies patched and opens PRs for security/version updates.
+# Docs: https://docs.github.com/code-security/dependabot/dependabot-version-updates
+version: 2
+updates:
+  # JS dependencies (pnpm). Dependabot reads package.json + pnpm-lock.yaml.
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 10
+    labels:
+      - dependencies
+      - javascript
+    groups:
+      # Bundle low-risk dev/patch bumps into a single PR to cut noise.
+      dev-and-patch:
+        patterns:
+          - '*'
+        update-types:
+          - minor
+          - patch
+    ignore:
+      # React Native upgrades are coordinated manually (native side-effects).
+      - dependency-name: react-native
+        update-types: ['version-update:semver-major']
+      - dependency-name: react
+        update-types: ['version-update:semver-major']
+
+  # GitHub Actions used in our workflows.
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+    labels:
+      - dependencies
+      - ci
+
+  # Ruby gems (Fastlane / CocoaPods tooling via Gemfile).
+  - package-ecosystem: bundler
+    directory: /
+    schedule:
+      interval: monthly
+    labels:
+      - dependencies
+      - ios
+
+  # Android Gradle dependencies.
+  - package-ecosystem: gradle
+    directory: /android
+    schedule:
+      interval: monthly
+    labels:
+      - dependencies
+      - android

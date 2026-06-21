@@ -1,0 +1,88 @@
+name: Snyk Security
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  schedule:
+    # Weekly full scan (Monday 02:00 UTC) to catch newly-disclosed vulns
+    # in dependencies that haven't changed.
+    - cron: '0 2 * * 1'
+
+# Snyk needs a token. Add it under Settings → Secrets and variables →
+# Actions → New repository secret:  SNYK_TOKEN  (from app.snyk.io account settings).
+# Exposed as an env var so the `if:` guards below can skip (not fail) when it's absent.
+env:
+  SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+
+permissions:
+  contents: read
+
+jobs:
+  # Snyk Code = SAST: finds vulns in OUR source (injection, hardcoded
+  # secrets, weak crypto…). This is the part pnpm audit / Dependabot do NOT cover.
+  # Report-only for now: Snyk Code must be enabled at the org level in
+  # app.snyk.io (Settings → Snyk Code) or it returns 403 (SNYK-CODE-0005).
+  # Once enabled, drop the `|| true` to make it a hard gate.
+  code:
+    name: Snyk Code (SAST)
+    runs-on: ubuntu-latest
+    # Skip on forked-PRs (no secret access).
+    if: ${{ github.event.pull_request.head.repo.full_name == github.repository || github.event_name != 'pull_request' }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.33.4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22.11.0
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Snyk Code test (report-only until enabled)
+        if: ${{ env.SNYK_TOKEN != '' }}
+        run: npx -y snyk code test --severity-threshold=high || true
+
+  # Snyk Open Source = SCA. Overlaps with pnpm audit, but Snyk's vuln DB is
+  # broader and includes fix advice + dashboard monitoring.
+  open-source:
+    name: Snyk Open Source (SCA)
+    runs-on: ubuntu-latest
+    if: ${{ github.event.pull_request.head.repo.full_name == github.repository || github.event_name != 'pull_request' }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.33.4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22.11.0
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      # Report-only: an RN app inevitably carries unfixable high-severity vulns
+      # transitively under react-native (metro, the CLI — "no patch available"),
+      # so a hard gate here would be permanently red. pnpm audit --prod (in
+      # ci.yml) is the real gate for runtime deps; this surfaces the broader
+      # picture without blocking PRs.
+      # --exclude=android: RN's Gradle plugin can't be resolved standalone by
+      # Snyk (needs full RN build + autolinking), so the Gradle scan always errors.
+      - name: Snyk Open Source test (report-only)
+        if: ${{ env.SNYK_TOKEN != '' }}
+        run: npx -y snyk test --severity-threshold=high --all-projects --exclude=android || true
+
+      # On push to main, send the snapshot to the Snyk dashboard so it keeps
+      # monitoring deps and alerts you when new vulns are disclosed later.
+      - name: Snyk monitor (main only)
+        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' && env.SNYK_TOKEN != '' }}
+        run: npx -y snyk monitor --all-projects --exclude=android || true
