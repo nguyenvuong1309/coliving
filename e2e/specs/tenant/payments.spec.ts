@@ -5,7 +5,6 @@ import {
   isTextDisplayed,
   openBottomTab,
   tap,
-  tapText,
   waitForDisplayed,
   waitForText,
 } from '../../helpers/utils';

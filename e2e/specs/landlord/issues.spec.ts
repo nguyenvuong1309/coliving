@@ -4,7 +4,6 @@ import {
   acceptAlert,
   tap,
   tapExisting,
-  tapText,
   typeText,
   waitForDisplayed,
   waitForExisting,

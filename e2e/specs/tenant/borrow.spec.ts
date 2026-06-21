@@ -5,7 +5,6 @@ import {
   openBottomTab,
   tap,
   tapExisting,
-  tapText,
   TIMEOUT,
   typeText,
   waitForDisplayed,
