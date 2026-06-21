@@ -70,7 +70,7 @@
     "@react-native/typescript-config": "0.84.1",
     "@types/jest": "^30.0.0",
     "@types/mocha": "^10.0.0",
-    "@types/node": "25.5.2",
+    "@types/node": "26.0.0",
     "@types/react": "^19.2.0",
     "@types/react-test-renderer": "^19.1.0",
     "@wdio/appium-service": "^8.40.0",
