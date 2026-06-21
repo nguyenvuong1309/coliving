@@ -89,7 +89,7 @@
     "prettier": "3.8.4",
     "react-test-renderer": "19.2.3",
     "ts-node": "^10.9.0",
-    "typescript": "^5.8.3",
+    "typescript": "^6.0.3",
     "webdriverio": "^8.40.0"
   },
   "engines": {
