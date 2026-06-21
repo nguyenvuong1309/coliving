@@ -86,7 +86,7 @@
     "eslint": "^8.19.0",
     "hermes-compiler": "250829098.0.9",
     "jest": "^29.6.3",
-    "prettier": "2.8.8",
+    "prettier": "3.8.4",
     "react-test-renderer": "19.2.3",
     "ts-node": "^10.9.0",
     "typescript": "^5.8.3",
