@@ -3,3 +3,23 @@ packages:
 
 minimumReleaseAge: 10080
 trustPolicy: no-downgrade
+# @react-native-firebase moved from "trusted publisher" to npm provenance
+# attestation. pnpm flags trusted->provenance as a trust downgrade, but
+# provenance (Sigstore-signed CI/CD build) is a stronger supply-chain
+# guarantee, not a takeover signal. Scoped exception just for these.
+trustPolicyExclude:
+  - '@react-native-firebase/app@24.1.1'
+  - '@react-native-firebase/messaging@24.1.1'
+  # Pre-existing e2e toolchain (WebdriverIO / @wdio/*, already in the committed
+  # lockfile). These 9.x releases ship without trust evidence; excluded to keep
+  # the existing toolchain installable. Dev-only, never bundled into the app.
+  - 'webdriverio@9.15.0'
+  - 'webdriver@9.15.0'
+  - '@wdio/globals@9.15.0'
+  - '@wdio/config@9.15.0'
+  - '@wdio/logger@9.15.0'
+  - '@wdio/logger@9.18.0'
+  - '@wdio/protocols@9.15.0'
+  - '@wdio/repl@9.4.4'
+  - '@wdio/types@9.15.0'
+  - '@wdio/utils@9.15.0'

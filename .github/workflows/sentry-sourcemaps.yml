@@ -1,0 +1,105 @@
+name: Sentry source maps
+
+# Trigger thu cong (Actions > "Sentry source maps" > Run workflow).
+# Build Android prod release voi Sentry auto-upload bat, day source map Hermes
+# (da compose + gan Debug IDs) len Sentry de stacktrace production doc duoc.
+on:
+  workflow_dispatch:
+    inputs:
+      release_version:
+        description: 'App version cho Sentry release (mac dinh lay tu vars.APP_VERSION)'
+        required: false
+        default: ''
+
+jobs:
+  android-sourcemaps:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0 # can lich su commit de associate vao Sentry release
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v6
+        with:
+          version: 10.33.4
+
+      - name: Setup Node
+        uses: actions/setup-node@v6
+        with:
+          node-version: 22.11.0
+          cache: pnpm
+
+      - name: Setup JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Validate Sentry + release secrets
+        run: |
+          test -n "${{ secrets.SENTRY_ORG }}"
+          test -n "${{ secrets.SENTRY_PROJECT }}"
+          test -n "${{ secrets.SENTRY_AUTH_TOKEN }}"
+          test -n "${{ secrets.SUPABASE_URL }}"
+          test -n "${{ secrets.SUPABASE_ANON_KEY }}"
+          test -n "${{ secrets.GOOGLE_WEB_CLIENT_ID }}"
+          test -n "${{ secrets.GOOGLE_REVERSED_CLIENT_ID }}"
+          test -n "${{ secrets.ANDROID_RELEASE_KEYSTORE_BASE64 }}"
+          test -n "${{ secrets.RELEASE_STORE_PASSWORD }}"
+          test -n "${{ secrets.RELEASE_KEY_ALIAS }}"
+          test -n "${{ secrets.RELEASE_KEY_PASSWORD }}"
+
+      - name: Write production env
+        run: |
+          cat > .env.production <<'EOF'
+          ENV=production
+          SUPABASE_URL=${{ secrets.SUPABASE_URL }}
+          SUPABASE_ANON_KEY=${{ secrets.SUPABASE_ANON_KEY }}
+          APP_NAME=CoLiving
+          APP_DISPLAY_NAME=CoLiving
+          APP_VERSION=${{ github.event.inputs.release_version || vars.APP_VERSION || '1.0.0' }}
+          APP_PASSWORD_RESET_REDIRECT_URL=coliving://auth/reset-password
+          GOOGLE_WEB_CLIENT_ID=${{ secrets.GOOGLE_WEB_CLIENT_ID }}
+          GOOGLE_REVERSED_CLIENT_ID=${{ secrets.GOOGLE_REVERSED_CLIENT_ID }}
+          SENTRY_DSN=${{ secrets.SENTRY_DSN }}
+          EOF
+
+      # google-services.json that (base64) de build duoc khi co Firebase. Neu
+      # chua cau hinh push, bo qua secret nay — google-services plugin se khong
+      # apply va build van chay (push tat).
+      - name: Decode google-services.json
+        if: ${{ secrets.GOOGLE_SERVICES_JSON_BASE64 != '' }}
+        run: |
+          printf '%s' "${{ secrets.GOOGLE_SERVICES_JSON_BASE64 }}" | base64 -d > android/app/google-services.json
+
+      - name: Decode Android keystore
+        run: |
+          printf '%s' "${{ secrets.ANDROID_RELEASE_KEYSTORE_BASE64 }}" | base64 -d > android/app/release.keystore
+
+      - name: Build Android prod release + upload source maps
+        working-directory: android
+        env:
+          ORG_GRADLE_PROJECT_RELEASE_STORE_FILE: release.keystore
+          ORG_GRADLE_PROJECT_RELEASE_STORE_PASSWORD: ${{ secrets.RELEASE_STORE_PASSWORD }}
+          ORG_GRADLE_PROJECT_RELEASE_KEY_ALIAS: ${{ secrets.RELEASE_KEY_ALIAS }}
+          ORG_GRADLE_PROJECT_RELEASE_KEY_PASSWORD: ${{ secrets.RELEASE_KEY_PASSWORD }}
+          # sentry-cli (qua sentry.gradle) doc cac bien nay de upload source map.
+          SENTRY_ORG: ${{ secrets.SENTRY_ORG }}
+          SENTRY_PROJECT: ${{ secrets.SENTRY_PROJECT }}
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+          # Bat upload (khac voi CI thuong vi tat).
+          SENTRY_DISABLE_AUTO_UPLOAD: 'false'
+        run: ./gradlew assembleProdRelease --no-daemon
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: coliving-prod-release-apk
+          path: android/app/build/outputs/apk/prod/release/*.apk
+          if-no-files-found: warn

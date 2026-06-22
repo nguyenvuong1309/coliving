@@ -55,7 +55,7 @@ cd ios && bundle install && bundle exec pod install
 
 Trong Xcode:
 - Sign in with Apple: ENABLED
-- Push Notifications: (de phase 2)
+- Push Notifications: xem `SENTRY_FCM_SETUP.md` muc B.3 (Firebase + APNs)
 
 ## 4. Android
 

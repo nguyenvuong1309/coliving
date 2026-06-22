@@ -94,3 +94,40 @@ jest.mock('@invertase/react-native-apple-authentication', () => ({
     CANCELED: 'CANCELED',
   },
 }));
+
+jest.mock('@sentry/react-native', () => ({
+  init: jest.fn(),
+  wrap: component => component,
+  captureException: jest.fn(),
+  captureMessage: jest.fn(),
+  addBreadcrumb: jest.fn(),
+  setUser: jest.fn(),
+}));
+
+jest.mock('@react-native-firebase/app', () => ({
+  getApps: () => [],
+  getApp: jest.fn(),
+}));
+
+jest.mock('@react-native-firebase/messaging', () => {
+  const messaging = () => ({
+    requestPermission: jest.fn(() => Promise.resolve(1)),
+    getToken: jest.fn(() => Promise.resolve('test-fcm-token')),
+    registerDeviceForRemoteMessages: jest.fn(() => Promise.resolve()),
+    onTokenRefresh: jest.fn(() => () => {}),
+    onMessage: jest.fn(() => () => {}),
+    setBackgroundMessageHandler: jest.fn(),
+  });
+  messaging.AuthorizationStatus = {AUTHORIZED: 1, PROVISIONAL: 2, DENIED: 0};
+  return {__esModule: true, default: messaging};
+});
+
+jest.mock('@notifee/react-native', () => ({
+  __esModule: true,
+  default: {
+    createChannel: jest.fn(() => Promise.resolve('default')),
+    displayNotification: jest.fn(() => Promise.resolve()),
+    requestPermission: jest.fn(() => Promise.resolve({authorizationStatus: 1})),
+  },
+  AndroidImportance: {HIGH: 4, DEFAULT: 3},
+}));

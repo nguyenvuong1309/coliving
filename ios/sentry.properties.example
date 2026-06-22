@@ -1,0 +1,8 @@
+# Template cho Sentry source map upload (iOS).
+# Trong CI dung bien moi truong: SENTRY_ORG, SENTRY_PROJECT, SENTRY_AUTH_TOKEN
+# De upload tu may local, copy -> ios/sentry.properties (da gitignore).
+# KHONG commit auth.token.
+defaults.url=https://sentry.io/
+defaults.org=REPLACE_SENTRY_ORG
+defaults.project=REPLACE_SENTRY_PROJECT
+auth.token=REPLACE_SENTRY_AUTH_TOKEN

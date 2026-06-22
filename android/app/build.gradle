@@ -2,6 +2,18 @@ apply plugin: "com.android.application"
 apply plugin: "org.jetbrains.kotlin.android"
 apply plugin: "com.facebook.react"
 
+// Sentry: tu dong upload source map khi build release (doc cau hinh tu
+// android/sentry.properties + bien moi truong SENTRY_AUTH_TOKEN).
+apply from: new File(["node", "--print", "require.resolve('@sentry/react-native/package.json')"].execute(null, rootDir).text.trim(), "../sentry.gradle")
+
+// Firebase google-services: chi apply khi co google-services.json (de app van
+// build duoc khi chua truyen config Firebase). Truyen file vao sau de bat push.
+if (file("google-services.json").exists()
+        || file("src/dev/google-services.json").exists()
+        || file("src/prod/google-services.json").exists()) {
+    apply plugin: "com.google.gms.google-services"
+}
+
 // react-native-config: map flavor names to env files
 project.ext.envConfigFiles = [
     dev: ".env.development",

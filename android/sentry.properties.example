@@ -1,0 +1,9 @@
+# Template cho Sentry source map upload (Android).
+# Trong CI dung bien moi truong thay vi file nay:
+#   SENTRY_ORG, SENTRY_PROJECT, SENTRY_AUTH_TOKEN
+# Neu muon upload tu may local, copy file nay -> android/sentry.properties
+# (da gitignore) va dien gia tri. KHONG commit auth.token.
+defaults.url=https://sentry.io/
+defaults.org=REPLACE_SENTRY_ORG
+defaults.project=REPLACE_SENTRY_PROJECT
+auth.token=REPLACE_SENTRY_AUTH_TOKEN

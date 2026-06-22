@@ -6,8 +6,9 @@ import { Provider } from 'react-redux';
 import { store } from './src/store';
 import RootNavigator from './src/navigation/RootNavigator';
 import ErrorToast from './src/components/ErrorToast';
+import { Sentry } from './src/config/sentry';
 
-export default function App() {
+function App() {
   return (
     <GestureHandlerRootView style={styles.container}>
       <Provider store={store}>
@@ -26,3 +27,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
 });
+
+// Sentry.wrap bao boc app de bat loi render + performance. No-op an toan khi
+// Sentry chua duoc init (khong co SENTRY_DSN).
+export default Sentry.wrap(App);

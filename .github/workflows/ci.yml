@@ -98,4 +98,7 @@ jobs:
           ORG_GRADLE_PROJECT_RELEASE_STORE_PASSWORD: ${{ secrets.RELEASE_STORE_PASSWORD }}
           ORG_GRADLE_PROJECT_RELEASE_KEY_ALIAS: ${{ secrets.RELEASE_KEY_ALIAS }}
           ORG_GRADLE_PROJECT_RELEASE_KEY_PASSWORD: ${{ secrets.RELEASE_KEY_PASSWORD }}
+          # Khong upload source map o CI thuong. Viec do dành cho workflow
+          # manual "Sentry source maps" (sentry-sourcemaps.yml).
+          SENTRY_DISABLE_AUTO_UPLOAD: 'true'
         run: ./gradlew assembleProdRelease

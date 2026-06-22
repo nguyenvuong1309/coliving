@@ -10,6 +10,8 @@ declare module 'react-native-config' {
     APP_PASSWORD_RESET_REDIRECT_URL?: string;
     GOOGLE_WEB_CLIENT_ID: string;
     GOOGLE_REVERSED_CLIENT_ID?: string;
+    // Sentry: de trong de tat error reporting (vi du build local).
+    SENTRY_DSN?: string;
   }
 
   export const Config: NativeConfig;

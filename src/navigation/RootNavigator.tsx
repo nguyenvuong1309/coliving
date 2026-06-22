@@ -16,6 +16,7 @@ import {supabase} from '../config/supabase';
 import {getProfile} from '../services/auth';
 import {setAuthToken} from '../utils/mmkv';
 import {usePushNotifications} from '../hooks/usePushNotifications';
+import {setSentryUser} from '../utils/errorReporting';
 import type {RootStackParamList} from '../types/navigation';
 
 import AuthStack from './AuthStack';
@@ -78,6 +79,10 @@ export default function RootNavigator() {
       dispatch(fetchUnreadCountRequest({userId: user.id}));
     }
   }, [dispatch, user?.id, user?.role]);
+
+  useEffect(() => {
+    setSentryUser(user ? {id: user.id} : null);
+  }, [user]);
 
   useEffect(() => {
     const handleUrl = async (url: string | null) => {

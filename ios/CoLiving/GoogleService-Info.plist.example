@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  TEMPLATE. Tai GoogleService-Info.plist that tu Firebase Console > Project
+  settings > iOS apps. Trong Firebase tao 2 iOS app:
+    - com.vuongnguyen.coliving.dev  (scheme CoLiving-Dev)
+    - com.vuongnguyen.coliving      (scheme CoLiving-Prod)
+  Roi keo file vao Xcode (target CoLiving, "Copy items if needed"). De quan ly
+  dev/prod rieng, dat 2 file trong ios/config/dev|prod va them Run Script
+  "Copy GoogleService-Info.plist" theo CONFIGURATION. Xem ONBOARDING/SETUP.
+-->
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>API_KEY</key>
+	<string>REPLACE_IOS_API_KEY</string>
+	<key>GCM_SENDER_ID</key>
+	<string>REPLACE_SENDER_ID</string>
+	<key>PROJECT_ID</key>
+	<string>REPLACE_PROJECT_ID</string>
+	<key>STORAGE_BUCKET</key>
+	<string>REPLACE_PROJECT_ID.appspot.com</string>
+	<key>BUNDLE_ID</key>
+	<string>com.vuongnguyen.coliving</string>
+	<key>GOOGLE_APP_ID</key>
+	<string>REPLACE_IOS_GOOGLE_APP_ID</string>
+	<key>IS_GCM_ENABLED</key>
+	<true/>
+	<key>IS_ADS_ENABLED</key>
+	<false/>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true/>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false/>
+</dict>
+</plist>

@@ -79,6 +79,14 @@ yarn-error.log
 .env.*
 !.env.example
 !.env.e2e
+
+# Firebase config (secrets per project) — chi commit ban .example
+android/app/google-services.json
+android/app/src/*/google-services.json
+ios/**/GoogleService-Info.plist
+
+# Sentry (auth token) — chi commit ban .example
+**/sentry.properties
 e2e/logs/
 e2e/artifacts/
 e2e/build/
