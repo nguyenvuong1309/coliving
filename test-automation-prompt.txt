@@ -1,0 +1,98 @@
+=====================================================================
+PROMPT: ANALYZE & WRITE APPIUM TEST AUTOMATION FOR THE COLIVING APP
+=====================================================================
+
+ROLE:
+You are a Senior Mobile QA Automation Engineer specializing in Appium
+for React Native apps. Your task is to analyze the entire codebase and
+WRITE (do NOT run yet) a complete, well-structured Appium end-to-end
+test automation suite that will be runnable later on real/emulated
+Android & iOS devices.
+
+---------------------------------------------------------------------
+PROJECT CONTEXT
+---------------------------------------------------------------------
+- App: CoLiving — React Native (0.84) + Supabase backend.
+- State management: Redux Toolkit (RTK) + redux-saga.
+- Validation: Zod. Storage: MMKV v4. This is an MVP Phase 1.
+- The codebase is mostly Vietnamese (UI strings + comments, mixed
+  with/without diacritics) — selectors based on text must account for this.
+- IMPORTANT: existing jest tests + lint are in a BROKEN state (pre-existing).
+  Trust `tsc` (the TypeScript compiler) over old test/lint results.
+
+---------------------------------------------------------------------
+TARGET STACK (Appium)
+---------------------------------------------------------------------
+- Test runner/framework: Appium 2.x with WebdriverIO (preferred) OR
+  the Appium WebDriver client in TypeScript. Choose one and stay consistent.
+- Drivers: UiAutomator2 (Android) and XCUITest (iOS).
+- Language: TypeScript, mirroring the app's tooling.
+- Pattern: Page Object Model (POM) — one page/screen object per app screen.
+- Selector strategy: prefer `accessibilityId` / testID over text/xpath.
+  Where testIDs are missing, FLAG them and propose the testIDs to add
+  (do not silently rely on brittle xpath).
+
+---------------------------------------------------------------------
+GENERAL REQUIREMENTS
+---------------------------------------------------------------------
+1. ONLY WRITE TESTS — DO NOT RUN ANY TESTS at this stage.
+   (Do not start Appium server, emulators, or execute specs.)
+2. Before writing, ANALYZE the app first and present a plan.
+3. Write E2E flows that are readable, with descriptive behavior-driven names.
+4. Respect existing conventions and folder layout; put Appium tests in a
+   dedicated directory (e.g. `e2e/appium/`).
+5. Do not break existing app code.
+
+---------------------------------------------------------------------
+STEP 1 — ANALYSIS (do this first, output a report)
+---------------------------------------------------------------------
+- Scan the navigation structure and list ALL user-facing screens/flows
+  (auth/login, signup, home, listings, profile, settings, etc.).
+- Map each screen to its source file and identify interactive elements
+  (buttons, inputs, lists, modals).
+- Inventory existing testID / accessibilityLabel coverage; list screens
+  that are NOT testable yet because they lack testIDs.
+- Identify critical end-to-end user journeys by business risk.
+- Provide a PRIORITY MATRIX (high/medium/low) of flows to automate, with reasoning.
+
+---------------------------------------------------------------------
+STEP 2 — APPIUM SETUP & STRATEGY
+---------------------------------------------------------------------
+- Propose the Appium project structure: capabilities/config files for
+  Android + iOS, POM directory, helpers, fixtures, test data.
+- Define desired capabilities (app path, deviceName, platformVersion,
+  automationName) for both platforms — use placeholders where unknown.
+- Explain how to handle: app login/auth state, Supabase test data/backend,
+  waits (explicit waits, not sleeps), and Vietnamese text in selectors.
+- Recommend the testIDs to add to the app for stable selectors (list them).
+
+---------------------------------------------------------------------
+STEP 3 — WRITE THE APPIUM TESTS
+---------------------------------------------------------------------
+- Write Page Object classes for each priority screen.
+- Write E2E spec files for HIGH-priority journeys first, then MEDIUM:
+  cover happy path, validation errors, empty states, and error/network cases.
+- Use explicit waits and stable selectors (accessibilityId/testID).
+- Create shared helpers (driver setup/teardown, login helper, data factories).
+- Write the Appium/WebdriverIO config files needed to run later (but DO NOT run).
+
+---------------------------------------------------------------------
+STEP 4 — SUMMARY
+---------------------------------------------------------------------
+- List all files created (configs, page objects, specs, helpers) + their purpose.
+- List every testID that must be added to the app for the tests to work.
+- Note which flows are still uncovered and suggest next steps.
+- Provide clear instructions on how to run the suite later (install deps,
+  start Appium server, build app, run specs) — as documentation only.
+
+---------------------------------------------------------------------
+CONSTRAINTS
+---------------------------------------------------------------------
+- DO NOT run tests, Appium server, or emulators in this session — only
+  analyze and write test code/config.
+- DO NOT change business logic; if testIDs must be added to app components,
+  list them as recommendations (or add them in a clearly separate step
+  only if explicitly approved).
+- Verify with `tsc` that test/config files have no type errors (type-check only).
+- Keep tests independent, deterministic, with no flaky sleeps or real-network
+  assumptions beyond a configured test backend.
