@@ -12,6 +12,9 @@ declare module 'react-native-config' {
     GOOGLE_REVERSED_CLIENT_ID?: string;
     // Sentry: de trong de tat error reporting (vi du build local).
     SENTRY_DSN?: string;
+    // RevenueCat: de trong de tat in-app purchase (vi du build local).
+    REVENUECAT_IOS_API_KEY?: string;
+    REVENUECAT_ANDROID_API_KEY?: string;
   }
 
   export const Config: NativeConfig;

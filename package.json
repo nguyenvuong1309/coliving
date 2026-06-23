@@ -47,6 +47,7 @@
     "react-native-config": "^1.6.1",
     "react-native-gesture-handler": "^2.31.0",
     "react-native-image-picker": "^8.2.1",
+    "react-native-purchases": "^10.4.0",
     "react-native-mmkv": "^4.3.0",
     "react-native-nitro-modules": "^0.35.3",
     "react-native-reanimated": "^4.3.0",
@@ -105,6 +106,9 @@
       "appium",
       "appium-ios-tuntap",
       "sharp"
-    ]
+    ],
+    "overrides": {
+      "jest-environment-node": "30.4.1"
+    }
   }
 }

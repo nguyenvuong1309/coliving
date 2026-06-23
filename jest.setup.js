@@ -131,3 +131,29 @@ jest.mock('@notifee/react-native', () => ({
   },
   AndroidImportance: {HIGH: 4, DEFAULT: 3},
 }));
+
+jest.mock('react-native-purchases', () => ({
+  __esModule: true,
+  default: {
+    configure: jest.fn(),
+    setLogLevel: jest.fn(() => Promise.resolve()),
+    logIn: jest.fn(() =>
+      Promise.resolve({
+        customerInfo: {entitlements: {active: {}}},
+        created: false,
+      }),
+    ),
+    logOut: jest.fn(() => Promise.resolve({entitlements: {active: {}}})),
+    getOfferings: jest.fn(() => Promise.resolve({current: null, all: {}})),
+    purchasePackage: jest.fn(() =>
+      Promise.resolve({customerInfo: {entitlements: {active: {}}}}),
+    ),
+    restorePurchases: jest.fn(() =>
+      Promise.resolve({entitlements: {active: {}}}),
+    ),
+    getCustomerInfo: jest.fn(() =>
+      Promise.resolve({entitlements: {active: {}}}),
+    ),
+  },
+  LOG_LEVEL: {DEBUG: 'DEBUG', ERROR: 'ERROR', INFO: 'INFO', WARN: 'WARN'},
+}));

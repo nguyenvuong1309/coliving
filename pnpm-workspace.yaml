@@ -2,6 +2,10 @@ packages:
   - .
 
 minimumReleaseAge: 10080
+# react-native-purchases (RevenueCat) phat hanh chua qua 7 ngay khi them vao;
+# chap nhan sai lech tuoi release cho rieng goi nay.
+minimumReleaseAgeExclude:
+  - 'react-native-purchases'
 trustPolicy: no-downgrade
 # @react-native-firebase moved from "trusted publisher" to npm provenance
 # attestation. pnpm flags trusted->provenance as a trust downgrade, but
