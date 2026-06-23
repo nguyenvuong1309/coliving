@@ -2,8 +2,8 @@ import React, {useEffect} from 'react';
 import {View, Text, ActivityIndicator, StyleSheet} from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import type {NativeStackNavigationProp} from '@react-navigation/native-stack';
-import {useAuth} from '../../hooks/useAuth';
-import type {AuthStackParamList} from '../../types/navigation';
+import {useAuth} from '../../hooks';
+import type {AuthStackParamList} from '../../types';
 
 type Nav = NativeStackNavigationProp<AuthStackParamList, 'Splash'>;
 

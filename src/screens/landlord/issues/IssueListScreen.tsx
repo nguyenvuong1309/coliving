@@ -1,19 +1,14 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { View, Text, FlatList, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import PressableOpacity from '../../../components/PressableOpacity';
+import {PressableOpacity, Card, StatusBadge, EmptyState, LoadingOverlay} from '../../../components';
+import {useApartment} from '../../../hooks';
+import {formatRelativeTime} from '../../../utils';
+import type {LandlordStackParamList, Issue} from '../../../types';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import Card from '../../../components/Card';
-import StatusBadge from '../../../components/StatusBadge';
-import EmptyState from '../../../components/EmptyState';
-import LoadingOverlay from '../../../components/LoadingOverlay';
-import { useApartment } from '../../../hooks/useApartment';
 import { useAppSelector, useAppDispatch } from '../../../store';
 import { fetchIssuesRequest } from '../../../store/slices/issueSlice';
-import { formatRelativeTime } from '../../../utils/formatters';
-import type { LandlordStackParamList } from '../../../types/navigation';
-import type { Issue } from '../../../types/database';
 
 type NavigationProp = NativeStackNavigationProp<LandlordStackParamList>;
 

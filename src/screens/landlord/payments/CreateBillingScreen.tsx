@@ -8,27 +8,19 @@ import {
   Platform,
   StyleSheet,
 } from 'react-native';
-import PressableOpacity from '../../../components/PressableOpacity';
+import {PressableOpacity, ScreenWrapper, Card, Button, LoadingOverlay} from '../../../components';
+import {useApartment} from '../../../hooks';
+import {createBillingSchema, type CreateBillingFormData} from '../../../schemas';
+import {formatCurrency, formatDate, parseMoneyInput} from '../../../utils';
+import type {LandlordStackParamList} from '../../../types';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import ScreenWrapper from '../../../components/ScreenWrapper';
-import Card from '../../../components/Card';
-import Button from '../../../components/Button';
-import LoadingOverlay from '../../../components/LoadingOverlay';
-import { useApartment } from '../../../hooks/useApartment';
 import { useAppDispatch, useAppSelector } from '../../../store';
 import { createBillingRequest } from '../../../store/slices/paymentSlice';
 import { fetchUtilityConfigsRequest } from '../../../store/slices/utilitySlice';
-import {
-  createBillingSchema,
-  type CreateBillingFormData,
-} from '../../../schemas/payment';
-import { formatCurrency, formatDate } from '../../../utils/formatters';
-import { parseMoneyInput } from '../../../utils/utilityCalculator';
-import type { LandlordStackParamList } from '../../../types/navigation';
 
 type NavigationProp = NativeStackNavigationProp<LandlordStackParamList>;
 

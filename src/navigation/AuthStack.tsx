@@ -1,7 +1,7 @@
 import React from 'react';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {useAppSelector} from '../store';
-import type {AuthStackParamList} from '../types/navigation';
+import type {AuthStackParamList} from '../types';
 
 import SplashScreen from '../screens/auth/SplashScreen';
 import WelcomeScreen from '../screens/auth/WelcomeScreen';

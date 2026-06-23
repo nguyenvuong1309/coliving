@@ -1,25 +1,16 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { View, Text, FlatList, Platform, StyleSheet } from 'react-native';
-import PressableOpacity from '../../../components/PressableOpacity';
+import {PressableOpacity, ScreenWrapper, Button, Input, Card, LoadingOverlay} from '../../../components';
 import { useNavigation } from '@react-navigation/native';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import ScreenWrapper from '../../../components/ScreenWrapper';
-import Button from '../../../components/Button';
-import Input from '../../../components/Input';
-import Card from '../../../components/Card';
-import LoadingOverlay from '../../../components/LoadingOverlay';
-import { useAuth } from '../../../hooks/useAuth';
-import { useApartment } from '../../../hooks/useApartment';
+import {useAuth, useApartment} from '../../../hooks';
 import { useAppSelector, useAppDispatch } from '../../../store';
 import { createBorrowRequestRequest } from '../../../store/slices/borrowSlice';
 import { fetchAssetsRequest } from '../../../store/slices/assetSlice';
-import {
-  borrowRequestSchema,
-  type BorrowRequestFormData,
-} from '../../../schemas/borrow';
-import type { Asset } from '../../../types/database';
+import {borrowRequestSchema, type BorrowRequestFormData} from '../../../schemas';
+import type {Asset} from '../../../types';
 
 const BorrowCreateScreen: React.FC = () => {
   const navigation = useNavigation();

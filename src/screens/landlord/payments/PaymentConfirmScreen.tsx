@@ -3,23 +3,16 @@ import { View, Text, Image, Alert, StyleSheet } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { RouteProp } from '@react-navigation/native';
-import ScreenWrapper from '../../../components/ScreenWrapper';
-import Card from '../../../components/Card';
-import Button from '../../../components/Button';
-import StatusBadge from '../../../components/StatusBadge';
-import LoadingOverlay from '../../../components/LoadingOverlay';
-import { useApartment } from '../../../hooks/useApartment';
+import {ScreenWrapper, Card, Button, StatusBadge, LoadingOverlay} from '../../../components';
+import {useApartment} from '../../../hooks';
+import {formatCurrency, formatDate} from '../../../utils';
+import {getSignedImageUrl} from '../../../services';
+import type {LandlordStackParamList} from '../../../types';
 import { useAppSelector, useAppDispatch } from '../../../store';
 import {
   confirmPaymentRequest,
   rejectPaymentRequest,
 } from '../../../store/slices/paymentSlice';
-import {
-  formatCurrency,
-  formatDate,
-} from '../../../utils/formatters';
-import { getSignedImageUrl } from '../../../services/storage';
-import type { LandlordStackParamList } from '../../../types/navigation';
 
 type NavigationProp = NativeStackNavigationProp<LandlordStackParamList>;
 type ConfirmRouteProp = RouteProp<LandlordStackParamList, 'PaymentConfirm'>;

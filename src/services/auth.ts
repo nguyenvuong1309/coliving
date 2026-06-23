@@ -1,6 +1,6 @@
 import { supabase } from '../config/supabase';
 import Config from 'react-native-config';
-import type { ProfileInsert, ProfileUpdate } from '../types/database';
+import type { ProfileInsert, ProfileUpdate } from '../types';
 import {e2eBackend, isE2EMode} from '../e2e/fakeBackend';
 
 export async function signUp(

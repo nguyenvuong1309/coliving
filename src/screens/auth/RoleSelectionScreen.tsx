@@ -6,14 +6,13 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from 'react-native';
-import PressableOpacity from '../../components/PressableOpacity';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useAppDispatch } from '../../store';
 import { setLoading } from '../../store/slices/authSlice';
-import { setUserRole } from '../../utils/mmkv';
-import Button from '../../components/Button';
-import type { AuthStackParamList } from '../../types/navigation';
+import { setUserRole } from '../../utils';
+import { PressableOpacity, Button } from '../../components';
+import type { AuthStackParamList } from '../../types';
 
 type Nav = NativeStackNavigationProp<AuthStackParamList, 'RoleSelection'>;
 

@@ -1,22 +1,14 @@
 import React, {useCallback, useEffect, useMemo, useState} from 'react';
 import {FlatList, StyleSheet, Switch, Text, TextInput, View} from 'react-native';
-import ScreenWrapper from '../../../components/ScreenWrapper';
-import Card from '../../../components/Card';
-import Button from '../../../components/Button';
-import LoadingOverlay from '../../../components/LoadingOverlay';
-import {useApartment} from '../../../hooks/useApartment';
+import {ScreenWrapper, Card, Button, LoadingOverlay} from '../../../components';
+import {useApartment} from '../../../hooks';
+import {formatCurrency, DEFAULT_ELECTRICITY_TIERS_VN, calculateTieredAmount, parseMoneyInput} from '../../../utils';
+import type {Json} from '../../../types';
 import {useAppDispatch, useAppSelector} from '../../../store';
 import {
   fetchUtilityConfigsRequest,
   upsertUtilityConfigRequest,
 } from '../../../store/slices/utilitySlice';
-import {formatCurrency} from '../../../utils/formatters';
-import {
-  DEFAULT_ELECTRICITY_TIERS_VN,
-  calculateTieredAmount,
-  parseMoneyInput,
-} from '../../../utils/utilityCalculator';
-import type {Json} from '../../../types/database';
 
 type UtilityType = 'electricity' | 'water' | 'internet' | 'parking';
 

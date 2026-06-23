@@ -2,23 +2,15 @@ import React, { useEffect, useCallback, useState } from 'react';
 import { View, Text, Image, StyleSheet } from 'react-native';
 import { useRoute } from '@react-navigation/native';
 import type { RouteProp } from '@react-navigation/native';
-import ScreenWrapper from '../../../components/ScreenWrapper';
-import Card from '../../../components/Card';
-import Button from '../../../components/Button';
-import StatusBadge from '../../../components/StatusBadge';
-import LoadingOverlay from '../../../components/LoadingOverlay';
+import {ScreenWrapper, Card, Button, StatusBadge, LoadingOverlay} from '../../../components';
 import { useAppSelector, useAppDispatch } from '../../../store';
 import {
   fetchIssueDetailRequest,
   updateIssueStatusRequest,
 } from '../../../store/slices/issueSlice';
-import {
-  formatDate,
-  formatDateTime,
-  getStatusLabel,
-} from '../../../utils/formatters';
-import { getSignedImageUrl } from '../../../services/storage';
-import type { TenantStackParamList } from '../../../types/navigation';
+import {formatDate, formatDateTime, getStatusLabel} from '../../../utils';
+import {getSignedImageUrl} from '../../../services';
+import type {TenantStackParamList} from '../../../types';
 
 type ScreenRouteProp = RouteProp<TenantStackParamList, 'IssueDetail'>;
 

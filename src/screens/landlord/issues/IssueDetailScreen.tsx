@@ -9,23 +9,16 @@ import {
 } from 'react-native';
 import { useRoute } from '@react-navigation/native';
 import type { RouteProp } from '@react-navigation/native';
-import ScreenWrapper from '../../../components/ScreenWrapper';
-import Card from '../../../components/Card';
-import StatusBadge from '../../../components/StatusBadge';
-import Button from '../../../components/Button';
-import LoadingOverlay from '../../../components/LoadingOverlay';
-import { useApartment } from '../../../hooks/useApartment';
+import {ScreenWrapper, Card, StatusBadge, Button, LoadingOverlay} from '../../../components';
+import {useApartment} from '../../../hooks';
+import {formatDate, getStatusLabel} from '../../../utils';
+import {getSignedImageUrl} from '../../../services';
+import type {LandlordStackParamList} from '../../../types';
 import { useAppSelector, useAppDispatch } from '../../../store';
 import {
   fetchIssueDetailRequest,
   updateIssueStatusRequest,
 } from '../../../store/slices/issueSlice';
-import {
-  formatDate,
-  getStatusLabel,
-} from '../../../utils/formatters';
-import { getSignedImageUrl } from '../../../services/storage';
-import type { LandlordStackParamList } from '../../../types/navigation';
 
 type DetailRouteProp = RouteProp<LandlordStackParamList, 'LandlordIssueDetail'>;
 

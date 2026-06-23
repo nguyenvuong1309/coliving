@@ -2,18 +2,14 @@ import React, { useCallback, useEffect } from 'react';
 import { Alert, StyleSheet, Text, View } from 'react-native';
 import { useRoute } from '@react-navigation/native';
 import type { RouteProp } from '@react-navigation/native';
-import ScreenWrapper from '../../../components/ScreenWrapper';
-import Card from '../../../components/Card';
-import Button from '../../../components/Button';
-import StatusBadge from '../../../components/StatusBadge';
-import LoadingOverlay from '../../../components/LoadingOverlay';
+import {ScreenWrapper, Card, Button, StatusBadge, LoadingOverlay} from '../../../components';
+import {formatDate, formatDateTime} from '../../../utils';
+import type {LandlordStackParamList} from '../../../types';
 import { useAppDispatch, useAppSelector } from '../../../store';
 import {
   fetchBorrowDetailRequest,
   updateBorrowStatusRequest,
 } from '../../../store/slices/borrowSlice';
-import { formatDate, formatDateTime } from '../../../utils/formatters';
-import type { LandlordStackParamList } from '../../../types/navigation';
 
 type DetailRouteProp = RouteProp<LandlordStackParamList, 'LandlordBorrowDetail'>;
 

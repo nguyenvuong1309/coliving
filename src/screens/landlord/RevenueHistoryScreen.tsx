@@ -1,10 +1,8 @@
 import React, { useMemo } from 'react';
 import { View, Text, FlatList, StyleSheet } from 'react-native';
-import Card from '../../components/Card';
-import EmptyState from '../../components/EmptyState';
-import ScreenWrapper from '../../components/ScreenWrapper';
+import {Card, EmptyState, ScreenWrapper} from '../../components';
+import {formatCurrency} from '../../utils';
 import { useAppSelector } from '../../store';
-import { formatCurrency } from '../../utils/formatters';
 
 interface MonthRevenue {
   periodId: string;

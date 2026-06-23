@@ -1,14 +1,14 @@
 import {useCallback, useEffect, useRef} from 'react';
-import {registerDeviceToken} from '../services/deviceToken';
 import {
+  registerDeviceToken,
   ensureAndroidChannel,
   getFcmToken,
   isPushConfigured,
   requestPushPermission,
   subscribeForegroundMessages,
   subscribeTokenRefresh,
-} from '../services/pushNotifications';
-import {captureException} from '../utils/errorReporting';
+} from '../services';
+import {captureException} from '../utils';
 
 /**
  * Khoi tao push notification cho user dang dang nhap:

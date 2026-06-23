@@ -10,9 +10,9 @@ import {
   setUser,
   setSession,
 } from '../store/slices/authSlice';
-import {getAuthToken, clearAuth} from '../utils/mmkv';
+import {getAuthToken, clearAuth} from '../utils';
 import {supabase} from '../config/supabase';
-import type {Profile} from '../types/database';
+import type {Profile} from '../types';
 import {isE2EMode} from '../e2e/fakeBackend';
 
 export function useAuth() {

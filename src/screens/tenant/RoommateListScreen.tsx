@@ -1,11 +1,7 @@
 import React, { useEffect } from 'react';
 import { View, Text, FlatList, StyleSheet } from 'react-native';
-import ScreenWrapper from '../../components/ScreenWrapper';
-import Avatar from '../../components/Avatar';
-import EmptyState from '../../components/EmptyState';
-import LoadingOverlay from '../../components/LoadingOverlay';
-import { useAuth } from '../../hooks/useAuth';
-import { useApartment } from '../../hooks/useApartment';
+import {ScreenWrapper, Avatar, EmptyState, LoadingOverlay} from '../../components';
+import {useAuth, useApartment} from '../../hooks';
 
 const RoommateListScreen: React.FC = () => {
   const { user } = useAuth();

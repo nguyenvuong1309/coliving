@@ -3,12 +3,9 @@ import { Alert, StyleSheet, Text } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { RouteProp } from '@react-navigation/native';
-import ScreenWrapper from '../../../components/ScreenWrapper';
-import Input from '../../../components/Input';
-import Button from '../../../components/Button';
-import LoadingOverlay from '../../../components/LoadingOverlay';
-import { useApartment } from '../../../hooks/useApartment';
-import type { LandlordStackParamList } from '../../../types/navigation';
+import {ScreenWrapper, Input, Button, LoadingOverlay} from '../../../components';
+import {useApartment} from '../../../hooks';
+import type {LandlordStackParamList} from '../../../types';
 
 type NavigationProp = NativeStackNavigationProp<LandlordStackParamList>;
 type EditRouteProp = RouteProp<LandlordStackParamList, 'TenantEdit'>;

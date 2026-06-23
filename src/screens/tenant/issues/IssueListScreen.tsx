@@ -1,19 +1,14 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { View, Text, FlatList, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import PressableOpacity from '../../../components/PressableOpacity';
+import {PressableOpacity, Card, StatusBadge, EmptyState, LoadingOverlay} from '../../../components';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import Card from '../../../components/Card';
-import StatusBadge from '../../../components/StatusBadge';
-import EmptyState from '../../../components/EmptyState';
-import LoadingOverlay from '../../../components/LoadingOverlay';
-import { useApartment } from '../../../hooks/useApartment';
+import {useApartment} from '../../../hooks';
 import { useAppSelector, useAppDispatch } from '../../../store';
 import { fetchIssuesRequest } from '../../../store/slices/issueSlice';
-import { formatDate, getStatusLabel } from '../../../utils/formatters';
-import type { TenantStackParamList } from '../../../types/navigation';
-import type { Issue } from '../../../types/database';
+import {formatDate, getStatusLabel} from '../../../utils';
+import type {TenantStackParamList, Issue} from '../../../types';
 
 type NavigationProp = NativeStackNavigationProp<TenantStackParamList>;
 

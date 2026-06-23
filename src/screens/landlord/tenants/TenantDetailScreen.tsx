@@ -3,21 +3,11 @@ import { View, Text, FlatList, Alert, StyleSheet } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { RouteProp } from '@react-navigation/native';
-import ScreenWrapper from '../../../components/ScreenWrapper';
-import Card from '../../../components/Card';
-import Avatar from '../../../components/Avatar';
-import StatusBadge from '../../../components/StatusBadge';
-import Button from '../../../components/Button';
-import LoadingOverlay from '../../../components/LoadingOverlay';
-import { useApartment } from '../../../hooks/useApartment';
+import {ScreenWrapper, Card, Avatar, StatusBadge, Button, LoadingOverlay} from '../../../components';
+import {useApartment} from '../../../hooks';
+import {formatCurrency, formatDate, formatRelativeTime} from '../../../utils';
+import type {LandlordStackParamList, Payment, Issue} from '../../../types';
 import { useAppSelector } from '../../../store';
-import {
-  formatCurrency,
-  formatDate,
-  formatRelativeTime,
-} from '../../../utils/formatters';
-import type { LandlordStackParamList } from '../../../types/navigation';
-import type { Payment, Issue } from '../../../types/database';
 
 type NavigationProp = NativeStackNavigationProp<LandlordStackParamList>;
 type DetailRouteProp = RouteProp<LandlordStackParamList, 'TenantDetail'>;

@@ -1,9 +1,9 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import PressableOpacity from '../../components/PressableOpacity';
+import { PressableOpacity } from '../../components';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import type { AuthStackParamList } from '../../types/navigation';
+import type { AuthStackParamList } from '../../types';
 
 type Nav = NativeStackNavigationProp<AuthStackParamList, 'Welcome'>;
 

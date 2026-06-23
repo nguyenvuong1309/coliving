@@ -1,5 +1,5 @@
 import { supabase } from '../config/supabase';
-import type { BorrowRequestInsert } from '../types/database';
+import type { BorrowRequestInsert } from '../types';
 import {e2eBackend, isE2EMode} from '../e2e/fakeBackend';
 
 export async function createBorrowRequest(

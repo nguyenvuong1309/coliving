@@ -4,12 +4,12 @@ import {
   getUtilityConfigs,
   upsertUtilityConfig,
   updateUtilityConfig,
-} from '../../services/utility';
+} from '../../services';
 import type {
   UtilityConfig,
   UtilityConfigInsert,
   UtilityConfigUpdate,
-} from '../../types/database';
+} from '../../types';
 
 interface UtilityState {
   configs: UtilityConfig[];

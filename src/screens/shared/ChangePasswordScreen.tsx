@@ -1,10 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { Alert, StyleSheet, Text } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import ScreenWrapper from '../../components/ScreenWrapper';
-import Input from '../../components/Input';
-import Button from '../../components/Button';
-import LoadingOverlay from '../../components/LoadingOverlay';
+import { ScreenWrapper, Input, Button, LoadingOverlay } from '../../components';
 import { useAppDispatch, useAppSelector } from '../../store';
 import { changePasswordRequest } from '../../store/slices/authSlice';
 

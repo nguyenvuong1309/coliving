@@ -13,11 +13,10 @@ import {
 } from '../store/slices/authSlice';
 import {fetchUnreadCountRequest} from '../store/slices/notificationSlice';
 import {supabase} from '../config/supabase';
-import {getProfile} from '../services/auth';
-import {setAuthToken} from '../utils/mmkv';
-import {usePushNotifications} from '../hooks/usePushNotifications';
-import {setSentryUser} from '../utils/errorReporting';
-import type {RootStackParamList} from '../types/navigation';
+import {getProfile} from '../services';
+import {setAuthToken, setSentryUser} from '../utils';
+import {usePushNotifications} from '../hooks';
+import type {RootStackParamList} from '../types';
 
 import AuthStack from './AuthStack';
 import TenantStack from './TenantTabs';

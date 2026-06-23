@@ -6,11 +6,12 @@ import {
   updateIssueStatus,
   getIssue,
   addIssueImages,
-} from '../../services/issue';
-import {getApartment} from '../../services/apartment';
-import {createNotification} from '../../services/notification';
-import {uploadImage, getImageUrl} from '../../services/storage';
-import type {Issue, IssueInsert} from '../../types/database';
+  getApartment,
+  createNotification,
+  uploadImage,
+  getImageUrl,
+} from '../../services';
+import type {Issue, IssueInsert} from '../../types';
 import type {RootState} from '../index';
 
 type IssueStatus =

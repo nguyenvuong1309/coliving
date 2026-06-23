@@ -1,16 +1,12 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { Alert, View, StyleSheet, Text, Image } from 'react-native';
-import PressableOpacity from '../../components/PressableOpacity';
 import { useNavigation } from '@react-navigation/native';
 import { launchImageLibrary } from 'react-native-image-picker';
-import ScreenWrapper from '../../components/ScreenWrapper';
-import Input from '../../components/Input';
-import Button from '../../components/Button';
-import LoadingOverlay from '../../components/LoadingOverlay';
-import { useAuth } from '../../hooks/useAuth';
+import { PressableOpacity, ScreenWrapper, Input, Button, LoadingOverlay } from '../../components';
+import { useAuth } from '../../hooks';
 import { useAppDispatch, useAppSelector } from '../../store';
 import { updateProfileRequest } from '../../store/slices/authSlice';
-import { uploadImage, getImageUrl } from '../../services/storage';
+import { uploadImage, getImageUrl } from '../../services';
 
 const EditProfileScreen: React.FC = () => {
   const navigation = useNavigation();

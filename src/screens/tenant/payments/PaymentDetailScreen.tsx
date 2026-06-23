@@ -1,22 +1,17 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { View, Text, Image, StyleSheet, Alert } from 'react-native';
-import PressableOpacity from '../../../components/PressableOpacity';
+import {PressableOpacity, ScreenWrapper, Card, Button, StatusBadge, LoadingOverlay} from '../../../components';
 import { useRoute } from '@react-navigation/native';
 import type { RouteProp } from '@react-navigation/native';
 import { launchImageLibrary } from 'react-native-image-picker';
-import ScreenWrapper from '../../../components/ScreenWrapper';
-import Card from '../../../components/Card';
-import Button from '../../../components/Button';
-import StatusBadge from '../../../components/StatusBadge';
-import LoadingOverlay from '../../../components/LoadingOverlay';
 import { useAppSelector, useAppDispatch } from '../../../store';
 import {
   fetchMyPaymentsRequest,
   reportPaymentRequest,
 } from '../../../store/slices/paymentSlice';
-import { useAuth } from '../../../hooks/useAuth';
-import { formatCurrency, formatDate } from '../../../utils/formatters';
-import type { TenantStackParamList } from '../../../types/navigation';
+import {useAuth} from '../../../hooks';
+import {formatCurrency, formatDate} from '../../../utils';
+import type {TenantStackParamList} from '../../../types';
 
 type ScreenRouteProp = RouteProp<TenantStackParamList, 'PaymentDetail'>;
 

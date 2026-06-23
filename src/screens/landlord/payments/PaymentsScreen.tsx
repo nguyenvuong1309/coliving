@@ -1,17 +1,13 @@
 import React, { useEffect, useMemo } from 'react';
 import { View, Text, FlatList, StyleSheet } from 'react-native';
-import PressableOpacity from '../../../components/PressableOpacity';
+import {PressableOpacity, Card, EmptyState, LoadingOverlay} from '../../../components';
+import {useApartment} from '../../../hooks';
+import {formatCurrency} from '../../../utils';
+import type {LandlordStackParamList, BillingPeriod} from '../../../types';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import Card from '../../../components/Card';
-import EmptyState from '../../../components/EmptyState';
-import LoadingOverlay from '../../../components/LoadingOverlay';
-import { useApartment } from '../../../hooks/useApartment';
 import { useAppSelector, useAppDispatch } from '../../../store';
 import { fetchBillingPeriodsRequest } from '../../../store/slices/paymentSlice';
-import { formatCurrency } from '../../../utils/formatters';
-import type { LandlordStackParamList } from '../../../types/navigation';
-import type { BillingPeriod } from '../../../types/database';
 
 type NavigationProp = NativeStackNavigationProp<LandlordStackParamList>;
 

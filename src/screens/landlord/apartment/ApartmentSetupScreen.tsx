@@ -5,22 +5,16 @@ import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { RouteProp } from '@react-navigation/native';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import ScreenWrapper from '../../../components/ScreenWrapper';
-import Input from '../../../components/Input';
-import Button from '../../../components/Button';
-import LoadingOverlay from '../../../components/LoadingOverlay';
-import { useApartment } from '../../../hooks/useApartment';
+import {ScreenWrapper, Input, Button, LoadingOverlay} from '../../../components';
+import {useApartment} from '../../../hooks';
+import {apartmentSetupSchema, type ApartmentSetupFormData} from '../../../schemas';
+import type {LandlordStackParamList} from '../../../types';
 import { useAppDispatch } from '../../../store';
 import {
   createApartmentRequest,
   fetchApartmentRequest,
   updateApartmentRequest,
 } from '../../../store/slices/apartmentSlice';
-import {
-  apartmentSetupSchema,
-  type ApartmentSetupFormData,
-} from '../../../schemas/apartment';
-import type { LandlordStackParamList } from '../../../types/navigation';
 
 type NavigationProp = NativeStackNavigationProp<LandlordStackParamList>;
 type SetupRouteProp = RouteProp<LandlordStackParamList, 'ApartmentSetup'>;

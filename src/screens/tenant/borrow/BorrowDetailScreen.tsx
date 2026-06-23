@@ -2,20 +2,15 @@ import React, { useEffect, useCallback } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { useRoute } from '@react-navigation/native';
 import type { RouteProp } from '@react-navigation/native';
-import ScreenWrapper from '../../../components/ScreenWrapper';
-import Card from '../../../components/Card';
-import Button from '../../../components/Button';
-import StatusBadge from '../../../components/StatusBadge';
-import LoadingOverlay from '../../../components/LoadingOverlay';
-import { useAuth } from '../../../hooks/useAuth';
-import { useApartment } from '../../../hooks/useApartment';
+import {ScreenWrapper, Card, Button, StatusBadge, LoadingOverlay} from '../../../components';
+import {useAuth, useApartment} from '../../../hooks';
 import { useAppSelector, useAppDispatch } from '../../../store';
 import {
   fetchBorrowDetailRequest,
   updateBorrowStatusRequest,
 } from '../../../store/slices/borrowSlice';
-import { formatDate, formatDateTime } from '../../../utils/formatters';
-import type { TenantStackParamList } from '../../../types/navigation';
+import {formatDate, formatDateTime} from '../../../utils';
+import type {TenantStackParamList} from '../../../types';
 
 type ScreenRouteProp = RouteProp<TenantStackParamList, 'BorrowDetail'>;
 

@@ -1,7 +1,7 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { all, call, fork, put, select, takeLatest } from 'redux-saga/effects';
 import type { RootState } from '../index';
-import {clearAuth, setAuthToken} from '../../utils/mmkv';
+import {clearAuth, setAuthToken} from '../../utils';
 import {
   signUp,
   signIn,
@@ -12,8 +12,8 @@ import {
   getProfile,
   updateProfile,
   changePassword,
-} from '../../services/auth';
-import type { Profile, ProfileUpdate } from '../../types/database';
+} from '../../services';
+import type { Profile, ProfileUpdate } from '../../types';
 
 interface AuthState {
   user: Profile | null;

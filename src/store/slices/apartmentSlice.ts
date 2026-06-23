@@ -11,13 +11,13 @@ import {
   removeMember,
   updateMember,
   generateInviteCode,
-} from '../../services/apartment';
-import { createNotification } from '../../services/notification';
+  createNotification,
+} from '../../services';
 import type {
   Apartment,
   ApartmentMember,
   ApartmentMemberUpdate,
-} from '../../types/database';
+} from '../../types';
 import type { RootState } from '../index';
 
 interface ApartmentMemberWithProfile extends ApartmentMember {

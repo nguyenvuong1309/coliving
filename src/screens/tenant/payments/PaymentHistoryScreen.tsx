@@ -2,16 +2,12 @@ import React, { useEffect, useMemo } from 'react';
 import { View, Text, SectionList, StyleSheet } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import Card from '../../../components/Card';
-import StatusBadge from '../../../components/StatusBadge';
-import EmptyState from '../../../components/EmptyState';
-import LoadingOverlay from '../../../components/LoadingOverlay';
-import { useAuth } from '../../../hooks/useAuth';
+import {Card, StatusBadge, EmptyState, LoadingOverlay} from '../../../components';
+import {useAuth} from '../../../hooks';
 import { useAppSelector, useAppDispatch } from '../../../store';
 import { fetchMyPaymentsRequest } from '../../../store/slices/paymentSlice';
-import { formatCurrency, formatDate } from '../../../utils/formatters';
-import type { TenantStackParamList } from '../../../types/navigation';
-import type { Payment } from '../../../types/database';
+import {formatCurrency, formatDate} from '../../../utils';
+import type {TenantStackParamList, Payment} from '../../../types';
 
 type NavigationProp = NativeStackNavigationProp<TenantStackParamList>;
 

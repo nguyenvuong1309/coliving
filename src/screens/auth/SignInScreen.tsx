@@ -7,20 +7,16 @@ import {
   Platform,
   ScrollView,
 } from 'react-native';
-import PressableOpacity from '../../components/PressableOpacity';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { useAuth } from '../../hooks/useAuth';
-import { signInSchema, type SignInData } from '../../schemas/auth';
-import Input from '../../components/Input';
-import Button from '../../components/Button';
-import { GoogleSignInButton } from '../../components/GoogleSignInButton';
-import { AppleSignInButton } from '../../components/AppleSignInButton';
+import { useAuth } from '../../hooks';
+import { signInSchema, type SignInData } from '../../schemas';
+import { PressableOpacity, Input, Button, GoogleSignInButton, AppleSignInButton } from '../../components';
 import { useAppDispatch } from '../../store';
 import { setError as setAuthError } from '../../store/slices/authSlice';
-import type { AuthStackParamList } from '../../types/navigation';
+import type { AuthStackParamList } from '../../types';
 
 type Nav = NativeStackNavigationProp<AuthStackParamList, 'SignIn'>;
 

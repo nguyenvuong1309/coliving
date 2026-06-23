@@ -1,18 +1,12 @@
 import React, { useEffect, useMemo } from 'react';
 import { View, Text, FlatList, StyleSheet } from 'react-native';
-import PressableOpacity from '../../../components/PressableOpacity';
+import {PressableOpacity, Card, Avatar, StatusBadge, EmptyState, LoadingOverlay, ScreenWrapper} from '../../../components';
+import {useApartment} from '../../../hooks';
+import {formatCurrency} from '../../../utils';
+import type {LandlordStackParamList} from '../../../types';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import Card from '../../../components/Card';
-import Avatar from '../../../components/Avatar';
-import StatusBadge from '../../../components/StatusBadge';
-import EmptyState from '../../../components/EmptyState';
-import LoadingOverlay from '../../../components/LoadingOverlay';
-import ScreenWrapper from '../../../components/ScreenWrapper';
-import { useApartment } from '../../../hooks/useApartment';
 import { useAppSelector } from '../../../store';
-import { formatCurrency } from '../../../utils/formatters';
-import type { LandlordStackParamList } from '../../../types/navigation';
 
 type NavigationProp = NativeStackNavigationProp<LandlordStackParamList>;
 

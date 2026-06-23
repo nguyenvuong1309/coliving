@@ -1,22 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, Image, StyleSheet, Alert } from 'react-native';
-import PressableOpacity from '../../../components/PressableOpacity';
+import {PressableOpacity, ScreenWrapper, Button, Input, LoadingOverlay} from '../../../components';
 import { useNavigation } from '@react-navigation/native';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { launchImageLibrary } from 'react-native-image-picker';
-import ScreenWrapper from '../../../components/ScreenWrapper';
-import Button from '../../../components/Button';
-import Input from '../../../components/Input';
-import LoadingOverlay from '../../../components/LoadingOverlay';
-import { useAuth } from '../../../hooks/useAuth';
-import { useApartment } from '../../../hooks/useApartment';
+import {useAuth, useApartment} from '../../../hooks';
 import { useAppSelector, useAppDispatch } from '../../../store';
 import { createIssueRequest } from '../../../store/slices/issueSlice';
-import {
-  issueCreateSchema,
-  type IssueCreateFormData,
-} from '../../../schemas/issue';
+import {issueCreateSchema, type IssueCreateFormData} from '../../../schemas';
 
 const CATEGORIES = [
   { value: 'equipment' as const, label: 'Hong hoc' },

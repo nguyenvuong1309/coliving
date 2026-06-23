@@ -3,7 +3,7 @@ import type {
   UtilityConfig,
   UtilityConfigInsert,
   UtilityConfigUpdate,
-} from '../types/database';
+} from '../types';
 import {e2eBackend, isE2EMode} from '../e2e/fakeBackend';
 
 export async function getUtilityConfigs(

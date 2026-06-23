@@ -2,13 +2,12 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useAuth } from '../../hooks/useAuth';
+import { useAuth } from '../../hooks';
 import {
   forgotPasswordSchema,
   type ForgotPasswordData,
-} from '../../schemas/auth';
-import Input from '../../components/Input';
-import Button from '../../components/Button';
+} from '../../schemas';
+import { Input, Button } from '../../components';
 
 export default function ForgotPasswordScreen() {
   const { resetPassword, loading } = useAuth();

@@ -1,5 +1,5 @@
 import {supabase} from '../config/supabase';
-import type {Json, Payment} from '../types/database';
+import type {Json, Payment} from '../types';
 import {e2eBackend, isE2EMode} from '../e2e/fakeBackend';
 
 export interface CreatePaymentRow {

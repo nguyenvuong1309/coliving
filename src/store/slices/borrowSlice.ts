@@ -5,9 +5,9 @@ import {
   createBorrowRequest,
   updateBorrowStatus,
   getBorrowRequest,
-} from '../../services/borrow';
-import {createNotification} from '../../services/notification';
-import type {BorrowRequest, BorrowRequestInsert} from '../../types/database';
+  createNotification,
+} from '../../services';
+import type {BorrowRequest, BorrowRequestInsert} from '../../types';
 
 type BorrowStatus =
   | 'pending'

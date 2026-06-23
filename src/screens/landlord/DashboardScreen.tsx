@@ -1,14 +1,11 @@
 import React, { useEffect, useMemo } from 'react';
 import { View, Text, FlatList, StyleSheet } from 'react-native';
-import PressableOpacity from '../../components/PressableOpacity';
+import {PressableOpacity, Card, Button, LoadingOverlay, ScreenWrapper} from '../../components';
+import {useAuth, useApartment} from '../../hooks';
+import {formatCurrency, formatRelativeTime} from '../../utils';
+import type {LandlordStackParamList, Notification} from '../../types';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import Card from '../../components/Card';
-import Button from '../../components/Button';
-import LoadingOverlay from '../../components/LoadingOverlay';
-import ScreenWrapper from '../../components/ScreenWrapper';
-import { useAuth } from '../../hooks/useAuth';
-import { useApartment } from '../../hooks/useApartment';
 import { useAppSelector, useAppDispatch } from '../../store';
 import { fetchIssuesRequest } from '../../store/slices/issueSlice';
 import {
@@ -19,9 +16,6 @@ import {
   fetchNotificationsRequest,
   markAsReadRequest,
 } from '../../store/slices/notificationSlice';
-import { formatCurrency, formatRelativeTime } from '../../utils/formatters';
-import type { LandlordStackParamList } from '../../types/navigation';
-import type { Notification } from '../../types/database';
 
 type NavigationProp = NativeStackNavigationProp<LandlordStackParamList>;
 

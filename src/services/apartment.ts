@@ -4,7 +4,7 @@ import type {
   ApartmentInsert,
   ApartmentUpdate,
   ApartmentMemberUpdate,
-} from '../types/database';
+} from '../types';
 import { e2eBackend, isE2EMode } from '../e2e/fakeBackend';
 
 const INVITE_CODE_ALPHABET = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';

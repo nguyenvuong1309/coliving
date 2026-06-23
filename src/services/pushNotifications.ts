@@ -4,7 +4,7 @@ import messaging, {
   FirebaseMessagingTypes,
 } from '@react-native-firebase/messaging';
 import notifee, {AndroidImportance} from '@notifee/react-native';
-import {captureException} from '../utils/errorReporting';
+import {captureException} from '../utils';
 
 export const ANDROID_DEFAULT_CHANNEL_ID = 'default';
 

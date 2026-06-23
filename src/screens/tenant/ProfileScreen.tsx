@@ -1,16 +1,11 @@
 import React, { useCallback } from 'react';
 import { View, Text, StyleSheet, Alert } from 'react-native';
-import PressableOpacity from '../../components/PressableOpacity';
+import {PressableOpacity, ScreenWrapper, Avatar, Card, Button} from '../../components';
 import Config from 'react-native-config';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import ScreenWrapper from '../../components/ScreenWrapper';
-import Avatar from '../../components/Avatar';
-import Card from '../../components/Card';
-import Button from '../../components/Button';
-import { useAuth } from '../../hooks/useAuth';
-import { useApartment } from '../../hooks/useApartment';
-import type { TenantStackParamList } from '../../types/navigation';
+import {useAuth, useApartment} from '../../hooks';
+import type {TenantStackParamList} from '../../types';
 
 type NavigationProp = NativeStackNavigationProp<TenantStackParamList>;
 

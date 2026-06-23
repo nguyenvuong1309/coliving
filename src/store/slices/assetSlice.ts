@@ -6,9 +6,10 @@ import {
   createAsset,
   updateAsset,
   deleteAsset,
-} from '../../services/asset';
-import {uploadImage, getImageUrl} from '../../services/storage';
-import type {Asset, AssetInsert, AssetUpdate} from '../../types/database';
+  uploadImage,
+  getImageUrl,
+} from '../../services';
+import type {Asset, AssetInsert, AssetUpdate} from '../../types';
 import type {RootState} from '../index';
 
 interface AssetState {

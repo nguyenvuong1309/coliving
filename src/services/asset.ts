@@ -1,5 +1,5 @@
 import {supabase} from '../config/supabase';
-import type {Asset, AssetInsert, AssetUpdate} from '../types/database';
+import type {Asset, AssetInsert, AssetUpdate} from '../types';
 import {e2eBackend, isE2EMode} from '../e2e/fakeBackend';
 
 export async function getAssets(apartmentId: string): Promise<Asset[]> {

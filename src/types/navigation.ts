@@ -18,6 +18,7 @@ export type TenantTabParamList = {
   BorrowList: undefined;
   IssueList: undefined;
   PaymentHistory: undefined;
+  ExpenseList: undefined;
   Notifications: undefined;
   TenantProfile: undefined;
 };
@@ -44,6 +45,21 @@ export type TenantStackParamList = TenantTabParamList & {
   NotificationSettings: undefined;
   EditProfile: undefined;
   ChangePassword: undefined;
+  // Quỹ chung & chia tiền
+  ExpenseCreate:
+    | {prefill?: import('./ai').ScanReceiptResult}
+    | undefined;
+  ExpenseDetail: {id: string};
+  Balance: undefined;
+  SettleUp: {toUser?: string; amount?: number; settlementId?: string};
+  // Chat căn hộ
+  Chat: undefined;
+  // Việc nhà
+  ChoreBoard: undefined;
+  ChoreCreate: undefined;
+  ChoreLeaderboard: undefined;
+  // Trợ lý AI
+  ReceiptScanner: undefined;
 };
 
 // Landlord stack (tabs + detail screens)

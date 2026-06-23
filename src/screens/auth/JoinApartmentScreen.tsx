@@ -2,13 +2,12 @@ import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useApartment } from '../../hooks/useApartment';
+import { useApartment } from '../../hooks';
 import {
   joinApartmentSchema,
   type JoinApartmentData,
-} from '../../schemas/auth';
-import Input from '../../components/Input';
-import Button from '../../components/Button';
+} from '../../schemas';
+import { Input, Button } from '../../components';
 
 export default function JoinApartmentScreen() {
   const { joinApartment, loading, error } = useApartment();

@@ -1,18 +1,16 @@
 import React, { useEffect, useCallback } from 'react';
 import { View, Text, FlatList, StyleSheet } from 'react-native';
-import PressableOpacity from '../../components/PressableOpacity';
+import {PressableOpacity, EmptyState, LoadingOverlay} from '../../components';
 import { useNavigation } from '@react-navigation/native';
-import EmptyState from '../../components/EmptyState';
-import LoadingOverlay from '../../components/LoadingOverlay';
-import { useAuth } from '../../hooks/useAuth';
+import {useAuth} from '../../hooks';
 import { useAppSelector, useAppDispatch } from '../../store';
 import {
   fetchNotificationsRequest,
   markAsReadRequest,
   markAllAsReadRequest,
 } from '../../store/slices/notificationSlice';
-import { formatRelativeTime } from '../../utils/formatters';
-import type { Notification } from '../../types/database';
+import {formatRelativeTime} from '../../utils';
+import type {Notification} from '../../types';
 
 const TYPE_ICONS: Record<string, string> = {
   payment: '💰',

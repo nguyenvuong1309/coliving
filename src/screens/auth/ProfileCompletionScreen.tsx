@@ -8,7 +8,7 @@ import {
   ScrollView,
   Alert,
 } from 'react-native';
-import PressableOpacity from '../../components/PressableOpacity';
+import { PressableOpacity, Input, Button } from '../../components';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useNavigation } from '@react-navigation/native';
@@ -16,11 +16,9 @@ import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { z } from 'zod';
 import { useAppDispatch, useAppSelector } from '../../store';
 import { setLoading, setError, setUser } from '../../store/slices/authSlice';
-import Input from '../../components/Input';
-import Button from '../../components/Button';
 import { supabase } from '../../config/supabase';
-import { getUserRole, setAuthToken } from '../../utils/mmkv';
-import type { AuthStackParamList } from '../../types/navigation';
+import { getUserRole, setAuthToken } from '../../utils';
+import type { AuthStackParamList } from '../../types';
 
 type Nav = NativeStackNavigationProp<AuthStackParamList, 'ProfileCompletion'>;
 

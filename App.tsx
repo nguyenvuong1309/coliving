@@ -5,7 +5,7 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { Provider } from 'react-redux';
 import { store } from './src/store';
 import RootNavigator from './src/navigation/RootNavigator';
-import ErrorToast from './src/components/ErrorToast';
+import { ErrorToast } from './src/components';
 import { Sentry } from './src/config/sentry';
 
 function App() {

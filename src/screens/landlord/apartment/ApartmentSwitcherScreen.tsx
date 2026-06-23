@@ -2,13 +2,9 @@ import React, {useCallback, useEffect} from 'react';
 import {FlatList, StyleSheet, Text, View} from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import type {NativeStackNavigationProp} from '@react-navigation/native-stack';
-import Card from '../../../components/Card';
-import EmptyState from '../../../components/EmptyState';
-import LoadingOverlay from '../../../components/LoadingOverlay';
-import {useAuth} from '../../../hooks/useAuth';
-import {useApartment} from '../../../hooks/useApartment';
-import type {LandlordStackParamList} from '../../../types/navigation';
-import type {Apartment} from '../../../types/database';
+import {Card, EmptyState, LoadingOverlay} from '../../../components';
+import {useAuth, useApartment} from '../../../hooks';
+import type {LandlordStackParamList, Apartment} from '../../../types';
 
 type NavigationProp = NativeStackNavigationProp<LandlordStackParamList>;
 

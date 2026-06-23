@@ -1,14 +1,12 @@
 import React, {useCallback, useEffect, useState} from 'react';
 import {StyleSheet, Switch, Text, View} from 'react-native';
-import ScreenWrapper from '../../components/ScreenWrapper';
-import Card from '../../components/Card';
-import LoadingOverlay from '../../components/LoadingOverlay';
-import {useAuth} from '../../hooks/useAuth';
+import {ScreenWrapper, Card, LoadingOverlay} from '../../components';
+import {useAuth} from '../../hooks';
 import {
   getNotificationPreference,
   upsertNotificationPreference,
-} from '../../services/deviceToken';
-import type {NotificationPreference} from '../../types/database';
+} from '../../services';
+import type {NotificationPreference} from '../../types';
 
 type ToggleKey =
   | 'push_enabled'

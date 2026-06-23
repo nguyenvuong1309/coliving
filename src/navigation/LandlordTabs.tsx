@@ -6,7 +6,7 @@ import { useAppSelector } from '../store';
 import type {
   LandlordTabParamList,
   LandlordStackParamList,
-} from '../types/navigation';
+} from '../types';
 
 import DashboardScreen from '../screens/landlord/DashboardScreen';
 import TenantListScreen from '../screens/landlord/tenants/TenantListScreen';

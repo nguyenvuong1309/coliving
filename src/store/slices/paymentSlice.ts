@@ -10,10 +10,11 @@ import {
   reportPayment,
   confirmPayment,
   rejectPayment,
-} from '../../services/payment';
-import {createNotification} from '../../services/notification';
-import {uploadImage, getImageUrl} from '../../services/storage';
-import type {BillingPeriod, Json, Payment} from '../../types/database';
+  createNotification,
+  uploadImage,
+  getImageUrl,
+} from '../../services';
+import type {BillingPeriod, Json, Payment} from '../../types';
 import type {RootState} from '../index';
 
 interface PaymentState {

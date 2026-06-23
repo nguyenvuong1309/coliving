@@ -6,7 +6,7 @@ import { useAppSelector } from '../store';
 import type {
   TenantTabParamList,
   TenantStackParamList,
-} from '../types/navigation';
+} from '../types';
 
 import TenantHomeScreen from '../screens/tenant/HomeScreen';
 import BorrowListScreen from '../screens/tenant/borrow/BorrowListScreen';
@@ -24,6 +24,16 @@ import EditProfileScreen from '../screens/shared/EditProfileScreen';
 import ChangePasswordScreen from '../screens/shared/ChangePasswordScreen';
 import NotificationSettingsScreen from '../screens/shared/NotificationSettingsScreen';
 import JoinApartmentScreen from '../screens/auth/JoinApartmentScreen';
+import ExpenseListScreen from '../screens/tenant/expense/ExpenseListScreen';
+import ExpenseCreateScreen from '../screens/tenant/expense/ExpenseCreateScreen';
+import ExpenseDetailScreen from '../screens/tenant/expense/ExpenseDetailScreen';
+import BalanceScreen from '../screens/tenant/expense/BalanceScreen';
+import SettleUpScreen from '../screens/tenant/expense/SettleUpScreen';
+import ChatScreen from '../screens/tenant/chat/ChatScreen';
+import ChoreBoardScreen from '../screens/tenant/chore/ChoreBoardScreen';
+import ChoreCreateScreen from '../screens/tenant/chore/ChoreCreateScreen';
+import ChoreLeaderboardScreen from '../screens/tenant/chore/ChoreLeaderboardScreen';
+import ReceiptScannerScreen from '../screens/tenant/ai/ReceiptScannerScreen';
 
 const Tab = createNativeBottomTabNavigator<TenantTabParamList>();
 const Stack = createNativeStackNavigator<TenantStackParamList>();
@@ -71,6 +81,13 @@ function TenantTabNavigator() {
         component={PaymentHistoryScreen}
         options={{
           tabBarLabel: 'Thanh toán',
+        }}
+      />
+      <Tab.Screen
+        name="ExpenseList"
+        component={ExpenseListScreen}
+        options={{
+          tabBarLabel: 'Quỹ chung',
         }}
       />
       <Tab.Screen
@@ -172,6 +189,51 @@ export default function TenantStack() {
         name="NotificationSettings"
         component={NotificationSettingsScreen}
         options={{ title: 'Cài đặt thông báo' }}
+      />
+      <Stack.Screen
+        name="ExpenseCreate"
+        component={ExpenseCreateScreen}
+        options={{ title: 'Tạo khoản chi' }}
+      />
+      <Stack.Screen
+        name="ExpenseDetail"
+        component={ExpenseDetailScreen}
+        options={{ title: 'Chi tiết khoản chi' }}
+      />
+      <Stack.Screen
+        name="Balance"
+        component={BalanceScreen}
+        options={{ title: 'Số nợ ròng' }}
+      />
+      <Stack.Screen
+        name="SettleUp"
+        component={SettleUpScreen}
+        options={{ title: 'Tất toán' }}
+      />
+      <Stack.Screen
+        name="Chat"
+        component={ChatScreen}
+        options={{ title: 'Thảo luận căn hộ' }}
+      />
+      <Stack.Screen
+        name="ChoreBoard"
+        component={ChoreBoardScreen}
+        options={{ title: 'Việc nhà' }}
+      />
+      <Stack.Screen
+        name="ChoreCreate"
+        component={ChoreCreateScreen}
+        options={{ title: 'Tạo việc nhà' }}
+      />
+      <Stack.Screen
+        name="ChoreLeaderboard"
+        component={ChoreLeaderboardScreen}
+        options={{ title: 'Bảng xếp hạng' }}
+      />
+      <Stack.Screen
+        name="ReceiptScanner"
+        component={ReceiptScannerScreen}
+        options={{ title: 'Quét hóa đơn AI' }}
       />
     </Stack.Navigator>
   );

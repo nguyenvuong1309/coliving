@@ -1,13 +1,10 @@
 import React, {useMemo, useState} from 'react';
 import {StyleSheet, Text, TextInput, View} from 'react-native';
 import Clipboard from '@react-native-clipboard/clipboard';
-import ScreenWrapper from '../../../components/ScreenWrapper';
-import Card from '../../../components/Card';
-import Button from '../../../components/Button';
-import PressableOpacity from '../../../components/PressableOpacity';
-import {useApartment} from '../../../hooks/useApartment';
+import {ScreenWrapper, Card, Button, PressableOpacity} from '../../../components';
+import {useApartment} from '../../../hooks';
+import {formatCurrency} from '../../../utils';
 import {useAppSelector} from '../../../store';
-import {formatCurrency} from '../../../utils/formatters';
 
 type ReportType = 'payments' | 'tenants' | 'issues';
 

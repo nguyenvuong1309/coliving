@@ -1,9 +1,7 @@
 import React from 'react';
 import { View, Text, Share, StyleSheet, Alert } from 'react-native';
 import Clipboard from '@react-native-clipboard/clipboard';
-import ScreenWrapper from '../../../components/ScreenWrapper';
-import Button from '../../../components/Button';
-import Card from '../../../components/Card';
+import {ScreenWrapper, Button, Card} from '../../../components';
 import { useAppSelector } from '../../../store';
 
 const InviteCodeScreen: React.FC = () => {

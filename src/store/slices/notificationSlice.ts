@@ -5,8 +5,8 @@ import {
   markAsRead,
   markAllAsRead,
   getUnreadCount,
-} from '../../services/notification';
-import type {Notification} from '../../types/database';
+} from '../../services';
+import type {Notification} from '../../types';
 
 interface NotificationState {
   notifications: Notification[];
