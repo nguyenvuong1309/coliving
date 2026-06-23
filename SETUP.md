@@ -97,4 +97,4 @@ Kiem tra:
 - [ ] Landlord tao asset → tenant tao yeu cau muon → landlord duyet → tenant tra
 - [ ] Tenant bao cao su co kem 3 anh → upload Storage thanh cong → landlord cap nhat trang thai
 - [ ] Landlord tao billing → tenant bao da tra (kem bien lai) → landlord xac nhan / tu choi
-- [ ] Doi thong tin profile + doi mat khau
+- [ ] Doi thong tin profile + doi mat  khau
